@@ -29,8 +29,8 @@ const products=[
 ];
 let orders=[],catalogReads=0;
 function setup(initialCatalog=null){
- cleanup();localStorage.clear();orders=[];catalogReads=0;
- globalThis.fetch=async(url,options)=>{if(url==='/api/catalog'){catalogReads++;return Response.json({products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}});}assert.equal(url,'/api/checkout');const body=JSON.parse(options.body);orders.push(body);return Response.json({message:'PEDIDO DE PRUEBA — NO CONFIRMAR\nTotal: $200,00',total:200,whatsappUrl:'https://wa.me/5493512136078?text=prueba',requiresCopy:false});};
+ cleanup();localStorage.clear();dom.reconfigure({url:'http://localhost'});orders=[];catalogReads=0;
+ globalThis.fetch=async(url,options)=>{if(url==='/api/catalog'){catalogReads++;return Response.json({products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}});}assert.equal(url,'/api/checkout');const body=JSON.parse(options.body);orders.push(body);return Response.json({message:'PEDIDO DE PRUEBA — NO CONFIRMAR\nTotal: $200,00',total:200,whatsappUrl:'http://localhost/#whatsapp-prueba'});};
  render(<Provider><Store initialCatalog={initialCatalog}/></Provider>);return userEvent.setup({document:dom.window.document});
 }
 test('React/Chakra: búsqueda, orden y categorías',async()=>{
@@ -54,15 +54,15 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
  await screen.findByRole('link',{name:/Ir a mi pedido, 1 presentaciones/});cleanup();
 });
-test('Checkout: datos obligatorios, mensaje de prueba e invalidación al modificar',async()=>{
+test('Checkout: datos obligatorios y redirección directa sin vista previa',async()=>{
  const user=setup();await screen.findByText('3 productos');
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));assert.equal(orders.length,0);
  await user.type(screen.getByLabelText('Tu nombre'),'Ulises');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
- await screen.findByRole('link',{name:'Abrir WhatsApp'});assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
- assert(screen.getByLabelText('Mensaje del pedido').value.includes('PEDIDO DE PRUEBA'));
+ await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
+ assert.equal(screen.queryByLabelText('Mensaje del pedido'),null);assert.equal(screen.queryByRole('button',{name:'Copiar mensaje'}),null);
  await user.type(screen.getByLabelText('Tu nombre'),' Astrada');assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
 });
 test('React/Chakra: tema persistente y detalle de producto',async()=>{
@@ -109,7 +109,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
  await user.click(screen.getByRole('button',{name:'Sumar una presentación de Chalita de harina de centeno y semilla de zapallo'}));
  assert(screen.getByText('$ 530,00',{selector:'.total-row strong'}));
  await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.type(screen.getByLabelText('Localidad'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
- await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));await screen.findByRole('link',{name:'Abrir WhatsApp'});
+ await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));
  assert.equal(orders[0].items.find(i=>i.id==='N002').offerSourceId,'N003');
  await user.click(screen.getByRole('button',{name:'Quitar Té verde',exact:true}));
  assert(screen.getByText('$ 400,00',{selector:'.total-row strong'}));
