@@ -34,10 +34,10 @@ test('Catálogo: precios numéricos, inactivos, IDs duplicados y vacíos',()=>{
  for(const value of ['',0,-1,'7.800,00','foo']) assert.throws(()=>normalizeRows([headers,['A','Item',value,true,'']]));
  assert.throws(()=>normalizeRows([headers,['A','Item',1,true,''],['A','Item',2,true,'']]));
 });
-test('Pedidos largos conservan el mensaje completo para copiar',()=>{
+test('Pedidos largos conservan el mensaje completo en el enlace de WhatsApp',()=>{
  const rows=Array.from({length:50},(_,i)=>({...products[0],id:'P'+i,nombre:'Nombre largo de producto que necesita una presentación completa '+i}));
  const order=makeOrder({items:rows.map(p=>({id:p.id,quantity:1,expectedPrice:p.precio})),name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},rows,settings);
- assert.equal(order.requiresCopy,true);assert.equal(order.whatsappUrl,'https://wa.me/5493512136078');assert.match(order.message,/P49/);
+ assert.equal(new URL(order.whatsappUrl).searchParams.get('text'),order.message);assert.match(order.message,/P49/);
 });
 test('Extracción: 295 IDs, 295 fotos y precios idénticos a transcripción PDF',async()=>{
  const raw=JSON.parse(await readFile(new URL('../data/catalog.json',import.meta.url),'utf8'));
