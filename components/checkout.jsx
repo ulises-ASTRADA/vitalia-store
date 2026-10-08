@@ -1,9 +1,9 @@
 'use client';
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useMemo,useRef,useState} from 'react';
 import NextLink from 'next/link';
 import NextImage from 'next/image';
 import {Button,IconButton,Input,Textarea} from '@chakra-ui/react';
-import {useTheme} from 'next-themes';
+import ThemeToggle from './theme-toggle';
 import {useCart} from './use-cart';
 import CartSuggestions from './cart-suggestions';
 import {getRecommendations} from '../lib/recommendations';
@@ -19,8 +19,7 @@ export default function Checkout({initialCatalog}){
   const {loaded,items,total,savings,acceptOffer,change:changeCart,remove:removeCart}=useCart(products);
   const [customer,setCustomer]=useState({name:'',locality:'',province:'',notes:''});
   const [ready,setReady]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[copied,setCopied]=useState(false);
-  const [mounted,setMounted]=useState(false),{resolvedTheme,setTheme}=useTheme(),message=useRef(null);
-  useEffect(()=>setMounted(true),[]);
+  const message=useRef(null);
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
   const money=n=>formatter.format(n);
   const recommendations=useMemo(()=>getRecommendations(products,items).filter(product=>items.some(item=>!item.offerSourceId&&canOffer(product,item.product))),[products,items]);
@@ -46,9 +45,8 @@ export default function Checkout({initialCatalog}){
   }
   async function copy(){try{await navigator.clipboard.writeText(ready.message);setCopied(true);}catch{message.current?.select();setError('Seleccioná y copiá el mensaje.');}}
   return <>
-    <header className="checkout-header"><Link href="/" className="brand" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" alt="Vitalia · Dietética" width={156} height={100} sizes="156px" loading="eager"/></Link><Link href="/" className="checkout-back">← Volver al catálogo</Link><IconButton unstyled className="theme-toggle" aria-label={mounted&&resolvedTheme==='dark'?'Activar modo claro':'Activar modo oscuro'} onClick={()=>setTheme(resolvedTheme==='dark'?'light':'dark')}>{mounted&&resolvedTheme==='dark'?'☀️':'🌙'}</IconButton></header>
+    <header className="checkout-header"><Link href="/" className="brand" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" alt="Vitalia · Dietética" width={156} height={100} sizes="156px" loading="eager"/></Link><Link href="/" className="checkout-back">← Volver al catálogo</Link><ThemeToggle/></header>
     <main className="checkout-shell"><h1>Tu pedido</h1>
-      {(settings.testCheckout||settings.isPreview)&&<p className="preview-note">Modo de prueba · Preparar el pedido no envía mensajes.</p>}
       {!loaded?<p role="status">Cargando tu pedido…</p>:!items.length?<section className="checkout-empty"><h2>Tu pedido empieza con algo rico.</h2><p>Explorá el catálogo y agregá los productos que te gusten.</p><Link href="/" className="secondary">Explorar productos</Link></section>:
       <form className="checkout-form" onSubmit={checkout}><div className="checkout-layout"><div className="checkout-main">
         <section className="checkout-card" aria-labelledby="items-title"><h2 id="items-title">Productos elegidos</h2>{items.map(({product,quantity,subtotal,savings:lineSavings})=><article className="checkout-line" key={product.id}><CartPhoto product={product}/><div className="checkout-line-info"><h3>{product.nombre}</h3><p>{product.presentacion||'Presentación a confirmar'} · {money(product.precio)} por presentación</p>{lineSavings>0&&<p className="offer-saving">10% en una presentación · Ahorrás {money(lineSavings)}</p>}<div className="checkout-line-actions"><div className="stepper" aria-label={`Cantidad de ${product.nombre}`}><IconButton unstyled type="button" disabled={busy} aria-label={`Quitar una presentación de ${product.nombre}`} onClick={()=>change(product,-1)}>−</IconButton><span aria-live="polite">{quantity}</span><IconButton unstyled type="button" disabled={busy} aria-label={`Sumar una presentación de ${product.nombre}`} onClick={()=>change(product,1)}>+</IconButton></div><span className="offer-prices">{lineSavings>0&&<del>{money(product.precio*quantity)}</del>}<strong>{money(subtotal)}</strong></span><Button unstyled type="button" className="remove-button" disabled={busy} aria-label={`Quitar ${product.nombre}`} onClick={()=>remove(product.id)}>Quitar</Button></div></div></article>)}</section>

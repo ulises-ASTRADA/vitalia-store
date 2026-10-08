@@ -3,17 +3,14 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import NextImage from 'next/image';
 const Image = NextImage.default || NextImage;
 import { Button, IconButton, Input, NativeSelect } from '@chakra-ui/react';
-import { useTheme } from 'next-themes';
+import Icon from './icon';
+import ThemeToggle from './theme-toggle';
 import NextLink from 'next/link';
 const Link=NextLink.default||NextLink;
 import {useCart} from './use-cart';
 import BoxBuilder from './box-builder';
 const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const pack = product => product.presentacion || 'Presentación a confirmar';
-function Icon({name}) {
-  const paths={bag:<><path d="M5 7h14l1 14H4L5 7Z"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/></>,search:<><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></>,sun:<><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></>,moon:<path d="M20.6 13.5A9 9 0 0 1 10.5 3.4a9 9 0 1 0 10.1 10.1Z"/>};
-  return <svg viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>;
-}
 function Photo({product,className='',eager=false,context='card'}) {
   const [broken,setBroken]=useState(false);
   const src=broken?'/images/logo-web.webp':product.imagen||'/images/logo-web.webp';
@@ -34,7 +31,6 @@ export default function Store({initialCatalog=null}) {
   const [products,setProducts]=useState(()=>initialCatalog?.products||[]), [settings,setSettings]=useState(()=>initialCatalog?.settings||{currency:'ARS',checkoutEnabled:false,name:'Vitalia'});
   const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(''),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
   const [detail,setDetail]=useState(null),[help,setHelp]=useState(false),[toast,setToast]=useState('');
-  const [mounted,setMounted]=useState(false),{resolvedTheme,setTheme}=useTheme();
   const header=useRef(null),search=useRef(null);
   const {cart,count,total,loaded,addSelection,change:changeCart}=useCart(products,{catalogReady:status==='ready'});
   const loadCatalog=useCallback(async()=>{
@@ -43,7 +39,6 @@ export default function Store({initialCatalog=null}) {
     catch {setStatus('error');setSettings(s=>({...s,checkoutEnabled:false}));return false;}
   },[]);
   useEffect(()=>{
-    setMounted(true);
     if(!initialCatalog)loadCatalog();
     const observer=new ResizeObserver(()=>document.documentElement.style.setProperty('--header-height',`${header.current?.getBoundingClientRect().height||145}px`));observer.observe(header.current);
     const shortcut=event=>{if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open],[role="dialog"]')){event.preventDefault();search.current?.focus();}};
@@ -61,7 +56,7 @@ export default function Store({initialCatalog=null}) {
     <div className="sticky-header" ref={header}><div className="topbar">VENTA MAYORISTA <span>·</span> Armá tu pedido y coordiná por WhatsApp</div>
       <header className="header"><a className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 112px, 156px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></a>
       <form className="search" role="search" onSubmit={e=>{e.preventDefault();document.getElementById('catalogo').scrollIntoView();}}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={e=>{setQuery(e.target.value);setLimit(24);}}/><kbd>/</kbd></form>
-      <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><IconButton unstyled id="theme-toggle" className="theme-toggle" aria-label={mounted&&resolvedTheme==='dark'?'Activar modo claro':'Activar modo oscuro'} aria-pressed={mounted&&resolvedTheme==='dark'} onClick={()=>setTheme(resolvedTheme==='dark'?'light':'dark')}><span className="theme-sun"><Icon name="sun"/></span><span className="theme-moon"><Icon name="moon"/></span></IconButton></div></header>
+      <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><ThemeToggle id="theme-toggle"/></div></header>
     </div>
     <main className="shell">{(settings.isPreview||settings.testCheckout)&&<div className="preview-note">{settings.checkoutEnabled?'Vista previa: los mensajes de WhatsApp se prepararán como pedidos de prueba.':'Vista previa del catálogo. Los pedidos todavía no están habilitados.'}</div>}
       <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><div className="hero-photos" aria-hidden="true">{['023','002','037'].map((id,i)=><Image key={id} className={`hero-photo photo-${['one','two','three'][i]}`} src={`/images/product-${id}.webp`} width={240} height={250} alt="" sizes="(max-width: 760px) 180px, 240px" loading={i===0?'eager':'lazy'} fetchPriority={i===0?'high':'auto'}/>)}<span className="hero-stamp">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span></div></section>
