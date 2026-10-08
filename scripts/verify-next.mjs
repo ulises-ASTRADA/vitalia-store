@@ -1,0 +1,35 @@
+import {spawn} from 'node:child_process';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const port=Number(process.env.TEST_PORT||3102),base=`http://127.0.0.1:${port}`;
+const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{env:{...process.env,PREVIEW_MODE:'true',ALLOW_TEST_CHECKOUT:'true',WHATSAPP_NUMBER:'5493512136078'},stdio:['ignore','pipe','pipe']});
+try{
+ await new Promise((resolve,reject)=>{server.stdout.on('data',chunk=>{if(String(chunk).includes('Ready'))resolve();});server.stderr.on('data',chunk=>process.stderr.write(chunk));server.on('exit',code=>reject(Error('Servidor terminó: '+code)));setTimeout(()=>reject(Error('Timeout servidor')),10000).unref();});
+ const pageResponse=await fetch(base),html=await pageResponse.text();
+ const manifest=JSON.parse(await readFile('.next/prerender-manifest.json','utf8'));
+ assert.equal(manifest.routes['/'].initialRevalidateSeconds,60);
+ assert.equal(manifest.routes['/checkout'].initialRevalidateSeconds,60);
+ assert(html.includes('href="/checkout"'));
+ assert(!html.includes('class="cart-dialog"'));
+ const checkoutPage=await fetch(base+'/checkout');assert.equal(checkoutPage.status,200);
+ const checkoutHtml=await checkoutPage.text();assert(checkoutHtml.includes('Tu pedido'));assert(checkoutHtml.includes('Volver al catálogo'));
+ assert(!checkoutHtml.includes('CASI LISTO'));
+ assert.match(checkoutPage.headers.get('cache-control'),/s-maxage=60/);
+ assert.match(pageResponse.headers.get('cache-control'),/s-maxage=60/);
+ assert.equal((html.match(/class="product-card"/g)||[]).length,24);
+ assert(html.includes('Pepas proteicas'));
+ assert(html.includes('/_next/image?'));
+ assert(!html.includes('Cargando productos…'));
+ const asset=await fetch(base+'/_next/image?url=%2Fimages%2Fproduct-001.webp&w=384&q=75',{headers:{Accept:'image/webp'}});
+ assert.equal(asset.status,200);assert.equal(asset.headers.get('content-type'),'image/webp');
+ const optimizedBytes=(await asset.arrayBuffer()).byteLength;
+ const originalBytes=(await readFile('public/images/product-001.webp')).byteLength;
+ assert(optimizedBytes<originalBytes);
+ console.log(`Foto N001 a 384px: ${originalBytes} → ${optimizedBytes} bytes`);assert(html.includes('Nuestro catálogo'));assert(html.includes('/_next/'));assert(html.includes('chakra'));
+ const response=await fetch(base+'/api/catalog'),data=await response.json();assert.equal(response.status,200);assert.equal(data.products.length,293);assert(data.settings.testCheckout);
+ const product=data.products[0],body={name:'Prueba local',locality:'Villa Allende',province:'Córdoba',notes:'Verificación sin envío',items:[{id:product.id,quantity:2,expectedPrice:product.precio}]};
+ const post=payload=>fetch(base+'/api/checkout',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify(payload)});
+ const order=await post(body),result=await order.json();assert.equal(order.status,200);assert.equal(result.total,product.precio*2);assert(result.message.includes('PEDIDO DE PRUEBA — NO CONFIRMAR'));assert(result.whatsappUrl.startsWith('https://wa.me/5493512136078'));
+ assert.equal((await post({...body,name:''})).status,400);assert.equal((await post({...body,items:[{...body.items[0],expectedPrice:1}]})).status,409);
+ console.log('Next.js HTTP: /checkout y enlace de pedido, 24 tarjetas en HTML sin JavaScript, ISR 60s, imágenes WebP optimizadas, 293 activos, checkout de prueba, datos obligatorios y precio manipulado verificados. No se abre WhatsApp.');
+}finally{server.kill('SIGTERM');}

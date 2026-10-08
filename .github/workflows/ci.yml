@@ -1,0 +1,45 @@
+name: Vitalia CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vitalia-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Pruebas y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Fixture local para CI. Las previews de Vercel usan la planilla pública.
+      PREVIEW_MODE: 'true'
+      ALLOW_TEST_CHECKOUT: 'true'
+      WHATSAPP_NUMBER: '5493512136078'
+      STORE_NAME: Vitalia
+      STORE_CURRENCY: ARS
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Preparar Node.js 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Probar catálogo, pedidos y boxes
+        run: npm test
+      - name: Probar interfaz y carrito
+        run: npm run test:ui
+      - name: Compilar
+        run: npm run build
+      - name: Verificar servidor compilado
+        run: npm run test:http

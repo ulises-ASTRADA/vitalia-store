@@ -1,0 +1,4587 @@
+[
+  {
+    "id": "N001",
+    "pagina": 1,
+    "nombre_original": "PEPAS PROTEICAS DE ALMENDRA SAVOR BANANA",
+    "precio_original": "$ 16500",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      182.6057586669922,
+      155.11962890625,
+      380.4394836425781
+    ]
+  },
+  {
+    "id": "N002",
+    "pagina": 1,
+    "nombre_original": "Chalitas de almendra a las finas hierbas a base de harina de almendras",
+    "precio_original": "$ 13500",
+    "detalle_original": [
+      "1 kl",
+      "Sésamo negro, romero, albahaca y oregano"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      389.4319763183594,
+      155.11962890625,
+      511.5793151855469
+    ]
+  },
+  {
+    "id": "N003",
+    "pagina": 1,
+    "nombre_original": "Chalitas de almendra",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "SKU : 1kl",
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      520.5717163085938,
+      155.11962890625,
+      642.7190551757812
+    ]
+  },
+  {
+    "id": "N004",
+    "pagina": 1,
+    "nombre_original": "Chalita de harina de centeno y semilla de zapallo",
+    "precio_original": "$ 7000",
+    "detalle_original": [
+      "SKU : 1 kl",
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      651.7114868164062,
+      155.11962890625,
+      773.8588256835938
+    ]
+  },
+  {
+    "id": "N005",
+    "pagina": 2,
+    "nombre_original": "Chalita integral de sesamo y girasol",
+    "precio_original": "$ 7000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96722412109375,
+      155.11962890625,
+      172.11456298828125
+    ]
+  },
+  {
+    "id": "N006",
+    "pagina": 2,
+    "nombre_original": "Chalita de chia",
+    "precio_original": "$ 6500",
+    "detalle_original": [
+      "1 kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.1070556640625,
+      155.11962890625,
+      303.25439453125
+    ]
+  },
+  {
+    "id": "N007",
+    "pagina": 2,
+    "nombre_original": "Chalita multicereal",
+    "precio_original": "$ 6500",
+    "detalle_original": [
+      "SKU : 1 kg",
+      "1 kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2467956542969,
+      155.11962890625,
+      434.3941345214844
+    ]
+  },
+  {
+    "id": "N008",
+    "pagina": 2,
+    "nombre_original": "Cookie de almendra sabor naranja endulzada con miel y stevia",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.38665771484375,
+      155.11962890625,
+      565.5339965820312
+    ]
+  },
+  {
+    "id": "N009",
+    "pagina": 2,
+    "nombre_original": "Chalitas blancas light",
+    "precio_original": "$ 6500",
+    "detalle_original": [
+      "1 kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5263671875,
+      155.11962890625,
+      696.6737060546875
+    ]
+  },
+  {
+    "id": "N010",
+    "pagina": 2,
+    "nombre_original": "Chalita de lino",
+    "precio_original": "$ 6500",
+    "detalle_original": [
+      "1 kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6661987304688,
+      155.11962890625,
+      827.8135375976562
+    ]
+  },
+  {
+    "id": "N011",
+    "pagina": 3,
+    "nombre_original": "Pepas de harina de almendra de frutilla",
+    "precio_original": "$ 15500",
+    "detalle_original": [
+      "1 kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96722412109375,
+      155.11962890625,
+      172.11456298828125
+    ]
+  },
+  {
+    "id": "N012",
+    "pagina": 3,
+    "nombre_original": "Pepas de harina de almendra de membrillo",
+    "precio_original": "$ 14500",
+    "detalle_original": [
+      "1 kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.1070556640625,
+      155.11962890625,
+      303.25439453125
+    ]
+  },
+  {
+    "id": "N013",
+    "pagina": 3,
+    "nombre_original": "Pepas de harina de algarroba con frambuesa",
+    "precio_original": "$ 16000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      315.24432373046875,
+      155.11962890625,
+      437.39166259765625
+    ]
+  },
+  {
+    "id": "N014",
+    "pagina": 3,
+    "nombre_original": "Pepas de harina de coco y almendra relleno de dulce de leche",
+    "precio_original": "$ 16500",
+    "detalle_original": [
+      "SKU : 1kl",
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      446.384033203125,
+      155.11962890625,
+      568.5313720703125
+    ]
+  },
+  {
+    "id": "N015",
+    "pagina": 3,
+    "nombre_original": "Cookie de harina integral y avena sabor naranja endulzada con miel y stevia",
+    "precio_original": "$ 7000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      577.52392578125,
+      155.11962890625,
+      699.6712646484375
+    ]
+  },
+  {
+    "id": "N016",
+    "pagina": 3,
+    "nombre_original": "Cookie de almendra sabor coco endulzada con miel y stevia",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      708.6637573242188,
+      155.11962890625,
+      830.8110961914062
+    ]
+  },
+  {
+    "id": "N017",
+    "pagina": 4,
+    "nombre_original": "Cookie de harina integral y avena sabor coco endulzada con miel y stevia",
+    "precio_original": "$ 7000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N018",
+    "pagina": 4,
+    "nombre_original": "Cookie de harina de centeno con quinoa pop de arándanos endulzada con miel y stevia",
+    "precio_original": "$ 8500",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10671997070312,
+      155.11962890625,
+      303.2540588378906
+    ]
+  },
+  {
+    "id": "N019",
+    "pagina": 4,
+    "nombre_original": "Cookies saludables de avena, arandanos, pasas rubias y durazno.",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "SKU : 1/2 kg",
+      "500 gramos Huevo, avena, harina integral, stevia, arándanos,",
+      "pasas rubias y durazno . Sin harinas refinadas ni azúcar"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2465515136719,
+      155.11962890625,
+      434.3938903808594
+    ]
+  },
+  {
+    "id": "N020",
+    "pagina": 4,
+    "nombre_original": "Cookies saludables de avena con nuez y almendras",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "SKU : 1/2 kg",
+      "500 gramos",
+      "Huevo, avena, harina integral, stevia, almendras y nueces. Sin",
+      "harinas refinadas ni azúcar"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.38641357421875,
+      155.11962890625,
+      565.5337524414062
+    ]
+  },
+  {
+    "id": "N021",
+    "pagina": 4,
+    "nombre_original": "Cookies saludables de pistachos",
+    "precio_original": "$ 9480",
+    "detalle_original": [
+      "500 gramos Harina de almendra harina de pistachos, crocante",
+      "de pistacho, huevo, endulzada con stevia"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N022",
+    "pagina": 4,
+    "nombre_original": "Cookies saludables de avena con chips de chocolate",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "SKU : 1/2 kg",
+      "Huevo, avena, harina integral, azúcar y chips de chocolate. Sin",
+      "harinas refinadas."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6658325195312,
+      155.11962890625,
+      827.8131713867188
+    ]
+  },
+  {
+    "id": "N023",
+    "pagina": 5,
+    "nombre_original": "Mix tropical",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "Banana, ananá, maní, nuez y pasas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96711730957031,
+      155.11962890625,
+      172.1144561767578
+    ]
+  },
+  {
+    "id": "N024",
+    "pagina": 5,
+    "nombre_original": "Mix seco",
+    "precio_original": "$ 8400",
+    "detalle_original": [
+      "Almendra, nueces, castaña, maní, pasa negra y pasa rubia"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10696411132812,
+      155.11962890625,
+      303.2543029785156
+    ]
+  },
+  {
+    "id": "N025",
+    "pagina": 5,
+    "nombre_original": "Mix cervecero",
+    "precio_original": "$ 7000",
+    "detalle_original": [
+      "SKU : 7000",
+      "Maíz frito, maní salado, girasol, maní saborizado, semillas de",
+      "zapallo, garbanzo horneado"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2467956542969,
+      155.11962890625,
+      434.3941345214844
+    ]
+  },
+  {
+    "id": "N026",
+    "pagina": 5,
+    "nombre_original": "Mix patagónico",
+    "precio_original": "$ 16200",
+    "detalle_original": [
+      "Arándanos, semilla de zapallo, maní, almendras, nueces y",
+      "manzana"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.38641357421875,
+      155.11962890625,
+      565.5337524414062
+    ]
+  },
+  {
+    "id": "N027",
+    "pagina": 5,
+    "nombre_original": "Mix europeo",
+    "precio_original": "$ 16200",
+    "detalle_original": [
+      "Almendra, castaña, nueces, avellanas y maní"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N028",
+    "pagina": 5,
+    "nombre_original": "Mix suizo",
+    "precio_original": "$ 15000",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Almendra, arándano, nuez, coco en escama, rocklets, pasa",
+      "rubia, maní sin sal, castaña y chip de chocolate"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6660766601562,
+      155.11962890625,
+      827.8134155273438
+    ]
+  },
+  {
+    "id": "N029",
+    "pagina": 6,
+    "nombre_original": "Mix tropical premium",
+    "precio_original": "$ 12600",
+    "detalle_original": [
+      "SKU : 1KL",
+      "Almendras, anana, chips de banana, nuez y pasas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96734619140625,
+      155.11962890625,
+      172.11468505859375
+    ]
+  },
+  {
+    "id": "N030",
+    "pagina": 6,
+    "nombre_original": "Mix seco premium",
+    "precio_original": "$ 12600",
+    "detalle_original": [
+      "SKU : 1KL",
+      "Nuez blanca, almendras, castañas, mani y pasas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      216.32766723632812,
+      155.11962890625,
+      338.4750061035156
+    ]
+  },
+  {
+    "id": "N031",
+    "pagina": 6,
+    "nombre_original": "Mix Sport",
+    "precio_original": "$ 12600",
+    "detalle_original": [
+      "Banana, almendras, nuez, girasol, pasas, maní, frutas mixtas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      347.4674987792969,
+      155.11962890625,
+      469.6148376464844
+    ]
+  },
+  {
+    "id": "N032",
+    "pagina": 6,
+    "nombre_original": "Mix cervecero premium",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "SKU : 1 kl",
+      "Castañas tostadas saladas, maíz frito, garbanzo, semillas",
+      "girasol y semillas de zapallo"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      478.60736083984375,
+      155.11962890625,
+      600.7546997070312
+    ]
+  },
+  {
+    "id": "N033",
+    "pagina": 6,
+    "nombre_original": "Mix turco",
+    "precio_original": "$ 16200",
+    "detalle_original": [
+      "Almendras, castaña, nueces, pasas rubias y pasas negras"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      609.7471923828125,
+      155.11962890625,
+      731.89453125
+    ]
+  },
+  {
+    "id": "N034",
+    "pagina": 7,
+    "nombre_original": "MIx Navidad",
+    "precio_original": "$ 18000",
+    "detalle_original": [
+      "1kl",
+      "Coco en escamas, rocklets, arándanos, maní con chocolate,",
+      "almendra con chocolate y garrapiñada de maní"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N035",
+    "pagina": 7,
+    "nombre_original": "Mix especial",
+    "precio_original": "$ 25200",
+    "detalle_original": [
+      "SKU : 1 kl",
+      "Nuez, almendra y castaña"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10671997070312,
+      155.11962890625,
+      303.2540588378906
+    ]
+  },
+  {
+    "id": "N036",
+    "pagina": 7,
+    "nombre_original": "Mix desayuno",
+    "precio_original": "$ 8500",
+    "detalle_original": [
+      "Anillos de color, bolitas de chocolate, arroz inflado, pasas de",
+      "uva, chip banana y copos azucarados"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2465515136719,
+      155.11962890625,
+      434.3938903808594
+    ]
+  },
+  {
+    "id": "N037",
+    "pagina": 7,
+    "nombre_original": "Granola tradicional",
+    "precio_original": "$ 6600",
+    "detalle_original": [
+      "Avena, arroz, copos de maíz, mix de semillas, miel, maní y",
+      "coco"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.38641357421875,
+      155.11962890625,
+      565.5337524414062
+    ]
+  },
+  {
+    "id": "N038",
+    "pagina": 7,
+    "nombre_original": "Granola de chocolate \"Nachmil\"",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Avena, arroz inflado, copos ,maní, miel, semillas de lino, cacao",
+      "y chips de chocolate"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N039",
+    "pagina": 7,
+    "nombre_original": "Granola premiun",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "SKU : 1Kg",
+      "Avena, copos, arroz inflado, mix de semillas, maní, semillas de",
+      "zapallo, almendras, nuez, castañas y miel"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6660766601562,
+      155.11962890625,
+      827.8134155273438
+    ]
+  },
+  {
+    "id": "N040",
+    "pagina": 8,
+    "nombre_original": "Granola patagonica",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "SKU : 1 Kg.",
+      "Avena, arroz, copos, mix de semillas, maní, manzana,",
+      "arándanos, coco en escamas, semillas de zapallo y miel."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N041",
+    "pagina": 8,
+    "nombre_original": "Granola tropical",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "Avena, copos, arroz, mix de semillas, ananá, chip de banana,",
+      "coco y miel"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      232.06405639648438,
+      155.11962890625,
+      354.2113952636719
+    ]
+  },
+  {
+    "id": "N042",
+    "pagina": 8,
+    "nombre_original": "Barrita enérgetica chocolate",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "14 unidades Maní, pasas, girasol, nuez, almendra, cacao",
+      "almagro, chips de chocolate y miel"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      363.2038879394531,
+      155.11962890625,
+      485.3512268066406
+    ]
+  },
+  {
+    "id": "N043",
+    "pagina": 8,
+    "nombre_original": "Barritas energéticas de frutos secos",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "14 unidades",
+      "Maní, girasol, pasas de uva rubias y negras, almendras,",
+      "castañas, nuez, miel y coco"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      494.34326171875,
+      155.11962890625,
+      616.4906005859375
+    ]
+  },
+  {
+    "id": "N044",
+    "pagina": 8,
+    "nombre_original": "Barritas energéticas tropical",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "14 unidades",
+      "Maní, girasol, pasas, banana, nuez, ananá, semillas de chia y",
+      "miel"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      625.4830932617188,
+      155.11962890625,
+      747.6304321289062
+    ]
+  },
+  {
+    "id": "N045",
+    "pagina": 9,
+    "nombre_original": "Granola con pasas",
+    "precio_original": "$ 22800",
+    "detalle_original": [
+      "SKU : x 5 kgs",
+      "Por 5kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96734619140625,
+      155.11962890625,
+      212.5806884765625
+    ]
+  },
+  {
+    "id": "N046",
+    "pagina": 9,
+    "nombre_original": "Granola tradicional",
+    "precio_original": "$ 22800",
+    "detalle_original": [
+      "SKU : X 5KG",
+      "Por 5kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      221.57296752929688,
+      155.11962890625,
+      384.1863098144531
+    ]
+  },
+  {
+    "id": "N047",
+    "pagina": 9,
+    "nombre_original": "Semilla de zapallo",
+    "precio_original": "$ 16000",
+    "detalle_original": [
+      "SKU : Semilla de zapallo",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      393.1790771484375,
+      155.11962890625,
+      484.60223388671875
+    ]
+  },
+  {
+    "id": "N048",
+    "pagina": 9,
+    "nombre_original": "Gelatina sin sabor premiun",
+    "precio_original": "$ 27600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      493.5947265625,
+      155.11962890625,
+      585.0178833007812
+    ]
+  },
+  {
+    "id": "N049",
+    "pagina": 9,
+    "nombre_original": "Crocante de pistacho azucarados",
+    "precio_original": "$ 18000",
+    "detalle_original": [
+      "Por 250g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      594.01025390625,
+      155.11962890625,
+      722.152587890625
+    ]
+  },
+  {
+    "id": "N050",
+    "pagina": 9,
+    "nombre_original": "Harina de pistacho 100% pura con azucar",
+    "precio_original": "$ 42000",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      731.14501953125,
+      155.11962890625,
+      822.5681762695312
+    ]
+  },
+  {
+    "id": "N051",
+    "pagina": 10,
+    "nombre_original": "Hibiscus en flor",
+    "precio_original": "$ 11400",
+    "detalle_original": [
+      "SKU : medio kl",
+      "Por 500g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96733856201172,
+      155.11962890625,
+      141.3905029296875
+    ]
+  },
+  {
+    "id": "N052",
+    "pagina": 10,
+    "nombre_original": "Castañas",
+    "precio_original": "$ 21600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      232.06407165527344,
+      155.11962890625,
+      291.2643127441406
+    ]
+  },
+  {
+    "id": "N053",
+    "pagina": 10,
+    "nombre_original": "Almendra marinada chica",
+    "precio_original": "$ 22800",
+    "detalle_original": [
+      "SKU : 1 kg",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      300.25689697265625,
+      155.11962890625,
+      391.6800537109375
+    ]
+  },
+  {
+    "id": "N054",
+    "pagina": 10,
+    "nombre_original": "Nuez extra light",
+    "precio_original": "$ 20400",
+    "detalle_original": [
+      "SKU : 1 kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      400.6724853515625,
+      155.11962890625,
+      522.81982421875
+    ]
+  },
+  {
+    "id": "N055",
+    "pagina": 10,
+    "nombre_original": "Maní saborizado",
+    "precio_original": "$ 4100",
+    "detalle_original": [
+      "Por 1kg",
+      "Pizza o jamon"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      531.8123168945312,
+      155.11962890625,
+      668.9470825195312
+    ]
+  },
+  {
+    "id": "N056",
+    "pagina": 11,
+    "nombre_original": "Maní con cascara",
+    "precio_original": "$ 4500",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      212.58021545410156
+    ]
+  },
+  {
+    "id": "N057",
+    "pagina": 11,
+    "nombre_original": "Maní tostado salado",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      221.57345581054688,
+      155.11962890625,
+      312.9966125488281
+    ]
+  },
+  {
+    "id": "N058",
+    "pagina": 11,
+    "nombre_original": "Pistacho salado con cascara",
+    "precio_original": "$ 42000",
+    "detalle_original": [
+      "SKU : ×1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      321.98907470703125,
+      155.11962890625,
+      382.68804931640625
+    ]
+  },
+  {
+    "id": "N059",
+    "pagina": 11,
+    "nombre_original": "Maíz frito clasico",
+    "precio_original": "$ 13200",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      391.6800231933594,
+      155.11962890625,
+      483.1031799316406
+    ]
+  },
+  {
+    "id": "N060",
+    "pagina": 11,
+    "nombre_original": "Maíz frito barbacoa",
+    "precio_original": "$ 13200",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      492.0955810546875,
+      155.11962890625,
+      629.2303466796875
+    ]
+  },
+  {
+    "id": "N061",
+    "pagina": 11,
+    "nombre_original": "Garbanzos tostados picante",
+    "precio_original": "$ 7700",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      638.2228393554688,
+      155.11962890625,
+      800.836181640625
+    ]
+  },
+  {
+    "id": "N062",
+    "pagina": 12,
+    "nombre_original": "Garbanzos horneados jamón",
+    "precio_original": "$ 7700",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      212.58021545410156
+    ]
+  },
+  {
+    "id": "N063",
+    "pagina": 12,
+    "nombre_original": "Maní sin sal",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      221.572509765625,
+      155.11962890625,
+      312.99566650390625
+    ]
+  },
+  {
+    "id": "N064",
+    "pagina": 12,
+    "nombre_original": "Pasas de uva rubias",
+    "precio_original": "$ 10440",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      321.9881286621094,
+      155.11962890625,
+      373.6946716308594
+    ]
+  },
+  {
+    "id": "N065",
+    "pagina": 12,
+    "nombre_original": "Pasas de uva",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "Por 1kg",
+      "Sin semillas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      382.6874694824219,
+      155.11962890625,
+      469.6144104003906
+    ]
+  },
+  {
+    "id": "N066",
+    "pagina": 12,
+    "nombre_original": "Chip de banana",
+    "precio_original": "$ 16800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      478.60687255859375,
+      155.11962890625,
+      530.3134155273438
+    ]
+  },
+  {
+    "id": "N067",
+    "pagina": 12,
+    "nombre_original": "Ananá de colores",
+    "precio_original": "$ 16800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      539.3052978515625,
+      155.11962890625,
+      630.7284545898438
+    ]
+  },
+  {
+    "id": "N068",
+    "pagina": 12,
+    "nombre_original": "Arandanos rojos",
+    "precio_original": "$ 19800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      639.7208862304688,
+      155.11962890625,
+      700.4198608398438
+    ]
+  },
+  {
+    "id": "N069",
+    "pagina": 12,
+    "nombre_original": "Higos",
+    "precio_original": "$ 10800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      709.4127807617188,
+      155.11962890625,
+      778.3548583984375
+    ]
+  },
+  {
+    "id": "N070",
+    "pagina": 13,
+    "nombre_original": "Ciruelas",
+    "precio_original": "$ 10600",
+    "detalle_original": [
+      "Por 1kg",
+      "Sin carozo"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.965938568115234,
+      155.11962890625,
+      112.91303253173828
+    ]
+  },
+  {
+    "id": "N071",
+    "pagina": 13,
+    "nombre_original": "Mix de frutas disecadas",
+    "precio_original": "$ 12800",
+    "detalle_original": [
+      "SKU : durazno pera damasco ciruela",
+      "Durazno, peras, ciruela y damascos.",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      121.90593719482422,
+      155.11962890625,
+      213.3291015625
+    ]
+  },
+  {
+    "id": "N072",
+    "pagina": 13,
+    "nombre_original": "Durazno pelon",
+    "precio_original": "$ 14100",
+    "detalle_original": [
+      "Por 1kg",
+      "Con carozo"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      222.32154846191406,
+      155.11962890625,
+      274.7774658203125
+    ]
+  },
+  {
+    "id": "N073",
+    "pagina": 13,
+    "nombre_original": "Datiles",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "SKU : *kl",
+      "Por 1kg",
+      "Con carozo"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      292.01251220703125,
+      155.11962890625,
+      383.4356689453125
+    ]
+  },
+  {
+    "id": "N074",
+    "pagina": 13,
+    "nombre_original": "Durazno orejón",
+    "precio_original": "$ 18000",
+    "detalle_original": [
+      "Por 1kg",
+      "Sin carozo"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      392.4281311035156,
+      155.11962890625,
+      483.8512878417969
+    ]
+  },
+  {
+    "id": "N075",
+    "pagina": 13,
+    "nombre_original": "Semilla de chia",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      492.84375,
+      155.11962890625,
+      553.542724609375
+    ]
+  },
+  {
+    "id": "N076",
+    "pagina": 13,
+    "nombre_original": "Sésamo blanco",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      562.5355834960938,
+      155.11962890625,
+      623.2345581054688
+    ]
+  },
+  {
+    "id": "N077",
+    "pagina": 13,
+    "nombre_original": "Semilla de quinoa boliviana",
+    "precio_original": "$ 9400",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      632.2265014648438,
+      155.11962890625,
+      769.3612670898438
+    ]
+  },
+  {
+    "id": "N078",
+    "pagina": 14,
+    "nombre_original": "Semilla girasol pelado",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.966880798339844,
+      155.11962890625,
+      141.39004516601562
+    ]
+  },
+  {
+    "id": "N079",
+    "pagina": 14,
+    "nombre_original": "Mix de semillas",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "Lino, chía, sésamo y girasol",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      150.38250732421875,
+      155.11962890625,
+      202.08905029296875
+    ]
+  },
+  {
+    "id": "N080",
+    "pagina": 14,
+    "nombre_original": "Sésamo Integral",
+    "precio_original": "$ 3840",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      220.0734100341797,
+      155.11962890625,
+      357.2081604003906
+    ]
+  },
+  {
+    "id": "N081",
+    "pagina": 14,
+    "nombre_original": "Semilla lino",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      366.2005920410156,
+      155.11962890625,
+      417.15777587890625
+    ]
+  },
+  {
+    "id": "N082",
+    "pagina": 14,
+    "nombre_original": "Coco rallado premium",
+    "precio_original": "$ 9600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      426.1500244140625,
+      155.11962890625,
+      517.5731811523438
+    ]
+  },
+  {
+    "id": "N083",
+    "pagina": 14,
+    "nombre_original": "Cacao amargo primera calidad",
+    "precio_original": "$ 16200",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      526.5656127929688,
+      155.11962890625,
+      587.2645874023438
+    ]
+  },
+  {
+    "id": "N084",
+    "pagina": 14,
+    "nombre_original": "Azúcar impalpable",
+    "precio_original": "$ 2400",
+    "detalle_original": [
+      "SKU : x1 kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      596.2575073242188,
+      155.11962890625,
+      687.6806640625
+    ]
+  },
+  {
+    "id": "N085",
+    "pagina": 15,
+    "nombre_original": "Azúcar mascabo",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.9659423828125,
+      155.11962890625,
+      187.10069274902344
+    ]
+  },
+  {
+    "id": "N086",
+    "pagina": 15,
+    "nombre_original": "Café tostado en grano Lagoa",
+    "precio_original": "$ 13800",
+    "detalle_original": [
+      "Por 250g",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      196.09310913085938,
+      155.11962890625,
+      399.17242431640625
+    ]
+  },
+  {
+    "id": "N087",
+    "pagina": 15,
+    "nombre_original": "Café tostada molido italiano Lagoa",
+    "precio_original": "$ 10000",
+    "detalle_original": [
+      "Por 250g",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      408.16497802734375,
+      155.11962890625,
+      530.3123168945312
+    ]
+  },
+  {
+    "id": "N088",
+    "pagina": 15,
+    "nombre_original": "Cafe tostada molido origen Colombia",
+    "precio_original": "$ 13800",
+    "detalle_original": [
+      "250g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      539.3043823242188,
+      155.11962890625,
+      661.4517211914062
+    ]
+  },
+  {
+    "id": "N089",
+    "pagina": 15,
+    "nombre_original": "Goma xantica",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "Por 100g en pote"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      670.4447021484375,
+      155.11962890625,
+      761.8678588867188
+    ]
+  },
+  {
+    "id": "N090",
+    "pagina": 16,
+    "nombre_original": "Goma Xantica",
+    "precio_original": "$ 28800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687698364258,
+      155.11962890625,
+      110.66586303710938
+    ]
+  },
+  {
+    "id": "N091",
+    "pagina": 16,
+    "nombre_original": "Sal rosada del himalaya",
+    "precio_original": "$ 3120",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      119.65779113769531,
+      155.11962890625,
+      256.79254150390625
+    ]
+  },
+  {
+    "id": "N092",
+    "pagina": 16,
+    "nombre_original": "Polvo de hornear primera calidad",
+    "precio_original": "$ 10800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      265.78497314453125,
+      155.11962890625,
+      402.91973876953125
+    ]
+  },
+  {
+    "id": "N093",
+    "pagina": 16,
+    "nombre_original": "Avena instantánea",
+    "precio_original": "$ 2400",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      411.9122009277344,
+      155.11962890625,
+      503.3353576660156
+    ]
+  },
+  {
+    "id": "N094",
+    "pagina": 16,
+    "nombre_original": "Soja texturizada",
+    "precio_original": "$ 3000",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      512.3278198242188,
+      155.11962890625,
+      577.5230102539062
+    ]
+  },
+  {
+    "id": "N095",
+    "pagina": 16,
+    "nombre_original": "Sal marina",
+    "precio_original": "$ 4920",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      586.515869140625,
+      155.11962890625,
+      641.2199096679688
+    ]
+  },
+  {
+    "id": "N096",
+    "pagina": 16,
+    "nombre_original": "Romero",
+    "precio_original": "$ 14000",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      656.2069091796875,
+      155.11962890625,
+      747.6300659179688
+    ]
+  },
+  {
+    "id": "N097",
+    "pagina": 16,
+    "nombre_original": "Tomillo",
+    "precio_original": "$ 11800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      756.6224975585938,
+      155.11962890625,
+      818.0708618164062
+    ]
+  },
+  {
+    "id": "N098",
+    "pagina": 17,
+    "nombre_original": "Oregano",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      118.908935546875
+    ]
+  },
+  {
+    "id": "N099",
+    "pagina": 17,
+    "nombre_original": "Pimienta blanca molida",
+    "precio_original": "$ 25200",
+    "detalle_original": [
+      "SKU : x 1 kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      245.55282592773438,
+      155.11962890625,
+      336.9759826660156
+    ]
+  },
+  {
+    "id": "N100",
+    "pagina": 17,
+    "nombre_original": "Pimienta negra molida",
+    "precio_original": "$ 18800",
+    "detalle_original": [
+      "SKU : x 1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      345.96844482421875,
+      155.11962890625,
+      437.3916015625
+    ]
+  },
+  {
+    "id": "N101",
+    "pagina": 17,
+    "nombre_original": "Curcuma",
+    "precio_original": "$ 15000",
+    "detalle_original": [
+      "SKU : x 1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      446.384033203125,
+      155.11962890625,
+      514.5767211914062
+    ]
+  },
+  {
+    "id": "N102",
+    "pagina": 17,
+    "nombre_original": "Pimenton",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "SKU : *1,kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      523.5684204101562,
+      155.11962890625,
+      614.9915771484375
+    ]
+  },
+  {
+    "id": "N103",
+    "pagina": 17,
+    "nombre_original": "Provenzal",
+    "precio_original": "$ 6400",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      623.9840698242188,
+      155.11962890625,
+      715.4072265625
+    ]
+  },
+  {
+    "id": "N104",
+    "pagina": 17,
+    "nombre_original": "Clavo de olor pedunculo",
+    "precio_original": "$ 22800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      724.3997192382812,
+      155.11962890625,
+      815.8228759765625
+    ]
+  },
+  {
+    "id": "N105",
+    "pagina": 18,
+    "nombre_original": "Canela en polvo",
+    "precio_original": "$ 16200",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      106.91899871826172
+    ]
+  },
+  {
+    "id": "N106",
+    "pagina": 18,
+    "nombre_original": "Ají molido",
+    "precio_original": "$ 9400",
+    "detalle_original": [
+      "SKU : x 1 kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      192.34779357910156,
+      155.11962890625,
+      261.28985595703125
+    ]
+  },
+  {
+    "id": "N107",
+    "pagina": 18,
+    "nombre_original": "Condimento para pizza",
+    "precio_original": "$ 7000",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      270.2821960449219,
+      155.11962890625,
+      361.7053527832031
+    ]
+  },
+  {
+    "id": "N108",
+    "pagina": 18,
+    "nombre_original": "Vitamina \"C\" (ácido ascorbico)",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "SKU : x100grs",
+      "Por 100g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      370.69781494140625,
+      155.11962890625,
+      492.84515380859375
+    ]
+  },
+  {
+    "id": "N109",
+    "pagina": 18,
+    "nombre_original": "Hongo adaptógeno \"Cola de Pavo\" Sintropia",
+    "precio_original": "$ 39600",
+    "detalle_original": [
+      "SKU : x50ml.",
+      "Cola Pavo: Fortalece y modula el sistema inmunológico. Se",
+      "destaca su capacidad para acompañar tratamientos",
+      "oncológicos.",
+      "Por 50ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      501.837158203125,
+      155.11962890625,
+      623.9844970703125
+    ]
+  },
+  {
+    "id": "N110",
+    "pagina": 18,
+    "nombre_original": "Tónico Herbal",
+    "precio_original": "$ 37200",
+    "detalle_original": [
+      "SKU : 100ml",
+      "Por 100ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      634.4756469726562,
+      155.11962890625,
+      749.1292724609375
+    ]
+  },
+  {
+    "id": "N111",
+    "pagina": 19,
+    "nombre_original": "Hongo Adaptógeno \"Reishi\" Sintropia",
+    "precio_original": "$ 39600",
+    "detalle_original": [
+      "SKU : 50ml",
+      "Fortalece el sistema inmunológico.",
+      "Mejora la calidad del sueño.",
+      "Antiflamatorio.",
+      "Hepatoprotector.",
+      "Adaptógeno.",
+      "Antioxidante.",
+      "Por 50ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N112",
+    "pagina": 19,
+    "nombre_original": "Hongo Adaptógeno \"Cordyceps\" Sintropia",
+    "precio_original": "$ 39600",
+    "detalle_original": [
+      "SKU : 50ml",
+      "Aumenta la resistencia física.",
+      "Proporciona energía y combate la fatiga.",
+      "Antiinflamatorio.",
+      "Mejora la salud cardiovascular.",
+      "Antioxidante.",
+      "Adaptogeno.",
+      "Por 50ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      246.3018798828125,
+      155.11962890625,
+      368.44921875
+    ]
+  },
+  {
+    "id": "N113",
+    "pagina": 19,
+    "nombre_original": "Hongo Adaptógeno \"Melena de León\" Sintropia",
+    "precio_original": "$ 39600",
+    "detalle_original": [
+      "SKU : 50ml.",
+      "Mejora la función cognitiva. Fortalece el sistema inmunológico.",
+      "Probiótico.",
+      "Promueve la neurogénesis.",
+      "Antiflamatorio.",
+      "Adaptógeno.",
+      "Por 50ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      426.15093994140625,
+      155.11962890625,
+      548.2982788085938
+    ]
+  },
+  {
+    "id": "N114",
+    "pagina": 19,
+    "nombre_original": "Fusilli de trigo sarraceno integral",
+    "precio_original": "$ 2520",
+    "detalle_original": [
+      "Por 250g",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      590.2621459960938,
+      155.11962890625,
+      712.4094848632812
+    ]
+  },
+  {
+    "id": "N115",
+    "pagina": 20,
+    "nombre_original": "Premezcla a base de trigo sarraceno integral",
+    "precio_original": "$ 6960",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N116",
+    "pagina": 20,
+    "nombre_original": "Premezcla universal",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "SKU : 1kl",
+      "Por 1kg",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.107177734375,
+      155.11962890625,
+      303.2545166015625
+    ]
+  },
+  {
+    "id": "N117",
+    "pagina": 20,
+    "nombre_original": "Premezcla bizcochuelo, budines, grisines y galletas citrico",
+    "precio_original": "$ 3960",
+    "detalle_original": [
+      "Por 500g",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2465515136719,
+      155.11962890625,
+      434.3938903808594
+    ]
+  },
+  {
+    "id": "N118",
+    "pagina": 20,
+    "nombre_original": "Premezcla para bizcochuelo y muffins",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "SKU : 500 Grs",
+      "Por 500g",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.38592529296875,
+      155.11962890625,
+      565.5332641601562
+    ]
+  },
+  {
+    "id": "N119",
+    "pagina": 20,
+    "nombre_original": "Premezcla para panes y pizzas",
+    "precio_original": "$ 3360",
+    "detalle_original": [
+      "SKU : 500 Ges",
+      "Por 500g",
+      "Sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5271606445312,
+      155.11962890625,
+      696.6744995117188
+    ]
+  },
+  {
+    "id": "N120",
+    "pagina": 20,
+    "nombre_original": "Dulce leche sin fructosa sin azucar endulzado con stevia",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "SKU : 5500",
+      "Por 400g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6665649414062,
+      155.11962890625,
+      827.8139038085938
+    ]
+  },
+  {
+    "id": "N121",
+    "pagina": 21,
+    "nombre_original": "Dulce de leche vegano sin azucar endulzado con stevia",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "Por 400g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96874237060547,
+      155.11962890625,
+      172.1160888671875
+    ]
+  },
+  {
+    "id": "N122",
+    "pagina": 21,
+    "nombre_original": "Dulce de leche endulzado con stevia",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "Por 400G"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      184.10626220703125,
+      155.11962890625,
+      306.25360107421875
+    ]
+  },
+  {
+    "id": "N123",
+    "pagina": 21,
+    "nombre_original": "Dulce de leche proteico endulzado con stevia",
+    "precio_original": "$ 8700",
+    "detalle_original": [
+      "Por 400g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      315.24560546875,
+      155.11962890625,
+      437.3929443359375
+    ]
+  },
+  {
+    "id": "N124",
+    "pagina": 21,
+    "nombre_original": "Aceite de coco neutro",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "SKU : x200",
+      "Por 200cc",
+      "Entrenuts"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      446.385009765625,
+      155.11962890625,
+      568.5323486328125
+    ]
+  },
+  {
+    "id": "N125",
+    "pagina": 21,
+    "nombre_original": "Aceite de coco Neutro",
+    "precio_original": "$ 7500",
+    "detalle_original": [
+      "SKU : x360cc",
+      "Por 360cc",
+      "Entrenuts"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      577.5243530273438,
+      155.11962890625,
+      699.6716918945312
+    ]
+  },
+  {
+    "id": "N126",
+    "pagina": 21,
+    "nombre_original": "Aceite de coco virgen",
+    "precio_original": "$ 8700",
+    "detalle_original": [
+      "Por 200cc",
+      "Entrenuts"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      708.6655883789062,
+      155.11962890625,
+      830.8129272460938
+    ]
+  },
+  {
+    "id": "N127",
+    "pagina": 22,
+    "nombre_original": "Aceite de coco virgen",
+    "precio_original": "$ 14100",
+    "detalle_original": [
+      "SKU : x 360",
+      "Por 360cc",
+      "Entrenuts"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N128",
+    "pagina": 22,
+    "nombre_original": "Salsa a base de soja Sante",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "Por 500cc"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10626220703125,
+      155.11962890625,
+      303.25360107421875
+    ]
+  },
+  {
+    "id": "N129",
+    "pagina": 22,
+    "nombre_original": "Salsa a base de soja Sante",
+    "precio_original": "$ 8700",
+    "detalle_original": [
+      "SKU : 1 ltritro",
+      "Por 1l"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24560546875,
+      155.11962890625,
+      434.3929443359375
+    ]
+  },
+  {
+    "id": "N130",
+    "pagina": 22,
+    "nombre_original": "Chocolate alpino para moldear semiamargo",
+    "precio_original": "$ 15600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N131",
+    "pagina": 22,
+    "nombre_original": "Chips de chocolate Alpino semi amargo",
+    "precio_original": "$ 14000",
+    "detalle_original": [
+      "SKU : ×1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N132",
+    "pagina": 22,
+    "nombre_original": "Maní con chocolate premiun",
+    "precio_original": "$ 26400",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6655883789062,
+      155.11962890625,
+      800.8356323242188
+    ]
+  },
+  {
+    "id": "N133",
+    "pagina": 23,
+    "nombre_original": "Almendras con chocolate",
+    "precio_original": "$ 46100",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.966880798339844,
+      155.11962890625,
+      141.39004516601562
+    ]
+  },
+  {
+    "id": "N134",
+    "pagina": 23,
+    "nombre_original": "Almendras con chocolate blanco",
+    "precio_original": "$ 44000",
+    "detalle_original": [
+      "SKU : *1kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      150.38250732421875,
+      155.11962890625,
+      239.55755615234375
+    ]
+  },
+  {
+    "id": "N135",
+    "pagina": 23,
+    "nombre_original": "Pasas de uva con chocolate",
+    "precio_original": "$ 33600",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      248.5500030517578,
+      155.11962890625,
+      309.2489929199219
+    ]
+  },
+  {
+    "id": "N136",
+    "pagina": 23,
+    "nombre_original": "Almendras non parell grande",
+    "precio_original": "$ 26400",
+    "detalle_original": [
+      "SKU : 1 kg",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      318.24188232421875,
+      155.11962890625,
+      420.90557861328125
+    ]
+  },
+  {
+    "id": "N137",
+    "pagina": 23,
+    "nombre_original": "Aceituna verdes en salmuera en frasco de vidrio",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "SKU : 380grs",
+      "Por 380g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      429.89813232421875,
+      155.11962890625,
+      552.0454711914062
+    ]
+  },
+  {
+    "id": "N138",
+    "pagina": 23,
+    "nombre_original": "Aceite oliva virgen extra primer prensado",
+    "precio_original": "$ 27600",
+    "detalle_original": [
+      "Por 2l"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      561.0374755859375,
+      155.11962890625,
+      683.184814453125
+    ]
+  },
+  {
+    "id": "N139",
+    "pagina": 23,
+    "nombre_original": "Aceite oliva virgen extra primer prensado",
+    "precio_original": "$ 9400",
+    "detalle_original": [
+      "Por 500 cc"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      692.1768798828125,
+      155.11962890625,
+      814.32421875
+    ]
+  },
+  {
+    "id": "N140",
+    "pagina": 24,
+    "nombre_original": "Vinagre orgánico de manzana",
+    "precio_original": "$ 6000",
+    "detalle_original": [
+      "Por 250cc"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N141",
+    "pagina": 24,
+    "nombre_original": "Aceite oliva virgen extra",
+    "precio_original": "$ 6000",
+    "detalle_original": [
+      "250 cc."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10812377929688,
+      155.11962890625,
+      303.2554626464844
+    ]
+  },
+  {
+    "id": "N142",
+    "pagina": 24,
+    "nombre_original": "Aceto Balsamico",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "Por 250cc"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24749755859375,
+      155.11962890625,
+      434.39483642578125
+    ]
+  },
+  {
+    "id": "N143",
+    "pagina": 24,
+    "nombre_original": "Aceitunas Griegas aceitunas negras tipo griega en aceite de oliva virgen",
+    "precio_original": "$ 6000",
+    "detalle_original": [
+      "500g."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N144",
+    "pagina": 24,
+    "nombre_original": "Pastas de Aceitunas negras condimentadas",
+    "precio_original": "$ 4800",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N145",
+    "pagina": 24,
+    "nombre_original": "Pasta de aceituna verdes condimentadas",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "200g."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.66748046875,
+      155.11962890625,
+      827.8148193359375
+    ]
+  },
+  {
+    "id": "N146",
+    "pagina": 25,
+    "nombre_original": "Extracto de Vainilla \"El Castillo\"",
+    "precio_original": "$ 8400",
+    "detalle_original": [
+      "SKU : x100 cm3",
+      "Por 100cm3"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N147",
+    "pagina": 25,
+    "nombre_original": "Extracto de Vainilla \"El Castillo\"",
+    "precio_original": "$ 5700",
+    "detalle_original": [
+      "SKU : x30cm3",
+      "Por 30cm3"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10626220703125,
+      155.11962890625,
+      303.25360107421875
+    ]
+  },
+  {
+    "id": "N148",
+    "pagina": 25,
+    "nombre_original": "Babaganush de berenjena",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "Por 170g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24560546875,
+      155.11962890625,
+      434.3929443359375
+    ]
+  },
+  {
+    "id": "N149",
+    "pagina": 25,
+    "nombre_original": "Hummus de garbanzo con ajo negro",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "SKU : 170G",
+      "Por 170g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.385009765625,
+      155.11962890625,
+      565.5323486328125
+    ]
+  },
+  {
+    "id": "N150",
+    "pagina": 25,
+    "nombre_original": "Hummus de garbanzo con aceite de sesamo",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "Por 170g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N151",
+    "pagina": 25,
+    "nombre_original": "Hummus de garbanzo ahumado",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "Por 170g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6655883789062,
+      155.11962890625,
+      827.8129272460938
+    ]
+  },
+  {
+    "id": "N152",
+    "pagina": 26,
+    "nombre_original": "Hummus de garbanzo remolacha asadas",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "170 g."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N153",
+    "pagina": 26,
+    "nombre_original": "Snack de garbanzos \"Hot\"",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : x100grs",
+      "Por 100grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10626220703125,
+      155.11962890625,
+      303.25360107421875
+    ]
+  },
+  {
+    "id": "N154",
+    "pagina": 26,
+    "nombre_original": "Snack de garbanzos \"sabor jamón\"",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : x100grs",
+      "Por 100grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24560546875,
+      155.11962890625,
+      434.3929443359375
+    ]
+  },
+  {
+    "id": "N155",
+    "pagina": 26,
+    "nombre_original": "Snack de garbanzos \"sabor queso\"",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : x100grs",
+      "Por 100grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N156",
+    "pagina": 26,
+    "nombre_original": "Snack de garbanzos \"sabor original\"",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : x100grs",
+      "Por 100grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N157",
+    "pagina": 27,
+    "nombre_original": "Snack de garbanzos \"sabor ciboulette\"",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : x100grs",
+      "Por 100grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N158",
+    "pagina": 27,
+    "nombre_original": "Moringa",
+    "precio_original": "$ 1100",
+    "detalle_original": [
+      "Por 90g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      216.328125,
+      155.11962890625,
+      338.4754638671875
+    ]
+  },
+  {
+    "id": "N159",
+    "pagina": 27,
+    "nombre_original": "Cartílago de tiburón",
+    "precio_original": "$ 1100",
+    "detalle_original": [
+      "Por 90g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      347.4674987792969,
+      155.11962890625,
+      469.6148376464844
+    ]
+  },
+  {
+    "id": "N160",
+    "pagina": 27,
+    "nombre_original": "Calcio",
+    "precio_original": "$ 1100",
+    "detalle_original": [
+      "Por 90g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      478.60687255859375,
+      155.11962890625,
+      600.7542114257812
+    ]
+  },
+  {
+    "id": "N161",
+    "pagina": 27,
+    "nombre_original": "Harina de coca",
+    "precio_original": "$ 1100",
+    "detalle_original": [
+      "Por 90g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      609.7462158203125,
+      155.11962890625,
+      812.8255615234375
+    ]
+  },
+  {
+    "id": "N162",
+    "pagina": 28,
+    "nombre_original": "Colágeno hidrolizado",
+    "precio_original": "$ 1100",
+    "detalle_original": [
+      "Por 90g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96686553955078,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N163",
+    "pagina": 28,
+    "nombre_original": "Maca roja peruana",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : x90grs",
+      "Aumenta la circulación cerebral. Regulador hormonal a todos",
+      "los niveles. Fortalece el cabello y los huesos.",
+      "Por 90g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10812377929688,
+      155.11962890625,
+      303.2554626464844
+    ]
+  },
+  {
+    "id": "N164",
+    "pagina": 28,
+    "nombre_original": "Maca negra",
+    "precio_original": "$ 2100",
+    "detalle_original": [
+      "SKU : ×160",
+      "Complemento nutricional",
+      "Por 160g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24749755859375,
+      155.11962890625,
+      434.39483642578125
+    ]
+  },
+  {
+    "id": "N165",
+    "pagina": 28,
+    "nombre_original": "Maca peruana",
+    "precio_original": "$ 2300",
+    "detalle_original": [
+      "SKU : orgánica",
+      "Por 500g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N166",
+    "pagina": 28,
+    "nombre_original": "Aceite de CBD al 20% via oral",
+    "precio_original": "$ 9600",
+    "detalle_original": [
+      "Por 40ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N167",
+    "pagina": 28,
+    "nombre_original": "Té verde en hebras",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Ayuda al metabolismo",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6655883789062,
+      155.11962890625,
+      766.3645629882812
+    ]
+  },
+  {
+    "id": "N168",
+    "pagina": 29,
+    "nombre_original": "Te negro en hebras",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Contiene antioxidantes, el cual ayuda a proteger el corazón y",
+      "vasos sanguíneos.",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687698364258,
+      155.11962890625,
+      95.67845916748047
+    ]
+  },
+  {
+    "id": "N169",
+    "pagina": 29,
+    "nombre_original": "Té rojo en hebras",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Contribuye a la salud del higado, entre otras propiedades.",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      151.130615234375,
+      155.11962890625,
+      242.55377197265625
+    ]
+  },
+  {
+    "id": "N170",
+    "pagina": 29,
+    "nombre_original": "Garbanzos enteros",
+    "precio_original": "$ 2300",
+    "detalle_original": [
+      "SKU : por kl",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      251.5462646484375,
+      155.11962890625,
+      307.7490234375
+    ]
+  },
+  {
+    "id": "N171",
+    "pagina": 29,
+    "nombre_original": "Maíz Pisingallo",
+    "precio_original": "$ 1500",
+    "detalle_original": [
+      "SKU : ×1kg",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      321.23809814453125,
+      155.11962890625,
+      387.93206787109375
+    ]
+  },
+  {
+    "id": "N172",
+    "pagina": 29,
+    "nombre_original": "Paprika",
+    "precio_original": "$ 10800",
+    "detalle_original": [
+      "SKU : x1 kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      396.92437744140625,
+      155.11962890625,
+      442.6359558105469
+    ]
+  },
+  {
+    "id": "N173",
+    "pagina": 29,
+    "nombre_original": "Fécula de Mandioca \"Monte Carlo\"",
+    "precio_original": "$ 4500",
+    "detalle_original": [
+      "SKU : x1kg",
+      "Libre de gluten, sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      466.61627197265625,
+      155.11962890625,
+      588.7636108398438
+    ]
+  },
+  {
+    "id": "N174",
+    "pagina": 29,
+    "nombre_original": "Alfajor de harina de nuez blanco relleno de dulce de leche",
+    "precio_original": "$ 17400",
+    "detalle_original": [
+      "SKU : por 12 unidades",
+      "Caja de 12 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      597.755615234375,
+      155.11962890625,
+      719.9029541015625
+    ]
+  },
+  {
+    "id": "N175",
+    "pagina": 29,
+    "nombre_original": "Copos sin azúcar",
+    "precio_original": "$ 4400",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      728.89501953125,
+      155.11962890625,
+      820.3181762695312
+    ]
+  },
+  {
+    "id": "N176",
+    "pagina": 30,
+    "nombre_original": "Copos azucarados",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      154.12933349609375
+    ]
+  },
+  {
+    "id": "N177",
+    "pagina": 30,
+    "nombre_original": "Copos sin azúcar",
+    "precio_original": "$ 10200",
+    "detalle_original": [
+      "SKU : 3kl",
+      "Por 3kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      183.3543701171875,
+      155.11962890625,
+      244.05335998535156
+    ]
+  },
+  {
+    "id": "N178",
+    "pagina": 30,
+    "nombre_original": "Copos azucarados",
+    "precio_original": "$ 15600",
+    "detalle_original": [
+      "SKU : *4kl",
+      "Por 4kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      253.04624938964844,
+      155.11962890625,
+      313.7452392578125
+    ]
+  },
+  {
+    "id": "N179",
+    "pagina": 30,
+    "nombre_original": "Quinoa Pop",
+    "precio_original": "$ 26400",
+    "detalle_original": [
+      "SKU : ×3kl",
+      "Por 3kgs",
+      "Gluten free",
+      "Super crocante, lista para consumir"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      322.7381286621094,
+      155.11962890625,
+      383.4371032714844
+    ]
+  },
+  {
+    "id": "N180",
+    "pagina": 30,
+    "nombre_original": "Quinoa pop",
+    "precio_original": "$ 9000",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      423.9018859863281,
+      155.11962890625,
+      484.6008605957031
+    ]
+  },
+  {
+    "id": "N181",
+    "pagina": 30,
+    "nombre_original": "Tutuca con azúcar",
+    "precio_original": "$ 5000",
+    "detalle_original": [
+      "SKU : dulce",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      493.59375,
+      155.11962890625,
+      554.292724609375
+    ]
+  },
+  {
+    "id": "N182",
+    "pagina": 30,
+    "nombre_original": "Tutuca con edulcorante",
+    "precio_original": "$ 8000",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      563.28564453125,
+      155.11962890625,
+      654.7088012695312
+    ]
+  },
+  {
+    "id": "N183",
+    "pagina": 30,
+    "nombre_original": "Tutucas con azúcar",
+    "precio_original": "$ 20000",
+    "detalle_original": [
+      "SKU : ×5KGR",
+      "Por 5kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      663.7012329101562,
+      155.11962890625,
+      724.4002075195312
+    ]
+  },
+  {
+    "id": "N184",
+    "pagina": 30,
+    "nombre_original": "Almohaditas de avellana",
+    "precio_original": "$ 10200",
+    "detalle_original": [
+      "SKU : ×1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      733.3912353515625,
+      155.11962890625,
+      824.8143920898438
+    ]
+  },
+  {
+    "id": "N185",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de chocolate",
+    "precio_original": "$ 11400",
+    "detalle_original": [
+      "SKU : ×1Kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.966880798339844,
+      155.11962890625,
+      141.39004516601562
+    ]
+  },
+  {
+    "id": "N186",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de limón",
+    "precio_original": "$ 10200",
+    "detalle_original": [
+      "SKU : ×1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      225.31875610351562,
+      155.11962890625,
+      316.7419128417969
+    ]
+  },
+  {
+    "id": "N187",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de frutilla",
+    "precio_original": "$ 10200",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      325.734375,
+      155.11962890625,
+      398.42327880859375
+    ]
+  },
+  {
+    "id": "N188",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de avellana",
+    "precio_original": "$ 21600",
+    "detalle_original": [
+      "SKU : ×2,5 kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      407.4169006347656,
+      155.11962890625,
+      498.8400573730469
+    ]
+  },
+  {
+    "id": "N189",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de frutilla",
+    "precio_original": "$ 21600",
+    "detalle_original": [
+      "SKU : ×2,5",
+      "Por 2.5kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      507.83251953125,
+      155.11962890625,
+      599.2556762695312
+    ]
+  },
+  {
+    "id": "N190",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de limón",
+    "precio_original": "$ 21600",
+    "detalle_original": [
+      "SKU : ×2,5 kgr",
+      "Por 2.5kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      608.2481079101562,
+      155.11962890625,
+      699.6712646484375
+    ]
+  },
+  {
+    "id": "N191",
+    "pagina": 31,
+    "nombre_original": "Almohaditas de chocolate",
+    "precio_original": "$ 23800",
+    "detalle_original": [
+      "SKU : ×2,5kgr",
+      "Por 2.5kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      708.6637573242188,
+      155.11962890625,
+      800.0869140625
+    ]
+  },
+  {
+    "id": "N192",
+    "pagina": 32,
+    "nombre_original": "Hebras de Salvado.",
+    "precio_original": "$ 15500",
+    "detalle_original": [
+      "SKU : ×3Kg",
+      "Por 3kgr. Hebras de salvado . No contiene sodio. Fuente de",
+      "fibras."
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.966880798339844,
+      155.11962890625,
+      141.39004516601562
+    ]
+  },
+  {
+    "id": "N193",
+    "pagina": 32,
+    "nombre_original": "Hebras de salvado",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      179.608154296875,
+      155.11962890625,
+      271.03131103515625
+    ]
+  },
+  {
+    "id": "N194",
+    "pagina": 32,
+    "nombre_original": "Anillitos de colores",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      280.02374267578125,
+      155.11962890625,
+      324.236572265625
+    ]
+  },
+  {
+    "id": "N195",
+    "pagina": 32,
+    "nombre_original": "Anillitos de avena y miel",
+    "precio_original": "$ 8000",
+    "detalle_original": [
+      "SKU : x1kgr",
+      "Por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      333.978759765625,
+      155.11962890625,
+      448.63238525390625
+    ]
+  },
+  {
+    "id": "N196",
+    "pagina": 32,
+    "nombre_original": "Anillitos de avena y miel",
+    "precio_original": "$ 20400",
+    "detalle_original": [
+      "SKU : x3kgr",
+      "Por 3kgs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      457.623779296875,
+      155.11962890625,
+      572.2774047851562
+    ]
+  },
+  {
+    "id": "N197",
+    "pagina": 32,
+    "nombre_original": "Anillitos de color",
+    "precio_original": "$ 16000",
+    "detalle_original": [
+      "Por 2kl lasfor"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      581.2706298828125,
+      155.11962890625,
+      672.6937866210938
+    ]
+  },
+  {
+    "id": "N198",
+    "pagina": 32,
+    "nombre_original": "Bolitas de chocolate",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "SKU : ×1kgr",
+      "Por 1kg (NUTRI FOOD)"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      681.6862182617188,
+      155.11962890625,
+      742.3851928710938
+    ]
+  },
+  {
+    "id": "N199",
+    "pagina": 33,
+    "nombre_original": "Bolitas chocolate",
+    "precio_original": "$ 19800",
+    "detalle_original": [
+      "por 2.5kgs (NUTRI FOOD)"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.966880798339844,
+      155.11962890625,
+      141.39004516601562
+    ]
+  },
+  {
+    "id": "N200",
+    "pagina": 33,
+    "nombre_original": "Lentejas",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "SKU : por 1 kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      150.3824920654297,
+      155.11962890625,
+      211.08148193359375
+    ]
+  },
+  {
+    "id": "N201",
+    "pagina": 33,
+    "nombre_original": "Maíz pisado blanco",
+    "precio_original": "$ 3300",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      220.0743865966797,
+      155.11962890625,
+      280.77337646484375
+    ]
+  },
+  {
+    "id": "N202",
+    "pagina": 33,
+    "nombre_original": "Poroto alubia",
+    "precio_original": "$ 2800",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      289.7662658691406,
+      155.11962890625,
+      381.1894226074219
+    ]
+  },
+  {
+    "id": "N203",
+    "pagina": 33,
+    "nombre_original": "Pasta de maní natural - ENTRE NUTS",
+    "precio_original": "$ 3200",
+    "detalle_original": [
+      "Sin azúcar agregada, sin T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      390.181884765625,
+      155.11962890625,
+      512.3292236328125
+    ]
+  },
+  {
+    "id": "N204",
+    "pagina": 33,
+    "nombre_original": "Miel pura",
+    "precio_original": "$ 8600",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      521.3212280273438,
+      155.11962890625,
+      643.4685668945312
+    ]
+  },
+  {
+    "id": "N205",
+    "pagina": 33,
+    "nombre_original": "Miel 100% pura de aveja",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "por 500gr"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      652.4606323242188,
+      155.11962890625,
+      774.6079711914062
+    ]
+  },
+  {
+    "id": "N206",
+    "pagina": 34,
+    "nombre_original": "Mermelada de damasco casera 100% natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "Mermelada light de damasco endulzada con jugo de frutas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96875762939453,
+      155.11962890625,
+      141.3919219970703
+    ]
+  },
+  {
+    "id": "N207",
+    "pagina": 34,
+    "nombre_original": "Mermelada de zapallo casera 100% natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "SKU : ×400grs",
+      "Mermelada light de zapallo endulzada con jugo de frutas, sin",
+      "T.A.C.C"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      150.38436889648438,
+      155.11962890625,
+      272.5317077636719
+    ]
+  },
+  {
+    "id": "N208",
+    "pagina": 34,
+    "nombre_original": "Mermelada de durazno casera 100% natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "Mermelada light de durazno endulzada con jugo de frutas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      281.52374267578125,
+      155.11962890625,
+      403.67108154296875
+    ]
+  },
+  {
+    "id": "N209",
+    "pagina": 34,
+    "nombre_original": "Mermelada de naranja casera 100% Natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "Mermelada light de naranja endulzada con jugo de frutas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      412.66314697265625,
+      155.11962890625,
+      534.8104858398438
+    ]
+  },
+  {
+    "id": "N210",
+    "pagina": 34,
+    "nombre_original": "Mermelada de manzana casera 100% natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "Mermelada light de manzana endulzada con jugo de frutas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      543.802490234375,
+      155.11962890625,
+      665.9498291015625
+    ]
+  },
+  {
+    "id": "N211",
+    "pagina": 34,
+    "nombre_original": "Mermelada de ciruela casera 100% natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "Mermelada light de ciruela endulzada con jugo de frutas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      674.9437255859375,
+      155.11962890625,
+      797.091064453125
+    ]
+  },
+  {
+    "id": "N212",
+    "pagina": 35,
+    "nombre_original": "Mermelada de pera casera 100% natural",
+    "precio_original": "$ 5100",
+    "detalle_original": [
+      "Mermelada light de pera endulzada con jugo de frutas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96874237060547,
+      155.11962890625,
+      172.1160888671875
+    ]
+  },
+  {
+    "id": "N213",
+    "pagina": 35,
+    "nombre_original": "Stevia Kony",
+    "precio_original": "$ 8700",
+    "detalle_original": [
+      "SKU : ×500cc",
+      "500cc"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10812377929688,
+      155.11962890625,
+      303.2554626464844
+    ]
+  },
+  {
+    "id": "N214",
+    "pagina": 35,
+    "nombre_original": "Stevia Kony",
+    "precio_original": "$ 5200",
+    "detalle_original": [
+      "200cc"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24749755859375,
+      155.11962890625,
+      434.39483642578125
+    ]
+  },
+  {
+    "id": "N215",
+    "pagina": 35,
+    "nombre_original": "Yerba Tucangua",
+    "precio_original": "$ 44400",
+    "detalle_original": [
+      "por 10kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3887939453125,
+      155.11962890625,
+      534.8119506835938
+    ]
+  },
+  {
+    "id": "N216",
+    "pagina": 35,
+    "nombre_original": "Yerba Tucangua suelta",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "SKU : 1kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      543.8043823242188,
+      155.11962890625,
+      665.9517211914062
+    ]
+  },
+  {
+    "id": "N217",
+    "pagina": 35,
+    "nombre_original": "Yerba Chamane tradicional",
+    "precio_original": "$ 2400",
+    "detalle_original": [
+      "por 500grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      674.9437866210938,
+      155.11962890625,
+      766.366943359375
+    ]
+  },
+  {
+    "id": "N218",
+    "pagina": 36,
+    "nombre_original": "Yerba Baldo con palo suave",
+    "precio_original": "$ 7200",
+    "detalle_original": [
+      "por 500grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.966880798339844,
+      155.11962890625,
+      141.39004516601562
+    ]
+  },
+  {
+    "id": "N219",
+    "pagina": 36,
+    "nombre_original": "Yerba kalena sin agrotóxicos sin T.A.C.C",
+    "precio_original": "$ 6400",
+    "detalle_original": [
+      "SKU : ×500grs",
+      "×500grs"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      150.38250732421875,
+      155.11962890625,
+      272.52984619140625
+    ]
+  },
+  {
+    "id": "N220",
+    "pagina": 36,
+    "nombre_original": "Grisin blanco",
+    "precio_original": "$ 8200",
+    "detalle_original": [
+      "SKU : *1kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      281.5218811035156,
+      155.11962890625,
+      372.9450378417969
+    ]
+  },
+  {
+    "id": "N221",
+    "pagina": 36,
+    "nombre_original": "Grisin de salvado",
+    "precio_original": "$ 8200",
+    "detalle_original": [
+      "SKU : *1kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      381.9375305175781,
+      155.11962890625,
+      473.3606872558594
+    ]
+  },
+  {
+    "id": "N222",
+    "pagina": 36,
+    "nombre_original": "Galleta granola",
+    "precio_original": "$ 5800",
+    "detalle_original": [
+      "avena miel maní pasas"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      482.35308837890625,
+      155.11962890625,
+      604.5004272460938
+    ]
+  },
+  {
+    "id": "N223",
+    "pagina": 36,
+    "nombre_original": "Galleta avena y miel",
+    "precio_original": "$ 5800",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      613.4924926757812,
+      155.11962890625,
+      735.6398315429688
+    ]
+  },
+  {
+    "id": "N224",
+    "pagina": 37,
+    "nombre_original": "Fajita de lino",
+    "precio_original": "$ 5800",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N225",
+    "pagina": 37,
+    "nombre_original": "Fajita multicereal",
+    "precio_original": "$ 5800",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10812377929688,
+      155.11962890625,
+      303.2554626464844
+    ]
+  },
+  {
+    "id": "N226",
+    "pagina": 37,
+    "nombre_original": "Fajita de chia",
+    "precio_original": "$ 5800",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24749755859375,
+      155.11962890625,
+      434.39483642578125
+    ]
+  },
+  {
+    "id": "N227",
+    "pagina": 37,
+    "nombre_original": "Fajita blanca",
+    "precio_original": "$ 5800",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N228",
+    "pagina": 37,
+    "nombre_original": "Tostada multicereal",
+    "precio_original": "$ 6000",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N229",
+    "pagina": 37,
+    "nombre_original": "Tostada dulce",
+    "precio_original": "$ 6000",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6655883789062,
+      155.11962890625,
+      827.8129272460938
+    ]
+  },
+  {
+    "id": "N230",
+    "pagina": 38,
+    "nombre_original": "Tostadas saladas",
+    "precio_original": "$ 6000",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96687316894531,
+      155.11962890625,
+      172.1142120361328
+    ]
+  },
+  {
+    "id": "N231",
+    "pagina": 38,
+    "nombre_original": "Bizcocho blanco",
+    "precio_original": "$ 6000",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10812377929688,
+      155.11962890625,
+      303.2554626464844
+    ]
+  },
+  {
+    "id": "N232",
+    "pagina": 38,
+    "nombre_original": "Bizcocho de salvado",
+    "precio_original": "$ 6000",
+    "detalle_original": [
+      "Lino y Salvado"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24749755859375,
+      155.11962890625,
+      434.39483642578125
+    ]
+  },
+  {
+    "id": "N233",
+    "pagina": 38,
+    "nombre_original": "Pan rustico integral - Lino y girasol",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "SKU : *560"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N234",
+    "pagina": 38,
+    "nombre_original": "Pan rustico integral - Multicereal",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "SKU : *560"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N235",
+    "pagina": 38,
+    "nombre_original": "Pan rustico integral - Doble salvado",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "SKU : *560"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.66748046875,
+      155.11962890625,
+      827.8148193359375
+    ]
+  },
+  {
+    "id": "N236",
+    "pagina": 39,
+    "nombre_original": "Pan rustico integral - Doble intefral",
+    "precio_original": "$ 5400",
+    "detalle_original": [
+      "SKU : *560"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96874237060547,
+      155.11962890625,
+      172.1160888671875
+    ]
+  },
+  {
+    "id": "N237",
+    "pagina": 39,
+    "nombre_original": "Pepas rusticas integrales algarroba y membrillo",
+    "precio_original": "$ 10700",
+    "detalle_original": [
+      "SKU : 1 kg",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10812377929688,
+      155.11962890625,
+      303.2554626464844
+    ]
+  },
+  {
+    "id": "N238",
+    "pagina": 39,
+    "nombre_original": "Pepas rusticas integrales membrillo y chia La Francia",
+    "precio_original": "$ 10700",
+    "detalle_original": [
+      "SKU : *1kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2493591308594,
+      155.11962890625,
+      434.3966979980469
+    ]
+  },
+  {
+    "id": "N239",
+    "pagina": 39,
+    "nombre_original": "Pepas rusticas integrales con batata La Francia",
+    "precio_original": "$ 10700",
+    "detalle_original": [
+      "SKU : x1kg",
+      "1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.3868408203125,
+      155.11962890625,
+      565.5341796875
+    ]
+  },
+  {
+    "id": "N240",
+    "pagina": 39,
+    "nombre_original": "Arroz yamani",
+    "precio_original": "$ 3000",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.528076171875,
+      155.11962890625,
+      635.22705078125
+    ]
+  },
+  {
+    "id": "N241",
+    "pagina": 39,
+    "nombre_original": "Harina de almendra",
+    "precio_original": "$ 6300",
+    "detalle_original": [
+      "SKU : *1kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      644.2181396484375,
+      155.11962890625,
+      735.6412963867188
+    ]
+  },
+  {
+    "id": "N242",
+    "pagina": 39,
+    "nombre_original": "Harina de coco",
+    "precio_original": "$ 11880",
+    "detalle_original": [
+      "SKU : *kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      744.6356201171875,
+      155.11962890625,
+      797.091552734375
+    ]
+  },
+  {
+    "id": "N243",
+    "pagina": 40,
+    "nombre_original": "Harina de centeno",
+    "precio_original": "$ 2400",
+    "detalle_original": [
+      "SKU : *kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96500015258789,
+      155.11962890625,
+      110.66398620605469
+    ]
+  },
+  {
+    "id": "N244",
+    "pagina": 40,
+    "nombre_original": "Harina de sésamo",
+    "precio_original": "$ 2400",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      119.65875244140625,
+      155.11962890625,
+      180.3577423095703
+    ]
+  },
+  {
+    "id": "N245",
+    "pagina": 40,
+    "nombre_original": "Harina de chia",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      189.34873962402344,
+      155.11962890625,
+      255.29331970214844
+    ]
+  },
+  {
+    "id": "N246",
+    "pagina": 40,
+    "nombre_original": "Harina de lino",
+    "precio_original": "$ 3600",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      264.2850036621094,
+      155.11962890625,
+      355.7081604003906
+    ]
+  },
+  {
+    "id": "N247",
+    "pagina": 40,
+    "nombre_original": "Harina de avena",
+    "precio_original": "$ 2640",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      364.7025146484375,
+      155.11962890625,
+      425.4014892578125
+    ]
+  },
+  {
+    "id": "N248",
+    "pagina": 40,
+    "nombre_original": "Harina de garbanzo",
+    "precio_original": "$ 1920",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      434.3924865722656,
+      155.11962890625,
+      495.0914611816406
+    ]
+  },
+  {
+    "id": "N249",
+    "pagina": 40,
+    "nombre_original": "Harina integral organica",
+    "precio_original": "$ 1560",
+    "detalle_original": [
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      504.08624267578125,
+      155.11962890625,
+      564.7852172851562
+    ]
+  },
+  {
+    "id": "N250",
+    "pagina": 40,
+    "nombre_original": "Harina de arroz",
+    "precio_original": "$ 2160",
+    "detalle_original": [
+      "SKU : *1kl",
+      "por 1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      573.7762451171875,
+      155.11962890625,
+      635.224609375
+    ]
+  },
+  {
+    "id": "N251",
+    "pagina": 40,
+    "nombre_original": "Aceituna descarozadas",
+    "precio_original": "$ 4500",
+    "detalle_original": [
+      "por 450"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      644.2162475585938,
+      155.11962890625,
+      766.3635864257812
+    ]
+  },
+  {
+    "id": "N252",
+    "pagina": 41,
+    "nombre_original": "Aceituna negra 000",
+    "precio_original": "$ 5760",
+    "detalle_original": [
+      "por 450"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96875,
+      155.11962890625,
+      172.1160888671875
+    ]
+  },
+  {
+    "id": "N253",
+    "pagina": 41,
+    "nombre_original": "Aceituna verde 00",
+    "precio_original": "$ 4500",
+    "detalle_original": [
+      "por 450"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10626220703125,
+      155.11962890625,
+      303.25360107421875
+    ]
+  },
+  {
+    "id": "N254",
+    "pagina": 41,
+    "nombre_original": "Aceituna negra 000",
+    "precio_original": "$ 14400",
+    "detalle_original": [
+      "SKU : *kl",
+      "1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.24749755859375,
+      155.11962890625,
+      434.39483642578125
+    ]
+  },
+  {
+    "id": "N255",
+    "pagina": 41,
+    "nombre_original": "Aceituna verde 00",
+    "precio_original": "$ 12600",
+    "detalle_original": [
+      "SKU : * kl",
+      "1kg"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.385009765625,
+      155.11962890625,
+      565.5323486328125
+    ]
+  },
+  {
+    "id": "N256",
+    "pagina": 41,
+    "nombre_original": "Aceite oliva extra virgen",
+    "precio_original": "$ 18500",
+    "detalle_original": [
+      "SKU : *2litros",
+      "2lt"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5262451171875,
+      155.11962890625,
+      696.673583984375
+    ]
+  },
+  {
+    "id": "N257",
+    "pagina": 41,
+    "nombre_original": "Aceite oliva extra virgen - envase vidrio",
+    "precio_original": "$ 8000",
+    "detalle_original": [
+      "SKU : 500",
+      "500ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.66748046875,
+      155.11962890625,
+      827.8148193359375
+    ]
+  },
+  {
+    "id": "N258",
+    "pagina": 42,
+    "nombre_original": "Aceite de Oliva Makia",
+    "precio_original": "$ 8760",
+    "detalle_original": [
+      "SKU : ×1LITRO",
+      "1lt"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.964988708496094,
+      155.11962890625,
+      172.11233520507812
+    ]
+  },
+  {
+    "id": "N259",
+    "pagina": 42,
+    "nombre_original": "Aceite de oliva Makia",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "500ml"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      216.322509765625,
+      155.11962890625,
+      338.4698486328125
+    ]
+  },
+  {
+    "id": "N260",
+    "pagina": 42,
+    "nombre_original": "Sal con finas hierbas",
+    "precio_original": "$ 2520",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      347.4637451171875,
+      155.11962890625,
+      469.611083984375
+    ]
+  },
+  {
+    "id": "N261",
+    "pagina": 42,
+    "nombre_original": "Sal con paprika / Sin sal siete especias",
+    "precio_original": "$ 2520",
+    "detalle_original": [
+      "SKU : *120"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      478.60498046875,
+      155.11962890625,
+      600.7523193359375
+    ]
+  },
+  {
+    "id": "N262",
+    "pagina": 42,
+    "nombre_original": "Sal con curry",
+    "precio_original": "$ 2520",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      609.7424926757812,
+      155.11962890625,
+      731.8898315429688
+    ]
+  },
+  {
+    "id": "N263",
+    "pagina": 43,
+    "nombre_original": "Sal y especias",
+    "precio_original": "$ 2520",
+    "detalle_original": [
+      "SKU : *250"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.964988708496094,
+      155.11962890625,
+      172.11233520507812
+    ]
+  },
+  {
+    "id": "N264",
+    "pagina": 43,
+    "nombre_original": "Sal y especias ahumada",
+    "precio_original": "$ 2520",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10250854492188,
+      155.11962890625,
+      303.2498474121094
+    ]
+  },
+  {
+    "id": "N265",
+    "pagina": 43,
+    "nombre_original": "Spaghetti de arroz con Morron",
+    "precio_original": "$ 3240",
+    "detalle_original": [
+      "280 gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      312.2437438964844,
+      155.11962890625,
+      434.3910827636719
+    ]
+  },
+  {
+    "id": "N266",
+    "pagina": 43,
+    "nombre_original": "Spaghetti de arroz con Espinaca",
+    "precio_original": "$ 3240",
+    "detalle_original": [
+      "280 gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      443.385009765625,
+      155.11962890625,
+      565.5323486328125
+    ]
+  },
+  {
+    "id": "N267",
+    "pagina": 43,
+    "nombre_original": "Spaghetti de arroz",
+    "precio_original": "$ 3240",
+    "detalle_original": [
+      "280 gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      574.5224609375,
+      155.11962890625,
+      696.6697998046875
+    ]
+  },
+  {
+    "id": "N268",
+    "pagina": 43,
+    "nombre_original": "Semilla Amapola",
+    "precio_original": "$ 18000",
+    "detalle_original": [
+      "1kl"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      705.6637573242188,
+      155.11962890625,
+      827.8110961914062
+    ]
+  },
+  {
+    "id": "N269",
+    "pagina": 44,
+    "nombre_original": "Petalos de rosa",
+    "precio_original": "$ 12600",
+    "detalle_original": [
+      "250 gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96874237060547,
+      155.11962890625,
+      172.1160888671875
+    ]
+  },
+  {
+    "id": "N270",
+    "pagina": 44,
+    "nombre_original": "Moringa en hojas",
+    "precio_original": "$ 8400",
+    "detalle_original": [
+      "250gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.11001586914062,
+      155.11962890625,
+      272.5331726074219
+    ]
+  },
+  {
+    "id": "N271",
+    "pagina": 44,
+    "nombre_original": "Stevia en hojas",
+    "precio_original": "$ 8400",
+    "detalle_original": [
+      "250gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      281.5237731933594,
+      155.11962890625,
+      372.9469299316406
+    ]
+  },
+  {
+    "id": "N272",
+    "pagina": 44,
+    "nombre_original": "Menta en hojas molida",
+    "precio_original": "$ 4200",
+    "detalle_original": [
+      "250 gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      381.9375,
+      155.11962890625,
+      504.0848388671875
+    ]
+  },
+  {
+    "id": "N273",
+    "pagina": 44,
+    "nombre_original": "Manzanilla",
+    "precio_original": "$ 9600",
+    "detalle_original": [
+      "250gramos"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      513.0787353515625,
+      155.11962890625,
+      604.5018920898438
+    ]
+  },
+  {
+    "id": "N274",
+    "pagina": 44,
+    "nombre_original": "Canela en Rama",
+    "precio_original": "$ 12000",
+    "detalle_original": [
+      "250GRAMOS"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      613.4962158203125,
+      155.11962890625,
+      735.6435546875
+    ]
+  },
+  {
+    "id": "N275",
+    "pagina": 45,
+    "nombre_original": "Nachos originales sin gluten y sin lacteos veganos",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "60g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96498107910156,
+      155.11962890625,
+      247.7987060546875
+    ]
+  },
+  {
+    "id": "N276",
+    "pagina": 45,
+    "nombre_original": "Nachos sabor Calabres sin gluten y sin lácteos",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "60g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      256.79248046875,
+      155.11962890625,
+      454.626220703125
+    ]
+  },
+  {
+    "id": "N277",
+    "pagina": 45,
+    "nombre_original": "Nachos sabor Napolitano sin gluten sin lactos",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "60g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      463.6162109375,
+      155.11962890625,
+      661.449951171875
+    ]
+  },
+  {
+    "id": "N278",
+    "pagina": 46,
+    "nombre_original": "Nachos sabor Mexicano sin gluten y sin lácteos",
+    "precio_original": "$ 4800",
+    "detalle_original": [
+      "60g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96498107910156,
+      155.11962890625,
+      247.7987060546875
+    ]
+  },
+  {
+    "id": "N279",
+    "pagina": 46,
+    "nombre_original": "Nachos sabor Pizza sin gluten y sin lácteos",
+    "precio_original": "$ 4800",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      256.79248046875,
+      155.11962890625,
+      454.626220703125
+    ]
+  },
+  {
+    "id": "N280",
+    "pagina": 46,
+    "nombre_original": "Barra proteica entrenuts sabor frutilla",
+    "precio_original": "$ 15600",
+    "detalle_original": [
+      "10unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      463.6162109375,
+      155.11962890625,
+      661.449951171875
+    ]
+  },
+  {
+    "id": "N281",
+    "pagina": 47,
+    "nombre_original": "Barritas proteicas entrenuts sabor choco mani",
+    "precio_original": "$ 15600",
+    "detalle_original": [
+      "10 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96498107910156,
+      155.11962890625,
+      247.7987060546875
+    ]
+  },
+  {
+    "id": "N282",
+    "pagina": 47,
+    "nombre_original": "Chocolate negro Cachafaz al 62%Cacao con avellanas partidas",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "100g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      256.79248046875,
+      155.11962890625,
+      454.626220703125
+    ]
+  },
+  {
+    "id": "N283",
+    "pagina": 47,
+    "nombre_original": "Chocolate negro Cachafaz al 62% Cacao con almendras partidas",
+    "precio_original": "$ 7800",
+    "detalle_original": [
+      "100g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      463.61993408203125,
+      155.11962890625,
+      661.4536743164062
+    ]
+  },
+  {
+    "id": "N284",
+    "pagina": 48,
+    "nombre_original": "Pistachino crema de pistacho Cachafaz caja 36 unidades",
+    "precio_original": "$ 37200",
+    "detalle_original": [],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96498107910156,
+      155.11962890625,
+      247.7987060546875
+    ]
+  },
+  {
+    "id": "N285",
+    "pagina": 48,
+    "nombre_original": "Bocadito Marroc Cachafaz por 54 unidades",
+    "precio_original": "$ 50400",
+    "detalle_original": [
+      "caja de 54 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      256.79248046875,
+      155.11962890625,
+      454.626220703125
+    ]
+  },
+  {
+    "id": "N286",
+    "pagina": 48,
+    "nombre_original": "Crackers al Curry sin gluten .sin coservantes ni lacteos",
+    "precio_original": "$ 6240",
+    "detalle_original": [
+      "75g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      463.61993408203125,
+      155.11962890625,
+      661.4536743164062
+    ]
+  },
+  {
+    "id": "N287",
+    "pagina": 49,
+    "nombre_original": "Galletitas sabor vainilla sin gluten sin consevantes sin lacteos",
+    "precio_original": "$ 8040",
+    "detalle_original": [
+      "180g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96122741699219,
+      155.11962890625,
+      247.79495239257812
+    ]
+  },
+  {
+    "id": "N288",
+    "pagina": 49,
+    "nombre_original": "Galletitas Marmoladas sin gluten sin conservantes y sin lacteos",
+    "precio_original": "$ 8040",
+    "detalle_original": [
+      "180g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      256.7886962890625,
+      155.11962890625,
+      454.6224365234375
+    ]
+  },
+  {
+    "id": "N289",
+    "pagina": 49,
+    "nombre_original": "Galletitas cacao sin gluten sin coservantes sin lacteos",
+    "precio_original": "$ 8040",
+    "detalle_original": [
+      "180g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      463.6162109375,
+      155.11962890625,
+      661.449951171875
+    ]
+  },
+  {
+    "id": "N290",
+    "pagina": 50,
+    "nombre_original": "Crackers a las finas Hierbas sin gluten .sin conservantes y sin lácteos",
+    "precio_original": "$ 6240",
+    "detalle_original": [
+      "75g"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.96873474121094,
+      155.11962890625,
+      247.80245971679688
+    ]
+  },
+  {
+    "id": "N291",
+    "pagina": 50,
+    "nombre_original": "Alfajor negrp relleno de dulce de leche Cachafaz",
+    "precio_original": "$ 25200",
+    "detalle_original": [
+      "12 unidedes"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      256.79248046875,
+      155.11962890625,
+      454.626220703125
+    ]
+  },
+  {
+    "id": "N292",
+    "pagina": 50,
+    "nombre_original": "Alfajor Cachafaz mousse",
+    "precio_original": "$ 25200",
+    "detalle_original": [
+      "12 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      463.61993408203125,
+      155.11962890625,
+      661.4536743164062
+    ]
+  },
+  {
+    "id": "N293",
+    "pagina": 50,
+    "nombre_original": "Alfajor de almendras 72% cacao sin harinas",
+    "precio_original": "$ 38400",
+    "detalle_original": [
+      "Caja 12 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      670.4437866210938,
+      155.11962890625,
+      756.621337890625
+    ]
+  },
+  {
+    "id": "N294",
+    "pagina": 51,
+    "nombre_original": "Alfajor de cacao y mani relleno de dulce de leche",
+    "precio_original": "$ 17400",
+    "detalle_original": [
+      "Caja de 12 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      49.964996337890625,
+      155.11962890625,
+      172.11233520507812
+    ]
+  },
+  {
+    "id": "N295",
+    "pagina": 51,
+    "nombre_original": "Alfajor de zapallo y algarroba negro relleno en dulce de leche",
+    "precio_original": "$ 17400",
+    "detalle_original": [
+      "Caja de 12 unidades"
+    ],
+    "imagen_bbox": [
+      63.69646453857422,
+      181.10250854492188,
+      155.11962890625,
+      303.2498474121094
+    ]
+  }
+]

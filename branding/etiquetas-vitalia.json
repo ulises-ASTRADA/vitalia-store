@@ -1,0 +1,1206 @@
+{
+  "method": "Deterministic logo montage; approved Vitalia logo; lossless WebP",
+  "photos_updated": 46,
+  "verification": "Pixels outside brand rectangles are identical to original decoded photos.",
+  "photos": [
+    {
+      "id": "N001",
+      "filename": "product-001.webp",
+      "size": [
+        400,
+        865
+      ],
+      "brand_regions": [
+        [
+          141,
+          304,
+          267,
+          366
+        ],
+        [
+          158,
+          480,
+          234,
+          495
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "2dd4c9221a276691169d37c5c9435861f3c75b13db58e4a2b6f3e90bf476e2e5",
+      "edited_sha256": "52b0485da66888f7d1581e72dde72046eb79f7abb991577c2768bb99a740573e"
+    },
+    {
+      "id": "N002",
+      "filename": "product-002.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          129,
+          121,
+          224,
+          160
+        ],
+        [
+          152,
+          335,
+          239,
+          349
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "438a44c79031d3cd5ca7f80a2e6c3ff1b50dc843d3697c5bedb4d5f59535d654",
+      "edited_sha256": "4956bc30bbe3f8a34c74cd753c37330d573e92b099c0ed60e8b541ed2bbf6ae6"
+    },
+    {
+      "id": "N003",
+      "filename": "product-003.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          175,
+          265,
+          246,
+          301
+        ],
+        [
+          186,
+          423,
+          242,
+          433
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "94417fb2eeacc7b128dc79d536f6be3959d59b6893519b5e0a6f7de409cb6f51",
+      "edited_sha256": "f202816f8baad533419d3fb23711a4ede88ba31f3bdded89ce65ea96b08d2014"
+    },
+    {
+      "id": "N004",
+      "filename": "product-004.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          170,
+          266,
+          239,
+          298
+        ],
+        [
+          181,
+          404,
+          238,
+          416
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "09f622529ac43e622f04392a9321a7ac2963c11d915b625a47d11704a469fa76",
+      "edited_sha256": "8906fc1d5cdb1c988e7cad40a03b0e003752493cdb8f46bd7b4472ad7588feb9"
+    },
+    {
+      "id": "N005",
+      "filename": "product-005.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          154,
+          225,
+          238,
+          265
+        ],
+        [
+          177,
+          385,
+          230,
+          395
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "58f0f89a866e81e96ce75c009d22190066732fe2bd87fe908dd1a2d8c5a194ed",
+      "edited_sha256": "afafa6d95fc3171fcd06fb01a93c4150274521a78cd46d1e4d757dc6a76bf091"
+    },
+    {
+      "id": "N006",
+      "filename": "product-006.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          156,
+          235,
+          240,
+          267
+        ],
+        [
+          161,
+          382,
+          232,
+          393
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "4c15c71b35fd1f9f1a95127fe97e71d67d01938d11fbc9995ecd7a81007d685c",
+      "edited_sha256": "cfae82d35754e92166376eda16cc7151c3214e1056bd665ba91319d0e1df85dd"
+    },
+    {
+      "id": "N007",
+      "filename": "product-007.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          176,
+          267,
+          246,
+          299
+        ],
+        [
+          183,
+          416,
+          245,
+          426
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "40987e880836c9e0d5f6073a52f940c5443baa3f44bc617fcfa6b61277be666a",
+      "edited_sha256": "607c7fdd3fab05eff90ad864f9c866dffce9735c79ae46ce539fa3dd067ff7d2"
+    },
+    {
+      "id": "N008",
+      "filename": "product-008.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          177,
+          242,
+          253,
+          281
+        ],
+        [
+          190,
+          362,
+          250,
+          372
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "cba7a063352444dafe35bc7ed24fa51b3fbba7034d203814b42c8a806fc5bcad",
+      "edited_sha256": "d154e873856532af9103dbde167cc354c2e403d5c2128cd73004c03419b317d3"
+    },
+    {
+      "id": "N009",
+      "filename": "product-009.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          168,
+          222,
+          237,
+          253
+        ],
+        [
+          176,
+          378,
+          232,
+          389
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "3ced03ea4abc91736340f1662107362811e4d3acfbf0b326c31cc5024ec9200b",
+      "edited_sha256": "919b54e0a23bb6e56612a79f1ee382f6dc540718ba9bf4b204134917b35c2f2f"
+    },
+    {
+      "id": "N010",
+      "filename": "product-010.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          177,
+          217,
+          240,
+          242
+        ],
+        [
+          182,
+          345,
+          236,
+          355
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "ba659f16f245da6066ac85b3af688c565a84d1ffe4541d7c4e124d5fe65473b7",
+      "edited_sha256": "7689fcbf88a6599a7a0d36f56504dc15c82d13e1fbf735eb1d8286153dc30652"
+    },
+    {
+      "id": "N011",
+      "filename": "product-011.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          174,
+          199,
+          250,
+          239
+        ],
+        [
+          191,
+          310,
+          239,
+          318
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "ba712b45e4667b8ec3683350f47dc21edff8b9cac113384de07c3fc483d0aa1a",
+      "edited_sha256": "2a01e6371ca22111a87920271aa17d2f1dfbaff8a3e12c526e72c898c6456b7d"
+    },
+    {
+      "id": "N012",
+      "filename": "product-012.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          173,
+          193,
+          244,
+          225
+        ],
+        [
+          192,
+          287,
+          236,
+          296
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "fd7f35f6e1162b1f799236859a5197c39a259eb8a70c1d92abe8aff73e3bf0e7",
+      "edited_sha256": "2fc4720aa5e4dd2b4c61166559e55c92613bb9ae781be70755d65591b9f15e41"
+    },
+    {
+      "id": "N013",
+      "filename": "product-013.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          171,
+          199,
+          241,
+          237
+        ],
+        [
+          178,
+          297,
+          228,
+          307
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "be4e67926837fe098b304b235fba2622964d8f4cedb11a2c2f3c66d57911d3df",
+      "edited_sha256": "b7e64c7ffa0a9539dcc14a2fb25d4a40fad7ee835ed0c4c161f6966e77ebbc69"
+    },
+    {
+      "id": "N014",
+      "filename": "product-014.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          170,
+          208,
+          252,
+          246
+        ],
+        [
+          185,
+          323,
+          244,
+          332
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "747e7154e61eccb396c46d1c6ce71494df3e62113d93547b686fe5d7f4d3e439",
+      "edited_sha256": "b6b19919faa243212f30103db21374cbc6a24b1221fe387f0b6f4b02095eec24"
+    },
+    {
+      "id": "N015",
+      "filename": "product-015.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          170,
+          222,
+          249,
+          262
+        ],
+        [
+          193,
+          333,
+          243,
+          341
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "a346bf7d384f9288c92c08da0748aa1507d6bdb640566462cace6b412cb76e58",
+      "edited_sha256": "d4463208fed566542decf7e0b86e68043b642e727c71190d48a73eada4dc8f49"
+    },
+    {
+      "id": "N016",
+      "filename": "product-016.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          175,
+          242,
+          260,
+          276
+        ],
+        [
+          190,
+          344,
+          247,
+          352
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "424a8068198755fd213ea6e8eb21f1ea76ba2f19c02e1d9cf0048a512992b85b",
+      "edited_sha256": "71c9e6606a224f1af1419399224bc9289655d7e83bf0111d4a96d68f82c193c2"
+    },
+    {
+      "id": "N017",
+      "filename": "product-017.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          151,
+          250,
+          240,
+          296
+        ],
+        [
+          167,
+          372,
+          230,
+          381
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "acb9e77823ac343bd64f32f04aaadce11da93601f618accf191f6f2633ac077b",
+      "edited_sha256": "b8aae55c8fefb98bf83b7a4c492f95fe8fa23321efc242e5f98cc6ad2c14391f"
+    },
+    {
+      "id": "N018",
+      "filename": "product-018.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          150,
+          252,
+          243,
+          296
+        ],
+        [
+          169,
+          384,
+          237,
+          394
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "cb960c98a2886887a0fe39cc9576cd5b08ae37d672a5597e3834eed1bb458012",
+      "edited_sha256": "ff5562ce61f795880eaa160e5d6d6ac8579d3b8d95ff7447369b6237541c791a"
+    },
+    {
+      "id": "N019",
+      "filename": "product-019.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          161,
+          238,
+          241,
+          273
+        ],
+        [
+          184,
+          329,
+          229,
+          338
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "c314c89739964084b4a9135aa14fb2540d13688a6de7ee3ce58bdec89591a3f4",
+      "edited_sha256": "58f6034aee66caac7d716b8310d791619077fbe235701a24e37df4d1f52a8cfe"
+    },
+    {
+      "id": "N020",
+      "filename": "product-020.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          158,
+          248,
+          241,
+          277
+        ],
+        [
+          175,
+          334,
+          228,
+          343
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "2e272ef9922e2e0bb83c9c921209717cbd5eb092a1cc63eae764b03dc30ecacc",
+      "edited_sha256": "a07f2ba8aa396298bcb751673d9189bfed51fe8add740cd60d8696764b763b8b"
+    },
+    {
+      "id": "N021",
+      "filename": "product-021.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          170,
+          252,
+          241,
+          280
+        ],
+        [
+          178,
+          331,
+          227,
+          339
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "b70560814307f4b18aab4f288cdeef3495b434e44087c404806525e244fb3fd5",
+      "edited_sha256": "08f06b73fd0279a093109849f576d66e3bc686e4a3b0c46fe7e322ca4e1acad2"
+    },
+    {
+      "id": "N022",
+      "filename": "product-022.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          159,
+          232,
+          245,
+          270
+        ],
+        [
+          185,
+          327,
+          235,
+          335
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "1a2564f1522648279a010900393ba613008a605cccc09a31a05609762af737a0",
+      "edited_sha256": "7cb9a7d467f1d0b49da3a0410d9a5056698a7cd493c826fd68cfcd66b00fa41d"
+    },
+    {
+      "id": "N023",
+      "filename": "product-023.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          169,
+          233,
+          239,
+          268
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "d6db85e815165f0f3cd17bebc8a1654e87fc92fe0d84b01d84981f10c4344586",
+      "edited_sha256": "7e7c4660fa2bd328669bedfd872f3f081e3db147477be25c19e7558d33e6f8f0"
+    },
+    {
+      "id": "N024",
+      "filename": "product-024.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          165,
+          251,
+          234,
+          282
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "dff6bf313c2f47c7c34352106ba02d54ce774f8a656ba2a66e1beae7ad557395",
+      "edited_sha256": "244b168d06140280f50455e2207f64d895a12ad8021f0305b3d223c1d0239a6c"
+    },
+    {
+      "id": "N025",
+      "filename": "product-025.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          177,
+          244,
+          245,
+          271
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "a6bb87a4226b4a8c9fe8431004c111fe07b87c01cba94e291ae8f754d8fd8035",
+      "edited_sha256": "4958d9a3b04acc49af0efbf2f913ec5cbebc4e12b15a0bdbbb7a8dadfc4d2cb8"
+    },
+    {
+      "id": "N026",
+      "filename": "product-026.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          165,
+          206,
+          244,
+          242
+        ],
+        [
+          174,
+          297,
+          238,
+          305
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "21aad39b83a03afab43e606223bbe43192ffb2473d4c3b40c63920d79e62715f",
+      "edited_sha256": "094f2001ad8fbf3751c6247490559045c830fe8db052c5007bb44bfeb1699670"
+    },
+    {
+      "id": "N027",
+      "filename": "product-027.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          175,
+          217,
+          246,
+          249
+        ],
+        [
+          184,
+          300,
+          235,
+          309
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "58a5cb6613fa0395b8d51e530cf1193b928d8a19d83770cc14375afca18ac04a",
+      "edited_sha256": "207574eeff3a8fb81703430046c05a2166e5554bac45afdf3ad4b3ffdbe91d94"
+    },
+    {
+      "id": "N028",
+      "filename": "product-028.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          178,
+          244,
+          242,
+          272
+        ],
+        [
+          188,
+          318,
+          231,
+          325
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "3c9aec97e525466e207cae344ee10ccbcf82fc16300203aaa45b368a4950c402",
+      "edited_sha256": "19cb6e49b3acb3c9d9c56ce6caf33dc3eb774fd49329bb7175654796272a84ac"
+    },
+    {
+      "id": "N029",
+      "filename": "product-029.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          163,
+          196,
+          242,
+          231
+        ],
+        [
+          179,
+          287,
+          229,
+          296
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "8739ec68df86451af08b34fdaab95f8d8e9205a0296d8f619fc3b1620963277f",
+      "edited_sha256": "b7d58450956a84e951809818fa48dbfa731afe1a7404204a64ae7d2621318ee4"
+    },
+    {
+      "id": "N030",
+      "filename": "product-030.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          158,
+          204,
+          242,
+          240
+        ],
+        [
+          172,
+          298,
+          230,
+          306
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "dba37227d6d8d75ecf49d7aeec574de6f54a190c026d646b9ed04998bce136bb",
+      "edited_sha256": "a0da27e37e857e7710ebc8fd61b17a9d19da42015e4d9d718221a80742ea176c"
+    },
+    {
+      "id": "N031",
+      "filename": "product-031.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          168,
+          194,
+          253,
+          230
+        ],
+        [
+          179,
+          294,
+          239,
+          304
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "7dc45f67a25b513ec1f252dc118710ddb5308a5b24b942206c3f04c33df8fcd2",
+      "edited_sha256": "76917e9d3a010270960e01440973a2477c9cf7eef411b45448118397be904737"
+    },
+    {
+      "id": "N032",
+      "filename": "product-032.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          172,
+          224,
+          244,
+          260
+        ],
+        [
+          179,
+          307,
+          236,
+          316
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "34b051dd96753608e4138edbce8a266626f9dcac002c57f7297fc0131a2f40c5",
+      "edited_sha256": "f154440a002c7ef6dccd4a9c97c540800ba8b4dd25ebc9f4e28ee099b078d595"
+    },
+    {
+      "id": "N033",
+      "filename": "product-033.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          173,
+          225,
+          248,
+          261
+        ],
+        [
+          189,
+          311,
+          243,
+          318
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "7a01f50c1b0b6c5e9ae9fb687598ed15270861b58c6a30ff82ba705d7b271748",
+      "edited_sha256": "509387f201319774e0fc6a944c11be156802af3e532e6fb0c0dba416859c112f"
+    },
+    {
+      "id": "N034",
+      "filename": "product-034.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          177,
+          209,
+          263,
+          246
+        ],
+        [
+          184,
+          379,
+          247,
+          389
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "f410473aa6072f3ca6359df5eac6d5987e1df7d4bcb4c2f1d75f2728d6f63574",
+      "edited_sha256": "14242e610306b2a2a3e9d0e97bf9fe54dd135e289be0a256930f232a5ae5ffd3"
+    },
+    {
+      "id": "N035",
+      "filename": "product-035.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          175,
+          220,
+          240,
+          264
+        ],
+        [
+          183,
+          308,
+          227,
+          317
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "b0d974afc91c6a39fe5d8c3fa1a93a798c03d6c707af9993261ddb31d2b5e479",
+      "edited_sha256": "7c6a0aa4f369dbd2437d85a3e3290159767d87454d799e10bb6589c99e21dc7b"
+    },
+    {
+      "id": "N036",
+      "filename": "product-036.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          180,
+          239,
+          250,
+          275
+        ],
+        [
+          196,
+          405,
+          251,
+          414
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "e50be10833446267df59e88169b9085b46c3b3c5dc1a9d2ffb6422155ee5f990",
+      "edited_sha256": "39b6a4b01ac5aa85a1d3a134225f726eb58eb57e0a3531c8b8db53e54390df21"
+    },
+    {
+      "id": "N037",
+      "filename": "product-037.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          171,
+          277,
+          242,
+          312
+        ],
+        [
+          189,
+          365,
+          237,
+          374
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "5614f0cd96a1e527daa1e95056b2092c34492016c5870852d9b8493debd458cc",
+      "edited_sha256": "8d15758a30e012f2059345b6bcc42a2a18e5b77db4a769cdb1da5c6cdb45edb5"
+    },
+    {
+      "id": "N038",
+      "filename": "product-038.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          177,
+          251,
+          243,
+          285
+        ],
+        [
+          186,
+          399,
+          245,
+          408
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "25e3f9e9c58a4ec2f2567fe12756d5b5037a9b619bea0eef3817830eaa031367",
+      "edited_sha256": "7e3a7932833ffd8e8ec69245d67e0688a1de04f3d2578d7ecee3866d5df940a0"
+    },
+    {
+      "id": "N039",
+      "filename": "product-039.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          162,
+          272,
+          241,
+          307
+        ],
+        [
+          183,
+          359,
+          240,
+          369
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "da2d315cfbfcec76a1174e28fdc9fa7c093c1d8d17403c8a6bc5f6d1fd4f7932",
+      "edited_sha256": "0355fd6589c83a57903336f3dfcc31a2d4e3af7a8f073503127eb143be7286b2"
+    },
+    {
+      "id": "N040",
+      "filename": "product-040.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          177,
+          265,
+          251,
+          298
+        ],
+        [
+          184,
+          345,
+          234,
+          354
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "9c688dceac96f27830c3f0c376c0e89d8bfd7c8f7c338ee829f6c601de1fd549",
+      "edited_sha256": "ad9a5bb43245f7d5caeac2d288c1242486dbe29e6c1181409685a71d4e2fc5a8"
+    },
+    {
+      "id": "N041",
+      "filename": "product-041.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          175,
+          243,
+          239,
+          271
+        ],
+        [
+          174,
+          390,
+          231,
+          398
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "53bccb65468c796d71c04a7842199d7e5909929c48c376a60564c3a652c0198a",
+      "edited_sha256": "20b5003aaefe2f2a61ee041cf4e3220e0c10ad73120d1c1db2cac530532bedf6"
+    },
+    {
+      "id": "N042",
+      "filename": "product-042.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          183,
+          222,
+          199,
+          237
+        ],
+        [
+          165,
+          250,
+          201,
+          272
+        ],
+        [
+          163,
+          286,
+          200,
+          307
+        ],
+        [
+          158,
+          321,
+          196,
+          344
+        ],
+        [
+          160,
+          356,
+          196,
+          378
+        ],
+        [
+          158,
+          389,
+          194,
+          407
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "f9d0c47c66cde7c3293f825e8840a3b2adc0d91a1c55f4905a0ab39f0130a550",
+      "edited_sha256": "9764d3304686919bd1cfa42b840f1e7a069c1de2f6e3c210cb6f4e36475295d0"
+    },
+    {
+      "id": "N043",
+      "filename": "product-043.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          160,
+          185,
+          197,
+          205
+        ],
+        [
+          159,
+          213,
+          199,
+          236
+        ],
+        [
+          161,
+          249,
+          204,
+          274
+        ],
+        [
+          155,
+          291,
+          195,
+          313
+        ],
+        [
+          147,
+          322,
+          186,
+          343
+        ],
+        [
+          148,
+          357,
+          187,
+          382
+        ],
+        [
+          145,
+          386,
+          184,
+          404
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "4c29f73ec4e86a04bae8e46263f58d1c5cefa39b7b62fd77b65bf4b95e128353",
+      "edited_sha256": "8c5145d91665fa39953e235aed4d7c7b2fc90c1e116a140ac5dedea7a1f7d9e3"
+    },
+    {
+      "id": "N044",
+      "filename": "product-044.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          165,
+          203,
+          200,
+          225
+        ],
+        [
+          155,
+          239,
+          189,
+          260
+        ],
+        [
+          156,
+          285,
+          195,
+          310
+        ],
+        [
+          155,
+          315,
+          194,
+          334
+        ],
+        [
+          154,
+          362,
+          191,
+          383
+        ],
+        [
+          156,
+          398,
+          192,
+          417
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "d91f854c1ab79097b99ae76badfa0921d3dec2e329de6efb62a09581547aac16",
+      "edited_sha256": "c87e0d788bb81cafc2cccc656fc1632673c17ad4e5e5b389156b0c8950f3c4d3"
+    },
+    {
+      "id": "N108",
+      "filename": "product-108.webp",
+      "size": [
+        400,
+        533
+      ],
+      "brand_regions": [
+        [
+          174,
+          244,
+          239,
+          278
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "6c577acb8eda870be6bb10336010fdf2b8fea00ecf753f1cadd51714de9f56a0",
+      "edited_sha256": "3ec43eb72580bfc4bd2eda515eb164351ae4e41af6435fb899204a0e2ed4248e"
+    },
+    {
+      "id": "N216",
+      "filename": "product-216.webp",
+      "size": [
+        400,
+        534
+      ],
+      "brand_regions": [
+        [
+          179,
+          248,
+          244,
+          282
+        ]
+      ],
+      "outside_regions_identical": true,
+      "source_sha256": "8edaefc1ef0cf9649b988197ea336d64b6b8668f0ca730786d0c1e1a7136d1af",
+      "edited_sha256": "5a1576557e0a0fa5c0694bdae3da7973c02104a1e0ca0781817755cf3e89374c"
+    }
+  ],
+  "other_product_photos_byte_identical": 249
+}

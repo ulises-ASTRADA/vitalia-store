@@ -1,0 +1,33 @@
+'use client';
+import {useMemo,useRef,useState} from 'react';
+import {Button,Input} from '@chakra-ui/react';
+import {BOXES,BOX_GOALS,buildBox} from '../lib/boxes';
+
+export default function BoxBuilder({products,money,onAdd,ready}){
+  const [open,setOpen]=useState(false),[answers,setAnswers]=useState({recipient:'self',taste:'varied',goal:'breakfast',profile:'breakfast',budget:'',avoid:''});
+  const [submitted,setSubmitted]=useState(false),[removed,setRemoved]=useState([]),[message,setMessage]=useState(''),[added,setAdded]=useState(false);
+  const panel=useRef(null);
+  const result=useMemo(()=>buildBox(products,{...answers,budget:answers.budget===''?null:Number(answers.budget)}),[products,answers]);
+  const selected=result.products.filter(p=>!removed.includes(p.id));
+  const total=selected.reduce((sum,p)=>sum+Math.round(p.precio*100),0)/100;
+  function update(key,value){setAnswers(a=>({...a,[key]:value}));setSubmitted(false);setRemoved([]);setMessage('');setAdded(false);}
+  function start(profile){setAnswers(a=>({...a,profile:profile||'breakfast',goal:profile||'discover'}));setOpen(true);setSubmitted(false);setRemoved([]);setMessage('');setAdded(false);requestAnimationFrame(()=>panel.current?.scrollIntoView({block:'start'}));}
+  function submit(event){event.preventDefault();setSubmitted(true);setRemoved([]);setMessage('');setAdded(false);}
+  function add(){const error=onAdd(selected);if(error){setMessage(error);return;}setAdded(true);setMessage('Box agregado a tu pedido. Podés revisar las cantidades en el checkout.');}
+  return <section className="boxes-section" id="boxes" aria-labelledby="boxes-title">
+    <div className="boxes-heading"><div><p className="eyebrow muted">PARA CADA MOMENTO</p><h2 id="boxes-title">Encontrá tu box Vitalia<span>.</span></h2></div><Button unstyled className="secondary box-action" onClick={()=>start(null)}>No sé qué elegir</Button></div>
+    <p className="boxes-intro">Elegí una idea y armá tu selección con productos del catálogo. Vos revisás qué sumar.</p>
+    <div className="box-grid">{BOXES.map((box,index)=><article className="box-card" key={box.id}><span className="box-number" aria-hidden="true">0{index+1}</span><p className="eyebrow muted">{box.occasion}</p><h3>{box.name}</h3><p>{box.description}</p><Button unstyled className="secondary box-action" onClick={()=>start(box.id)}>Armar {box.name}</Button></article>)}<article className="box-card box-pending"><span className="box-number" aria-hidden="true">04</span><p className="eyebrow muted">UNA SELECCIÓN DIFERENTE CADA MES</p><h3>Box del mes</h3><p>Estamos preparando esta idea. La selección todavía está por definir.</p><span className="box-status">Próximamente</span></article></div>
+    {open&&<div className="box-builder" ref={panel}><div className="box-builder-heading"><h3>No sé qué elegir</h3><Button unstyled type="button" className="plain" onClick={()=>setOpen(false)} aria-label="Cerrar asistente de boxes">Cerrar ×</Button></div><p>Contanos un poco y te proponemos una selección que podés ajustar.</p>
+      <form onSubmit={submit} className="box-questions">
+        <fieldset><legend>¿Para quién es?</legend>{[['self','Para mí'],['gift','Para regalar']].map(([value,label])=><label className="box-choice" key={value}><input type="radio" name="box-recipient" value={value} checked={answers.recipient===value} onChange={()=>update('recipient',value)}/>{label}</label>)}</fieldset>
+        <fieldset><legend>{answers.recipient==='gift'?'¿Qué le gusta?':'¿Qué preferís?'}</legend>{[['sweet','Dulce'],['salty','Salado'],['varied','Variado']].map(([value,label])=><label className="box-choice" key={value}><input type="radio" name="box-taste" value={value} checked={answers.taste===value} onChange={()=>update('taste',value)}/>{label}</label>)}</fieldset>
+        <div><label htmlFor="box-goal">{answers.recipient==='gift'?'¿Para qué momento es el regalo?':'¿Qué buscás con este box?'}</label><select id="box-goal" value={answers.goal} onChange={e=>update('goal',e.target.value)}>{BOX_GOALS.map(goal=><option key={goal.id} value={goal.id}>{goal.label}</option>)}</select></div>
+        <div><label htmlFor="box-budget">¿Cuánto querés gastar como máximo?</label><Input unstyled id="box-budget" type="number" inputMode="decimal" min="0.01" step="0.01" max="1000000000" value={answers.budget} placeholder="Ingresá un monto en pesos" onChange={e=>update('budget',e.target.value)} aria-describedby="box-budget-help"/><p id="box-budget-help" className="box-help">Opcional. Si lo dejás vacío, te mostramos la selección y su precio.</p></div>
+        <div className="box-avoid"><label htmlFor="box-avoid">¿Hay ingredientes que preferís evitar?</label><Input unstyled id="box-avoid" maxLength={200} value={answers.avoid} placeholder="Ej.: maní, coco (separados por comas)" onChange={e=>update('avoid',e.target.value)} aria-describedby="box-avoid-help"/><p id="box-avoid-help" className="box-help">Filtramos según el nombre y la descripción disponibles. Para alergias o restricciones alimentarias, confirmá ingredientes y trazas antes de comprar.</p></div>
+        <Button unstyled type="submit" className="primary box-action" disabled={!ready}>Ver mi selección</Button>
+      </form>
+      {submitted&&<section className="box-result" aria-labelledby="box-result-title"><h4 id="box-result-title">Tu selección · {result.definition.name}</h4><p>Una presentación de cada producto, al precio actual del catálogo. Disponibilidad a confirmar. No incluye packaging de regalo.</p>{selected.length?<><ul>{selected.map(product=><li key={product.id}><div><strong>{product.nombre}</strong><p>{product.presentacion} · {money(product.precio)}</p>{product.descripcion&&<details><summary>Ver descripción e ingredientes disponibles</summary><p>{product.descripcion}</p></details>}</div><Button unstyled type="button" className="plain" disabled={added} aria-label={`Excluir del box: ${product.nombre}`} onClick={()=>{setRemoved(ids=>[...ids,product.id]);setMessage('');}}>Quitar</Button></li>)}</ul><div className="box-total"><span>Total de esta selección</span><strong>{money(total)}</strong></div><Button unstyled type="button" className="primary box-action" disabled={!ready||added} onClick={add}>{added?'Agregado al pedido':'Agregar selección al pedido'}</Button></>:<p role="status">{result.minimum&&answers.budget!==''&&result.minimum>Number(answers.budget)?`No encontramos una presentación dentro de ese monto. Las opciones para estas preferencias empiezan en ${money(result.minimum)}.`:'No quedan productos para estas preferencias. Podés cambiar tus respuestas o explorar el catálogo.'}</p>}<p role="status" aria-live="polite">{message}</p></section>}
+    </div>}
+  </section>;
+}
