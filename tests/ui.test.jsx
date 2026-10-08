@@ -90,7 +90,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
  assert.equal(screen.queryByText('CASI LISTO'),null);
  const sidebar=document.querySelector('.checkout-sidebar');
  assert(sidebar.contains(screen.getByText('Resumen del pedido')));
- assert(sidebar.contains(screen.getByText('Completá tu pedido')));
+ assert(sidebar.contains(screen.getByText('Descuentos para vos por tu compra')));
  assert.equal(document.querySelector('.checkout-main .cart-suggestions'),null);
  assert.equal(screen.queryByText('¿Sumamos otra presentación?'),null);
  assert.equal(screen.queryByRole('link',{name:/Seguir eligiendo/}),null);
