@@ -21,6 +21,7 @@ const Provider=(await import('../components/provider.jsx')).default;
 const Store=(await import('../components/store.jsx')).default;
 const Checkout=(await import('../components/checkout.jsx')).default;
 const BoxBuilder=(await import('../components/box-builder.jsx')).default;
+const Boxes=(await import('../components/boxes.jsx')).default;
 const {useCart}=await import('../components/use-cart.js');
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
@@ -134,8 +135,11 @@ test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async(
  assert.equal(freshReads,1);assert(screen.getByText('$ 175,00',{selector:'.total-row strong'}));assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
 });
 
-test('Asistente de boxes: preguntas, presupuesto, exclusión y aceptación explícita con carrito persistente',async()=>{
+test('Asistente de boxes: ruta separada, preguntas y carrito compartido',async()=>{
  const user=setup(catalog);
+ assert.equal(screen.getByRole('link',{name:'Boxes',exact:true}).getAttribute('href'),'/boxes');
+ assert.equal(screen.queryByRole('button',{name:'No sé qué elegir',exact:true}),null);
+ cleanup();render(<Provider><Boxes initialCatalog={catalog}/></Provider>);
  await user.click(screen.getByRole('button',{name:'No sé qué elegir',exact:true}));
  assert(screen.getByLabelText('¿Qué buscás con este box?'));
  await user.click(screen.getByLabelText('Para regalar'));

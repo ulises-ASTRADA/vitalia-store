@@ -8,7 +8,7 @@ import ThemeToggle from './theme-toggle';
 import NextLink from 'next/link';
 const Link=NextLink.default||NextLink;
 import {useCart} from './use-cart';
-import BoxBuilder from './box-builder';
+import SectionNav from './section-nav';
 const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const pack = product => product.presentacion || 'Presentación a confirmar';
 function Photo({product,className='',eager=false,context='card'}) {
@@ -32,7 +32,7 @@ export default function Store({initialCatalog=null}) {
   const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(''),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
   const [detail,setDetail]=useState(null),[help,setHelp]=useState(false),[toast,setToast]=useState('');
   const header=useRef(null),search=useRef(null);
-  const {cart,count,total,loaded,addSelection,change:changeCart}=useCart(products,{catalogReady:status==='ready'});
+  const {cart,count,total,change:changeCart}=useCart(products,{catalogReady:status==='ready'});
   const loadCatalog=useCallback(async()=>{
     setStatus('loading');
     try {const response=await fetch('/api/catalog',{cache:'no-store'});if(!response.ok)throw Error();const data=await response.json();setProducts(data.products);setSettings(data.settings);setStatus('ready');return true;}
@@ -57,10 +57,10 @@ export default function Store({initialCatalog=null}) {
       <header className="header"><a className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 112px, 156px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></a>
       <form className="search" role="search" onSubmit={e=>{e.preventDefault();document.getElementById('catalogo').scrollIntoView();}}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={e=>{setQuery(e.target.value);setLimit(24);}}/><kbd>/</kbd></form>
       <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><ThemeToggle id="theme-toggle"/></div></header>
+      <SectionNav current="catalog"/>
     </div>
     <main className="shell">{(settings.isPreview||settings.testCheckout)&&<div className="preview-note">{settings.checkoutEnabled?'Vista previa: los mensajes de WhatsApp se prepararán como pedidos de prueba.':'Vista previa del catálogo. Los pedidos todavía no están habilitados.'}</div>}
       <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><div className="hero-photos" aria-hidden="true">{['023','002','037'].map((id,i)=><Image key={id} className={`hero-photo photo-${['one','two','three'][i]}`} src={`/images/product-${id}.webp`} width={240} height={250} alt="" sizes="(max-width: 760px) 180px, 240px" loading={i===0?'eager':'lazy'} fetchPriority={i===0?'high':'auto'}/>)}<span className="hero-stamp">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span></div></section>
-      <BoxBuilder products={products} money={money} ready={status==='ready'&&loaded} onAdd={addSelection}/>
       <section className="catalog-section" id="catalogo" aria-labelledby="catalog-title"><div className="catalog-top"><div><p className="eyebrow muted">ENCONTRÁ TUS FAVORITOS</p><h2 id="catalog-title">Nuestro catálogo<span>.</span></h2></div></div>
         <div className="catalog-layout"><aside className="categories"><h3>Categorías</h3><nav aria-label="Categorías de productos">{categories.map(name=><Button unstyled key={name} className="category-button" aria-pressed={name===category} onClick={()=>{setCategory(name);setLimit(24);}}><span>{name}</span><span className="category-count">{name==='Todos'?products.length:products.filter(p=>p.categoria===name).length}</span></Button>)}</nav><div className="side-note"><span className="tiny-rule"/><strong>De tu carrito<br/>a WhatsApp.</strong><p>Consultá disponibilidad y coordiná el pago y la entrega al enviar tu pedido.</p></div></aside>
         <div className="results"><div className="results-toolbar"><p role="status" aria-live="polite">{status==='loading'?'Cargando productos…':status==='error'?'Catálogo no disponible':`${filtered.length} ${filtered.length===1?'producto':'productos'}${category==='Todos'?'':' · '+category}`}</p><label className="sort-label" htmlFor="sort">Ordenar <NativeSelect.Root className="chakra-sort" width={{base:'176px',sm:'188px'}}><NativeSelect.Field id="sort" value={sort} onChange={e=>{setSort(e.target.value);setLimit(24);}} bg="var(--surface)" color="var(--ink)" borderColor="var(--line)" paddingInlineStart="14px" paddingInlineEnd="44px" minHeight="44px"><option value="catalog">Según catálogo</option><option value="price-asc">Menor precio</option><option value="price-desc">Mayor precio</option><option value="name">Nombre: A a Z</option></NativeSelect.Field><NativeSelect.Indicator insetInlineEnd="14px" color="var(--ink)"/></NativeSelect.Root></label></div>

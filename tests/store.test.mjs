@@ -73,8 +73,11 @@ test('Nombre, localidad y provincia son obligatorios y aparecen en el mensaje',(
  test('Mensaje claro: sin presentación faltante, total compacto y dos emojis',()=>{
  const p={id:'N001',nombre:'Pepas',precio:16500,presentacion:'',disponibilidad:'consultar'};
  const order=makeOrder({items:[{id:p.id,quantity:1,expectedPrice:p.precio}],name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},[p],settings);
- assert.ok(order.message.includes('🛍️ ¡Hola, Vitalia!'));
- assert.ok(order.message.includes('💰 Total: $16.500,00'));
+ assert.ok(order.message.includes('☘️ ¡Hola, Vitalia!'));
+ assert.ok(order.message.includes('✅ Total: $16.500,00'));
+ const decoded=new URL(order.whatsappUrl).searchParams.get('text');
+ assert.equal(decoded,order.message);
+ assert.ok(!/[\uFFFD\u{10000}-\u{10FFFF}]/u.test(decoded));
  assert.ok(order.message.endsWith('A confirmar: disponibilidad, envío y forma de pago.'));
  assert.ok(!order.message.includes('presentación a confirmar'));
  assert.ok(!order.message.includes('Total de productos:'));
