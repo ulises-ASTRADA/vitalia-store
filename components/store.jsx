@@ -81,8 +81,8 @@ export default function Store({initialCatalog=null}) {
   function change(product,delta){const error=changeCart(product,delta);setToast(error||(delta>0?'Producto agregado a tu pedido':''));}
   return <>
     <a className="skip-link" href="#catalogo">Ir al catálogo</a>
-    <div className="sticky-header" ref={header}><div className="topbar">VENTA MAYORISTA <span>·</span> Armá tu pedido y coordiná por WhatsApp</div>
-      <header className="header"><a className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 112px, 156px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></a>
+    <div className="sticky-header" ref={header}>
+      <header className="header"><a className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 88px, 112px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></a>
       <form className="search" role="search" onSubmit={e=>e.preventDefault()}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={e=>updateQuery(e.target.value)}/><kbd>/</kbd></form>
       <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><ThemeToggle id="theme-toggle"/></div></header>
       <SectionNav current="catalog"/>
