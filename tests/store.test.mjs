@@ -34,6 +34,15 @@ test('Catálogo: precios numéricos, inactivos, IDs duplicados y vacíos',()=>{
  for(const value of ['',0,-1,'7.800,00','foo']) assert.throws(()=>normalizeRows([headers,['A','Item',value,true,'']]));
  assert.throws(()=>normalizeRows([headers,['A','Item',1,true,''],['A','Item',2,true,'']]));
 });
+test('Catálogo: disponibilidad 0 significa agotado y bloquea el pedido',()=>{
+ const headers=['id','nombre','precio','activo','disponibilidad'];
+ for(const availability of [0,'0',' 0 ']){
+  const [product]=normalizeRows([headers,['A','Cookies',7800,true,availability]]);
+  assert.equal(product.disponibilidad,'agotado');
+  assert.throws(()=>makeOrder(valid(),[product,products[1]],settings),e=>e.status===409);
+ }
+ assert.throws(()=>normalizeRows([headers,['A','Cookies',7800,true,'desconocido']]));
+});
 test('Pedidos largos conservan el mensaje completo en el enlace de WhatsApp',()=>{
  const rows=Array.from({length:50},(_,i)=>({...products[0],id:'P'+i,nombre:'Nombre largo de producto que necesita una presentación completa '+i}));
  const order=makeOrder({items:rows.map(p=>({id:p.id,quantity:1,expectedPrice:p.precio})),name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},rows,settings);
