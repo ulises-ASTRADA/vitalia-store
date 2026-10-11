@@ -11,6 +11,10 @@
 html{scroll-padding-top:0}
 #catalogo{scroll-margin-top:calc(var(--header-height) + 16px)}
 .catalog-section{overflow-anchor:none}
+/* Las categorías acompañan al catálogo sin dejar vacía su columna al bajar. */
+@media(min-width:851px){
+  .categories{position:sticky;top:calc(var(--header-height) + 16px);align-self:start;max-height:calc(100dvh - var(--header-height) - 32px);overflow-y:auto;scrollbar-width:thin;overscroll-behavior-y:contain}
+}
 .search{transition:border-color .18s,box-shadow .18s}
 .search:focus-within{border-color:var(--muted);box-shadow:0 0 0 3px color-mix(in srgb,var(--muted) 12%,transparent)}
 .search input:focus,.search input:focus-visible{outline:none;box-shadow:none}
