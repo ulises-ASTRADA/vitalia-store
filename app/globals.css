@@ -10,6 +10,7 @@
 /* El espacio del encabezado corresponde a los destinos, no al campo fijo de búsqueda. */
 html{scroll-padding-top:0}
 #catalogo{scroll-margin-top:calc(var(--header-height) + 16px)}
+.catalog-section{overflow-anchor:none}
 .search{transition:border-color .18s,box-shadow .18s}
 .search:focus-within{border-color:var(--muted);box-shadow:0 0 0 3px color-mix(in srgb,var(--muted) 12%,transparent)}
 .search input:focus,.search input:focus-visible{outline:none;box-shadow:none}
