@@ -32,6 +32,7 @@ export default function Store({initialCatalog=null}) {
   const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(''),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
   const [detail,setDetail]=useState(null),[help,setHelp]=useState(false),[toast,setToast]=useState('');
   const [searchLayout,setSearchLayout]=useState(null);
+  const searching=Boolean(query);
   const header=useRef(null),search=useRef(null),results=useRef(null),catalogLimit=useRef(24);
   const {cart,count,total,change:changeCart}=useCart(products,{catalogReady:status==='ready'});
   const loadCatalog=useCallback(async()=>{
@@ -47,6 +48,20 @@ export default function Store({initialCatalog=null}) {
   },[loadCatalog,initialCatalog]);
   useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),2300);return()=>clearTimeout(timer);},[toast]);
   useEffect(()=>{document.title=`${settings.name} · Dietética`;},[settings.name]);
+  useEffect(()=>{
+    if(!searching)return;
+    let frame;
+    const compact=()=>{
+      cancelAnimationFrame(frame);
+      frame=requestAnimationFrame(()=>{
+        const offset=Math.max(0,(header.current?.getBoundingClientRect().bottom||0)+16-(results.current?.getBoundingClientRect().top||0));
+        // Al volver a subir, libera el espacio reservado sin mover el scroll.
+        setSearchLayout(previous=>previous&&offset<previous.paddingTop?{paddingTop:offset,minHeight:`calc(${offset}px + 100dvh - var(--header-height))`}:previous);
+      });
+    };
+    window.addEventListener('scroll',compact,{passive:true});
+    return()=>{window.removeEventListener('scroll',compact);cancelAnimationFrame(frame);};
+  },[searching]);
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
   const money=value=>formatter.format(value);
   const filtered=useMemo(()=>{const result=products.filter(p=>(category==='Todos'||p.categoria===category)&&(!query||normalize([p.nombre,p.descripcion,p.categoria,p.id,p.presentacion].join(' ')).includes(normalize(query))));if(sort==='price-asc')result.sort((a,b)=>a.precio-b.precio);if(sort==='price-desc')result.sort((a,b)=>b.precio-a.precio);if(sort==='name')result.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));return result;},[products,category,query,sort]);
