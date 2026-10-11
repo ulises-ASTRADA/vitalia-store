@@ -41,7 +41,7 @@ export default function Store({initialCatalog=null}) {
   useEffect(()=>{
     if(!initialCatalog)loadCatalog();
     const observer=new ResizeObserver(()=>document.documentElement.style.setProperty('--header-height',`${header.current?.getBoundingClientRect().height||145}px`));observer.observe(header.current);
-    const shortcut=event=>{if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open],[role="dialog"]')){event.preventDefault();search.current?.focus();}};
+    const shortcut=event=>{if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open],[role="dialog"]')){event.preventDefault();search.current?.focus({preventScroll:true});}};
     document.addEventListener('keydown',shortcut);return ()=>{observer.disconnect();document.removeEventListener('keydown',shortcut);};
   },[loadCatalog,initialCatalog]);
   useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),2300);return()=>clearTimeout(timer);},[toast]);
@@ -55,7 +55,7 @@ export default function Store({initialCatalog=null}) {
     <a className="skip-link" href="#catalogo">Ir al catálogo</a>
     <div className="sticky-header" ref={header}><div className="topbar">VENTA MAYORISTA <span>·</span> Armá tu pedido y coordiná por WhatsApp</div>
       <header className="header"><a className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 112px, 156px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></a>
-      <form className="search" role="search" onSubmit={e=>{e.preventDefault();document.getElementById('catalogo').scrollIntoView();}}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={e=>{setQuery(e.target.value);setLimit(24);}}/><kbd>/</kbd></form>
+      <form className="search" role="search" onSubmit={e=>e.preventDefault()}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={e=>{setQuery(e.target.value);setLimit(24);}}/><kbd>/</kbd></form>
       <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><ThemeToggle id="theme-toggle"/></div></header>
       <SectionNav current="catalog"/>
     </div>
