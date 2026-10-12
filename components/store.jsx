@@ -2,13 +2,12 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import NextImage from 'next/image';
 const Image = NextImage.default || NextImage;
-import { Button, IconButton, Input, NativeSelect } from '@chakra-ui/react';
+import { Button, IconButton, NativeSelect } from '@chakra-ui/react';
 import Icon from './icon';
-import ThemeToggle from './theme-toggle';
+import SiteHeader from './site-header';
 import NextLink from 'next/link';
 const Link=NextLink.default||NextLink;
 import {useCart} from './use-cart';
-import SectionNav from './section-nav';
 const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const pack = product => product.presentacion || 'Presentación a confirmar';
 function Photo({product,className='',eager=false,context='card'}) {
@@ -27,13 +26,13 @@ function ProductCard({product,quantity,money,change,onDetail}) {
   </article>;
 }
 const Modal=lazy(()=>import('./store-modal'));
-export default function Store({initialCatalog=null}) {
+export default function Store({initialCatalog=null,initialQuery=''}) {
   const [products,setProducts]=useState(()=>initialCatalog?.products||[]), [settings,setSettings]=useState(()=>initialCatalog?.settings||{currency:'ARS',checkoutEnabled:false,name:'Vitalia'});
-  const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(''),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
-  const [detail,setDetail]=useState(null),[help,setHelp]=useState(false),[toast,setToast]=useState('');
+  const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(initialQuery),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
+  const [detail,setDetail]=useState(null),[toast,setToast]=useState('');
   const [searchLayout,setSearchLayout]=useState(null);
   const searching=Boolean(query);
-  const header=useRef(null),search=useRef(null),results=useRef(null),catalogLimit=useRef(24);
+  const header=useRef(null),results=useRef(null),catalogLimit=useRef(24);
   const {cart,count,total,change:changeCart}=useCart(products,{catalogReady:status==='ready'});
   const loadCatalog=useCallback(async()=>{
     setStatus('loading');
@@ -42,9 +41,6 @@ export default function Store({initialCatalog=null}) {
   },[]);
   useEffect(()=>{
     if(!initialCatalog)loadCatalog();
-    const observer=new ResizeObserver(()=>document.documentElement.style.setProperty('--header-height',`${header.current?.getBoundingClientRect().height||145}px`));observer.observe(header.current);
-    const shortcut=event=>{if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open],[role="dialog"]')){event.preventDefault();search.current?.focus({preventScroll:true});}};
-    document.addEventListener('keydown',shortcut);return ()=>{observer.disconnect();document.removeEventListener('keydown',shortcut);};
   },[loadCatalog,initialCatalog]);
   useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),2300);return()=>clearTimeout(timer);},[toast]);
   useEffect(()=>{document.title=`${settings.name} · Dietética`;},[settings.name]);
@@ -81,12 +77,7 @@ export default function Store({initialCatalog=null}) {
   function change(product,delta){const error=changeCart(product,delta);setToast(error||(delta>0?'Producto agregado a tu pedido':''));}
   return <>
     <a className="skip-link" href="#catalogo">Ir al catálogo</a>
-    <div className="sticky-header" ref={header}>
-      <header className="header"><a className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 88px, 112px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></a>
-      <form className="search" role="search" onSubmit={e=>e.preventDefault()}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={e=>updateQuery(e.target.value)}/><kbd>/</kbd></form>
-      <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><ThemeToggle id="theme-toggle"/></div></header>
-      <SectionNav current="catalog"/>
-    </div>
+    <SiteHeader current="catalog" headerRef={header} query={query} onQueryChange={updateQuery}/>
     <main className="shell">
       <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><div className="hero-photos" aria-hidden="true">{['023','002','037'].map((id,i)=><Image key={id} className={`hero-photo photo-${['one','two','three'][i]}`} src={`/images/product-${id}.webp`} width={240} height={250} alt="" sizes="(max-width: 760px) 180px, 240px" loading={i===0?'eager':'lazy'} fetchPriority={i===0?'high':'auto'}/>)}<span className="hero-stamp">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span></div></section>
       <section className="catalog-section" id="catalogo" aria-labelledby="catalog-title"><div className="catalog-top"><div><p className="eyebrow muted">ENCONTRÁ TUS FAVORITOS</p><h2 id="catalog-title">Nuestro catálogo<span>.</span></h2></div></div>
@@ -101,6 +92,5 @@ export default function Store({initialCatalog=null}) {
     <Link href="/checkout" prefetch={false} id="floating-cart" className="floating-cart" aria-label={count?`Ir a mi pedido, ${count} presentaciones, total ${money(total)}`:'Ir a mi pedido, carrito vacío'}><Icon name="bag"/><span className="floating-cart-copy"><strong>Mi pedido <b>{count}</b></strong><span>{count?`${count} ${count===1?'presentación':'presentaciones'}`:'Carrito vacío'}</span></span><span className="floating-cart-total">{money(total)}</span></Link>
     <div className={`toast ${toast?'show':''}`} role="status" aria-live="polite">{toast}</div>
     {detail&&<Suspense fallback={null}><Modal open={!!detail} onClose={()=>setDetail(null)} title={detail?.nombre||'Detalle de producto'}>{detail&&<div className="product-detail-layout"><Photo product={detail} className="detail-image" context="detail" eager/><div className="detail-content"><p className="eyebrow muted">{detail.categoria}</p><h2>{detail.nombre}</h2><p className="detail-meta">{detail.id} · {pack(detail)}</p>{detail.descripcion&&<p className="detail-description">{detail.descripcion}</p>}<p className="detail-price">{money(detail.precio)}</p><p className="detail-meta">Precio por la presentación indicada. Moneda: {settings.currency}.</p><p className="detail-stock">{detail.disponibilidad==='disponible'?'Disponible según catálogo':detail.disponibilidad==='agotado'?'Agotado':'Disponibilidad a confirmar por WhatsApp'}</p><Button unstyled className="primary" disabled={detail.disponibilidad==='agotado'} onClick={()=>{change(detail,1);setDetail(null);}}>Agregar al pedido</Button></div></div>}</Modal></Suspense>}
-    {help&&<Suspense fallback={null}><Modal open={help} onClose={()=>setHelp(false)} title="Tu pedido, paso a paso" help><p className="eyebrow muted">ASÍ DE SIMPLE</p><h2>Tu pedido, paso a paso.</h2><ol><li><strong>Elegí tus productos.</strong><p>Revisá la presentación de cada uno y sumalo al carrito. Una cantidad equivale a una presentación, no siempre a una unidad individual.</p></li><li><strong>Prepará el mensaje.</strong><p>Completá tu nombre, localidad y provincia. Podés agregar una consulta opcional.</p></li><li><strong>Seguimos por WhatsApp.</strong><p>Enviá el mensaje para confirmar disponibilidad, presentaciones, entrega y forma de pago. El sitio no cobra ni reserva stock.</p></li></ol></Modal></Suspense>}
   </>;
 }

@@ -3,7 +3,7 @@ import {useMemo,useState} from 'react';
 import NextLink from 'next/link';
 import NextImage from 'next/image';
 import {Button,IconButton,Input,Textarea} from '@chakra-ui/react';
-import ThemeToggle from './theme-toggle';
+import SiteHeader from './site-header';
 import {useCart} from './use-cart';
 import CartSuggestions from './cart-suggestions';
 import {getRecommendations} from '../lib/recommendations';
@@ -43,7 +43,7 @@ export default function Checkout({initialCatalog}){
     }catch(problem){setError(problem.message||'No pudimos preparar el pedido.');}finally{setBusy(false);}
   }
   return <>
-    <header className="checkout-header"><Link href="/" className="brand" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" alt="Vitalia · Dietética" width={156} height={100} sizes="156px" loading="eager"/></Link><Link href="/" className="checkout-back">← Volver al catálogo</Link><ThemeToggle/></header>
+    <SiteHeader/>
     <main className="checkout-shell"><h1>Tu pedido</h1>
       {!loaded?<p role="status">Cargando tu pedido…</p>:!items.length?<section className="checkout-empty"><h2>Tu pedido empieza con algo rico.</h2><p>Explorá el catálogo y agregá los productos que te gusten.</p><Link href="/" className="secondary">Explorar productos</Link></section>:
       <form className="checkout-form" onSubmit={checkout}><div className="checkout-layout"><div className="checkout-main">
