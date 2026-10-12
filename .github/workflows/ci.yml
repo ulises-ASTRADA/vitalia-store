@@ -20,7 +20,7 @@ jobs:
       # Fixture local para CI. Las previews de Vercel usan la planilla pública.
       PREVIEW_MODE: 'true'
       ALLOW_TEST_CHECKOUT: 'true'
-      WHATSAPP_NUMBER: '5493512136078'
+      WHATSAPP_NUMBER: '5491100000000'
       STORE_NAME: Vitalia
       STORE_CURRENCY: ARS
     steps:

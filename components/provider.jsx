@@ -9,6 +9,6 @@ const system = createSystem(defaultConfig, {
     border: { value: 'var(--line)' }, 'fg.muted': { value: 'var(--muted)' }
   } } }
 });
-export default function Provider({ children }) {
-  return <ChakraProvider value={system}><ThemeProvider attribute="data-theme" storageKey="vitalia-theme" defaultTheme="system" enableSystem disableTransitionOnChange>{children}</ThemeProvider></ChakraProvider>;
+export default function Provider({ children, nonce }) {
+  return <ChakraProvider value={system}><ThemeProvider nonce={nonce} attribute="data-theme" storageKey="vitalia-theme" defaultTheme="system" enableSystem disableTransitionOnChange>{children}</ThemeProvider></ChakraProvider>;
 }

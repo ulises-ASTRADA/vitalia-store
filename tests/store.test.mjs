@@ -62,7 +62,7 @@ test('Producción sin Sheets no habilita pedidos',()=>{
 });
 test('API rechaza solicitudes de otro sitio y JSON incorrecto',async()=>{
  assert.equal((await POST(new Request('https://example.com/api/checkout',{method:'POST',headers:{origin:'https://other.com','content-type':'application/json'},body:'{}'}))).status,403);
- assert.equal((await POST(new Request('https://example.com/api/checkout',{method:'POST',headers:{'content-type':'application/json'},body:'wrong'}))).status,400);
+ assert.equal((await POST(new Request('https://www.vitalia.energy/api/checkout',{method:'POST',headers:{origin:'https://www.vitalia.energy','content-type':'application/json'},body:'wrong'}))).status,400);
 });
 
 test('Nombre, localidad y provincia son obligatorios y aparecen en el mensaje',()=>{
