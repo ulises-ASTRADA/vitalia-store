@@ -18,7 +18,7 @@ try{
  assert(html.includes('href="/checkout"'));
  assert(!html.includes('class="cart-dialog"'));
  const checkoutPage=await fetch(base+'/checkout');assert.equal(checkoutPage.status,200);
- const checkoutHtml=await checkoutPage.text();assert(checkoutHtml.includes('Tu pedido'));assert(checkoutHtml.includes('Volver al catálogo'));
+ const checkoutHtml=await checkoutPage.text();assert(checkoutHtml.includes('Tu pedido'));assert(checkoutHtml.includes('Cómo comprar'));assert(checkoutHtml.includes('Secciones de la tienda'));
  assert(!checkoutHtml.includes('CASI LISTO'));
  assert.match(checkoutPage.headers.get('cache-control'),/no-store/);
  assert.match(pageResponse.headers.get('cache-control'),/no-store/);

@@ -51,7 +51,7 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Quitar una presentación de Almendras'}));
  assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,1);
- assert.equal(screen.getByRole('link',{name:/Volver al catálogo/}).getAttribute('href'),'/');
+ assert.equal(screen.getByRole('link',{name:'Catálogo',exact:true}).getAttribute('href'),'/');
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
  await screen.findByRole('link',{name:/Ir a mi pedido, 1 presentaciones/});cleanup();
 });
