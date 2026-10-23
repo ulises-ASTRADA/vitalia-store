@@ -1,6 +1,7 @@
 'use client';
 import {useMemo,useRef,useState} from 'react';
 import {Button,Input} from '@chakra-ui/react';
+import Image from 'next/image';
 import {BOXES,BOX_GOALS,buildBox} from '../lib/boxes';
 
 export default function BoxBuilder({products,money,onAdd,ready}){
@@ -17,7 +18,7 @@ export default function BoxBuilder({products,money,onAdd,ready}){
   return <section className="boxes-section" id="boxes" aria-labelledby="boxes-title">
     <div className="boxes-heading"><div><p className="eyebrow muted">PARA CADA MOMENTO</p><h2 id="boxes-title">Encontrá tu box Vitalia<span>.</span></h2></div><Button unstyled className="secondary box-action" onClick={()=>start(null)}>No sé qué elegir</Button></div>
     <p className="boxes-intro">Elegí una idea y armá tu selección con productos del catálogo. Vos revisás qué sumar.</p>
-    <div className="box-grid">{BOXES.map((box,index)=><article className="box-card" key={box.id}><span className="box-number" aria-hidden="true">0{index+1}</span><p className="eyebrow muted">{box.occasion}</p><h3>{box.name}</h3><p>{box.description}</p><Button unstyled className="secondary box-action" onClick={()=>start(box.id)}>Armar {box.name}</Button></article>)}<article className="box-card box-pending"><span className="box-number" aria-hidden="true">04</span><p className="eyebrow muted">UNA SELECCIÓN DIFERENTE CADA MES</p><h3>Box del mes</h3><p>Estamos preparando esta idea. La selección todavía está por definir.</p><span className="box-status">Próximamente</span></article></div>
+    <div className="box-grid">{BOXES.map((box,index)=><article className="box-card" key={box.id}><Image className="box-image" src={box.image} alt="" width={600} height={400} sizes="(max-width: 540px) 100vw, (max-width: 1100px) 50vw, 25vw"/><span className="box-number" aria-hidden="true">0{index+1}</span><p className="eyebrow muted">{box.occasion}</p><h3>{box.name}</h3><p>{box.description}</p><Button unstyled className="secondary box-action" onClick={()=>start(box.id)}>Armar {box.name}</Button></article>)}<article className="box-card box-pending"><Image className="box-image" src="/images/boxes/monthly.webp" alt="" width={600} height={400} sizes="(max-width: 540px) 100vw, (max-width: 1100px) 50vw, 25vw"/><span className="box-number" aria-hidden="true">04</span><p className="eyebrow muted">UNA SELECCIÓN DIFERENTE CADA MES</p><h3>Box del mes</h3><p>Estamos preparando esta idea. La selección todavía está por definir.</p><span className="box-status">Próximamente</span></article></div>
     {open&&<div className="box-builder" ref={panel}><div className="box-builder-heading"><h3>No sé qué elegir</h3><Button unstyled type="button" className="plain" onClick={()=>setOpen(false)} aria-label="Cerrar asistente de boxes">Cerrar ×</Button></div><p>Contanos un poco y te proponemos una selección que podés ajustar.</p>
       <form onSubmit={submit} className="box-questions">
         <fieldset><legend>¿Para quién es?</legend>{[['self','Para mí'],['gift','Para regalar']].map(([value,label])=><label className="box-choice" key={value}><input type="radio" name="box-recipient" value={value} checked={answers.recipient===value} onChange={()=>update('recipient',value)}/>{label}</label>)}</fieldset>
