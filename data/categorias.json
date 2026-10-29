@@ -1,0 +1,67 @@
+{
+ "Galletitas y panificados": {
+  "slug": "galletitas-y-panificados",
+  "count": 53,
+  "intro": "Pepas de harina de almendra, cookies endulzadas con miel y stevia y chalitas, por kilo o en paquete. Pedilas por WhatsApp y te las llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Frutos secos y semillas": {
+  "slug": "frutos-secos-y-semillas",
+  "count": 53,
+  "intro": "Mix tropical, almendras non parell y semilla de chía, casi todo por kilo. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Granolas y cereales": {
+  "slug": "granolas-y-cereales",
+  "count": 37,
+  "intro": "Granola tradicional, quinoa pop y almohaditas de avellana, por kilo o en bolsas de hasta 5 kg. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Barritas": {
+  "slug": "barritas",
+  "count": 7,
+  "intro": "Barritas energéticas de frutos secos y barritas proteicas Entrenuts, de a 10 o 14 unidades. Pedilas por WhatsApp y te las llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Almacén": {
+  "slug": "almacen",
+  "count": 14,
+  "intro": "Cacao amargo, azúcar mascabo y soja texturizada por kilo, y extracto de vainilla El Castillo. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Harinas, pastas y legumbres": {
+  "slug": "harinas-pastas-y-legumbres",
+  "count": 33,
+  "intro": "Harina de almendra y lentejas por kilo, y spaghetti de arroz en paquete. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Infusiones": {
+  "slug": "infusiones",
+  "count": 21,
+  "intro": "Té verde en hebras, yerba Tucangua y café Lagoa, por kilo o en paquetes de 250 y 500 g. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Snacks": {
+  "slug": "snacks",
+  "count": 18,
+  "intro": "Maíz frito, garbanzos tostados y nachos, por kilo o en paquetes de 60 a 100 g. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Especias y condimentos": {
+  "slug": "especias-y-condimentos",
+  "count": 29,
+  "intro": "Sal rosada del Himalaya, cúrcuma y pimentón, casi todo por kilo. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Suplementos": {
+  "slug": "suplementos",
+  "count": 16,
+  "intro": "Maca peruana, colágeno hidrolizado y hongos reishi de Sintropia. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Untables y dulces": {
+  "slug": "untables-y-dulces",
+  "count": 23,
+  "intro": "Mermeladas caseras por kilo, dulce de leche con stevia y hummus de garbanzo. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Aceites y conservas": {
+  "slug": "aceites-y-conservas",
+  "count": 24,
+  "intro": "Aceite de oliva virgen extra, aceite de coco y aceitunas por kilo. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ },
+ "Alfajores y chocolates": {
+  "slug": "alfajores-y-chocolates",
+  "count": 24,
+  "intro": "Alfajores Cachafaz en caja de 12, almendras con chocolate y chips de chocolate semiamargo por kilo. Pedilos por WhatsApp y te los llevamos a Sierras Chicas y zona norte de Córdoba."
+ }
+}

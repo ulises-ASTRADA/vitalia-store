@@ -1,0 +1,215 @@
+/* ==========================================================================
+   Vitalia · Fase 1 — páginas de producto, categoría y envíos.
+   Se carga DESPUÉS de app/globals.css. Solo usa los tokens existentes
+   (--ink, --green, --lime, --paper, --surface, --soft, --line, --muted,
+   --field, --action-soft, --action-line, --radius). Sin colores nuevos salvo
+   el aviso [A COMPLETAR], que reutiliza los de .preview-note.
+   ========================================================================== */
+
+/* ---- Breadcrumb ------------------------------------------------------- */
+.breadcrumb{margin:4px 0 8px}
+.breadcrumb ol{list-style:none;margin:0;padding:0;display:flex;align-items:center;min-width:0;font-size:.875rem;color:var(--muted)}
+.breadcrumb li{display:flex;align-items:center;flex-shrink:0;white-space:nowrap}
+.breadcrumb li+li::before{content:"/" / "";padding:0 8px;color:var(--muted)}
+.breadcrumb a{display:inline-flex;align-items:center;min-height:44px;padding:0 2px;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.breadcrumb a:hover{color:var(--ink);text-decoration-color:currentColor}
+.breadcrumb li:last-child{flex-shrink:1;min-width:0}
+.breadcrumb [aria-current="page"]{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;display:block;line-height:44px}
+
+/* ---- Imagen con carga, sin foto ---------------------------------------- */
+.media-frame{position:relative;background:var(--soft);border-radius:10px;overflow:hidden}
+.media-frame img{display:block;width:100%;height:100%;transition:opacity .25s}
+.media-frame.is-loading img{opacity:0}
+.media-frame.is-loading::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,color-mix(in srgb,var(--surface) 70%,transparent) 50%,transparent 80%);background-size:200% 100%;animation:vt-shimmer 1.3s linear infinite}
+@keyframes vt-shimmer{from{background-position:120% 0}to{background-position:-80% 0}}
+.media-frame.is-fallback img{object-fit:contain!important;padding:18%;opacity:.55}
+.media-frame .no-photo{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:.75rem;color:var(--muted)}
+
+/* ---- Tarjeta de producto en páginas nuevas -----------------------------
+   Misma tarjeta del catálogo (.product-card). Cambios:
+   1) imagen y nombre son <a href="/productos/[slug]"> en vez de abrir el modal;
+   2) el área táctil de −/+ llega a 44px sin cambiar el tamaño visual. */
+a.product-image-button{display:block}
+a.product-name{display:flex;align-items:center;flex:1;text-decoration:none}
+a.product-name:hover{text-decoration:underline;text-underline-offset:3px}
+.product-card .add-button{position:relative}
+.product-card .add-button::after{content:"";position:absolute;inset:-6px;border-radius:50%}
+.product-card .price.price-ask{font-size:.8125rem;font-weight:600;color:var(--muted);letter-spacing:0;text-align:center;line-height:1.25}
+.product-pack.is-out{color:var(--ink);font-weight:600}
+.product-card.is-out .product-image-button img{filter:grayscale(.6);opacity:.75}
+.out-badge{position:absolute;left:10px;top:10px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;font-size:.75rem;font-weight:700;padding:4px 8px;letter-spacing:.3px}
+
+/* ---- Página de producto ------------------------------------------------ */
+.pdp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start;max-width:1120px;margin:0 auto}
+.pdp-media{position:sticky;top:calc(var(--header-height) + 16px)}
+.pdp-media .media-frame{aspect-ratio:1/1}
+.pdp-media img{object-fit:contain}
+.pdp-info{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding-top:8px}
+.pdp-info .eyebrow{margin:0 0 8px}
+.pdp-info .eyebrow a{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px;display:inline-flex;min-height:24px;align-items:center}
+.pdp-title{font-size:2rem;line-height:1.2;letter-spacing:-.8px;font-weight:600;margin:0 0 14px;overflow-wrap:break-word;hyphens:auto}
+.pdp-title.is-long{font-size:1.625rem}
+.pdp-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin:0}
+.pdp-amount{font-size:1.75rem;font-weight:700;letter-spacing:-.5px}
+.pdp-unit{font-size:.9375rem;color:var(--muted)}
+.pdp-perkg{font-size:.875rem;color:var(--muted);margin:6px 0 0}
+.pdp-buy{display:flex;gap:10px;margin:18px 0 0;min-height:52px}
+.pdp-buy .primary{min-height:52px;flex:1;width:auto;font-size:1rem}
+.pdp-buy .primary svg{width:20px;height:20px}
+.pdp-buy .primary[aria-disabled="true"]{background:var(--soft);color:var(--muted);border:1px solid var(--line);cursor:not-allowed}
+.pdp-stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.pdp-stepper button{width:48px;height:50px;border:0;border-radius:0;background:var(--soft);font-size:1.35rem;line-height:1}
+.pdp-stepper output{min-width:36px;text-align:center;font-weight:700}
+.pdp-feedback{font-size:.875rem;color:var(--muted);margin:10px 0 0;min-height:1.5em}
+.pdp-feedback a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.pdp-secondary{display:flex;align-items:center;justify-content:center;gap:9px;min-height:48px;margin:6px 0 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-weight:600;font-size:.9375rem}
+.pdp-secondary:hover{background:var(--soft)}
+.pdp-secondary svg{width:20px;height:20px}
+.ship-line{display:flex;gap:10px;align-items:flex-start;margin:16px 0 0;padding:12px 14px;background:var(--soft);border-radius:10px;font-size:.875rem;line-height:1.5}
+.ship-line svg{width:22px;height:22px;margin-top:1px}
+.ship-line a{font-weight:600;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:2px 0}
+.pdp-info .detail-stock{margin:14px 0 0;align-self:flex-start}
+.pdp-info .detail-stock.is-out{background:var(--surface);border:1px solid var(--ink);font-weight:700}
+.pdp-section-title{font-size:1rem;font-weight:600;margin:22px 0 6px}
+.pdp-info .detail-description{margin:0}
+.pdp-info .detail-meta{margin:12px 0 0}
+
+/* Relacionados: misma grilla del catálogo. */
+.related{max-width:1120px;margin:48px auto 0}
+.related-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px}
+.related-head h2{font-size:1.5rem;letter-spacing:-.6px;margin:0;font-weight:600}
+.related-head a,.see-all{font-size:.875rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;min-height:44px;display:inline-flex;align-items:center}
+.related .load-more{display:flex;align-items:center;justify-content:center;min-height:44px;width:fit-content}
+
+/* ---- Página de categoría ------------------------------------------------ */
+.category-head{margin:4px 0 22px}
+.category-head .eyebrow{margin-bottom:8px}
+.category-head h1{font-size:2.25rem;letter-spacing:-1.1px;font-weight:600;margin:0;line-height:1.15}
+.category-head h1 span{color:#8e9d3f}
+[data-theme="dark"] .category-head h1 span{color:var(--lime)}
+.category-intro{font-size:1rem;line-height:1.6;color:var(--muted);margin:10px 0 0;max-width:60ch}
+a.category-button{text-decoration:none;min-height:44px}
+a.category-button[aria-current="page"]{background:var(--green);color:white}
+a.category-button[aria-current="page"] .category-count{color:var(--lime)}
+.ship-band{margin:36px 0 0}
+
+/* ---- Envíos ------------------------------------------------------------- */
+.ship-page{max-width:880px;margin:0 auto}
+.ship-page h1{font-size:2.25rem;letter-spacing:-1.1px;font-weight:600;margin:0 0 10px;line-height:1.15}
+.ship-page h2{font-size:1.375rem;letter-spacing:-.4px;font-weight:600;margin:36px 0 14px}
+.ship-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0 0;padding:0}
+.ship-facts>div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.ship-facts dt{font-size:.875rem;color:var(--muted);margin:0 0 6px}
+.ship-facts dd{margin:0;font-size:1rem;font-weight:600}
+.zone-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.zone-list li{display:flex;align-items:center;gap:10px;min-height:52px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-weight:600;font-size:.9375rem}
+.zone-list svg{width:20px;height:20px;color:var(--muted)}
+.zone-note{font-size:.9375rem;line-height:1.6;color:var(--muted);margin:14px 0 0}
+.zone-note a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:10px 0}
+.faq{border-top:1px solid var(--line)}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item h3{margin:0;font-size:1rem}
+.faq-trigger{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:56px;padding:14px 4px;border:0;border-radius:0;background:none;text-align:left;font-weight:600;font-size:1rem;line-height:1.4}
+.faq-trigger:hover{color:var(--green)}
+[data-theme="dark"] .faq-trigger:hover{color:var(--lime)}
+.faq-trigger svg{width:20px;height:20px;transition:transform .2s}
+.faq-trigger[aria-expanded="true"] svg{transform:rotate(180deg)}
+.faq-panel{padding:0 4px 18px;font-size:.9375rem;line-height:1.65;color:var(--muted)}
+.faq-panel p{margin:0 0 8px}
+.ship-cta{display:flex;gap:12px;flex-wrap:wrap;margin:32px 0 0}
+.ship-cta .primary,.ship-cta .pdp-secondary{width:auto;min-height:48px;padding:12px 22px;margin:0;flex:1 1 220px}
+
+/* ---- Marcador de dato faltante: visible a propósito, nunca a producción --- */
+.tbd{display:inline-block;background:#fff6d7;color:#685313;border:1px dashed #c9b060;border-radius:4px;padding:0 6px;font-weight:700;font-size:.875em;letter-spacing:.2px}
+
+/* ---- Navegación: tercer destino ---------------------------------------- */
+.section-nav a{min-width:44px}
+
+/* ---- Breakpoints (mismos cortes que globals.css: 1200 / 850 / 540) ----- */
+@media(max-width:850px){
+  .pdp{gap:24px;grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+  .pdp-title{font-size:1.75rem}
+  .zone-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ship-facts{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:540px){
+  .breadcrumb{margin:0}
+  .breadcrumb ol{font-size:.8125rem}
+  .pdp{display:block}
+  .pdp-media{position:static}
+  .pdp-media .media-frame{aspect-ratio:3/2}
+  .pdp-info{padding-top:12px}
+  .pdp-info .eyebrow{margin-bottom:6px}
+  .pdp-title{font-size:1.5rem;line-height:1.22;letter-spacing:-.5px;margin-bottom:8px}
+  .pdp-title.is-long{font-size:1.3125rem}
+  .pdp-amount{font-size:1.5rem}
+  .pdp-buy{margin-top:12px}
+  .pdp-feedback{margin-top:6px}
+  .related{margin-top:36px}
+  .related-head h2{font-size:1.25rem}
+  .category-head h1,.ship-page h1{font-size:1.75rem;letter-spacing:-.8px}
+  .category-intro{font-size:.9375rem}
+  .ship-page h2{font-size:1.25rem;margin-top:30px}
+  .zone-list{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .zone-list li{font-size:.875rem;padding:10px 12px;min-height:48px}
+  .ship-facts>div{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){.media-frame.is-loading::after{animation:none}.faq-trigger svg{transition:none}}
+@media(forced-colors:active){.tbd{border:2px solid CanvasText}.media-frame{border:1px solid CanvasText}}
+
+/* Áreas táctiles ≥44px sin mover el layout (links inline). */
+.pdp-info .eyebrow a{min-height:44px;margin:-10px 0}
+.ship-line a{padding:10px 0;margin:-10px 0}
+a.product-name{min-height:44px}
+.pdp-feedback:empty{margin:0;min-height:0}
+.pdp-secondary{margin-top:10px}
+.product-page .breadcrumb{max-width:1120px;margin-inline:auto}
+
+/* ---- Envíos v2 (brief SEO 28/10): respuesta directa, saltos a zona, una sección por zona ---- */
+.ship-answer{font-size:1.0625rem;line-height:1.6;margin:10px 0 0;max-width:68ch}
+.zone-jump{margin:20px 0 0}
+.zone-jump-label{font-size:.875rem;font-weight:600;color:var(--muted);margin:0 0 8px}
+.zone-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.zone-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-weight:600;font-size:.9375rem}
+.zone-chip svg{width:18px;height:18px;color:var(--muted)}
+.zone-chip:hover{background:var(--soft);border-color:var(--muted)}
+.zone-group h2{margin-bottom:4px}
+.zone-section{padding:18px 0 20px;border-bottom:1px solid var(--line);scroll-margin-top:calc(var(--header-height) + 16px)}
+.zone-section:target h3{color:var(--green)}
+[data-theme="dark"] .zone-section:target h3{color:var(--lime)}
+.zone-section h3{font-size:1.125rem;font-weight:600;margin:0 0 6px;letter-spacing:-.2px}
+.zone-section p{margin:0 0 6px;font-size:.9375rem;line-height:1.6;color:var(--muted);max-width:68ch}
+.zone-q{font-size:.9375rem;font-weight:600;margin:12px 0 4px}
+.zone-wa{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:4px;font-weight:600;font-size:.9375rem;text-decoration:underline;text-underline-offset:3px}
+.zone-wa svg{width:20px;height:20px}
+.ship-steps{margin:0;padding-left:22px;display:grid;gap:10px;font-size:.9375rem;line-height:1.6;color:var(--muted)}
+.ship-steps strong{color:var(--ink)}
+.ship-steps-cta{width:auto;display:inline-flex;min-height:48px;margin:18px 0 0;padding:12px 22px}
+.ship-terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;margin:0;border-top:1px solid var(--line)}
+.ship-terms>div{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}
+.ship-terms dt{font-size:.9375rem;color:var(--muted)}
+.ship-terms dd{margin:0;font-weight:600;text-align:right}
+@media(max-width:850px){.zone-section{scroll-margin-top:150px}.ship-terms{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:540px){.ship-answer{font-size:1rem}.zone-chip{font-size:.875rem;padding:0 12px}.ship-steps-cta{display:flex;width:100%}}
+
+/* ---- Envíos v3: datos confirmados (costos, retiro) ---- */
+.zone-cost{display:flex;gap:8px;align-items:flex-start;color:var(--ink)!important;margin:8px 0 2px!important}
+.zone-cost svg{width:20px;height:20px;margin-top:2px;color:var(--muted)}
+.ship-table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:.9375rem}
+.ship-table th,.ship-table td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5}
+.ship-table thead th{font-size:.8125rem;font-weight:600;color:var(--muted);border-bottom-color:var(--muted)}
+.ship-table tbody th{font-weight:400}
+.ship-table td{font-weight:700;white-space:nowrap;text-align:right;width:1%}
+.ship-table thead th:last-child{text-align:right}
+.ship-free th,.ship-free td{background:var(--soft);font-weight:700;border-bottom:0}
+.ship-free td{color:var(--green)}
+[data-theme="dark"] .ship-free td{color:var(--lime)}
+.pickup{margin:24px 0 0;padding:18px 20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.pickup h3{margin:0 0 8px;font-size:1.125rem;font-weight:600}
+.pickup p{margin:0 0 6px;font-size:.9375rem;line-height:1.6;color:var(--muted)}
+.pickup .pickup-addr{display:flex;gap:8px;align-items:center;color:var(--ink);font-weight:600}
+.pickup-addr svg{width:20px;height:20px}
+.footer-social{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline;text-underline-offset:3px;margin-left:auto}
+@media(max-width:540px){.ship-table th,.ship-table td{padding:10px 8px}.pickup{padding:16px}.footer-social{margin-left:0}}
+@media(forced-colors:active){.ship-free th,.ship-free td{border:1px solid CanvasText}}
+.ship-table thead th:last-child{white-space:nowrap}.ship-terms dt{flex-shrink:0}

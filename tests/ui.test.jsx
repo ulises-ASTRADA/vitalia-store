@@ -22,6 +22,7 @@ const Store=(await import('../components/store.jsx')).default;
 const Checkout=(await import('../components/checkout.jsx')).default;
 const BoxBuilder=(await import('../components/box-builder.jsx')).default;
 const Boxes=(await import('../components/boxes.jsx')).default;
+const ProductPage=(await import('../components/product-page.jsx')).default;
 const {useCart}=await import('../components/use-cart.js');
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
@@ -69,7 +70,7 @@ test('Checkout: datos obligatorios y redirección directa sin vista previa',asyn
 test('React/Chakra: tema persistente y detalle de producto',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Activar modo oscuro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'dark'));assert.equal(localStorage.getItem('vitalia-theme'),'dark');
  await user.click(screen.getByRole('button',{name:'Activar modo claro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'light'));
- await user.click(screen.getByRole('button',{name:'Ver Almendras',exact:true}));const detail=await screen.findByRole('dialog',{name:'Almendras'});assert(within(detail).getByText('Disponibilidad a confirmar por WhatsApp'));await user.click(within(detail).getByRole('button',{name:'Cerrar',exact:true}));
+ assert.equal(screen.getByRole('link',{name:'Almendras',exact:true}).getAttribute('href'),'/productos/almendras-n001');
  goCheckout();await screen.findByText('Tu pedido');
  await user.click(screen.getByRole('button',{name:'Activar modo oscuro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'dark'));assert.equal(localStorage.getItem('vitalia-theme'),'dark');
  await user.click(screen.getByRole('button',{name:'Activar modo claro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'light'));cleanup();
@@ -166,4 +167,31 @@ test('Boxes no superan los límites del carrito ni agregan parcialmente al falla
  await user.click(screen.getByRole('button',{name:'Agregar selección al pedido'}));
  assert(screen.getByText('Máximo de 99 presentaciones de Té verde.'));
  assert.deepEqual(JSON.parse(localStorage.getItem('vitalia-cart-v1')),{N003:99});cleanup();
+});
+
+test('Tarjetas: N296 sin página propia abre el detalle como antes',async()=>{
+ cleanup();localStorage.clear();const cbd={id:'N296',nombre:'Producto sin página',categoria:'Aceites y conservas',precio:300,presentacion:'30 ML',imagen:'/images/product-001.webp',disponibilidad:'consultar'};
+ render(<Provider><Store initialCatalog={{...catalog,products:[...products,cbd]}}/></Provider>);const user=userEvent.setup({document:dom.window.document});
+ assert.equal(screen.queryByRole('link',{name:'Producto sin página',exact:true}),null);
+ await user.click(screen.getByRole('button',{name:'Ver Producto sin página',exact:true}));const detail=await screen.findByRole('dialog',{name:'Producto sin página'});assert(within(detail).getByText('Disponibilidad a confirmar por WhatsApp'));await user.click(within(detail).getByRole('button',{name:'Cerrar',exact:true}));cleanup();
+});
+test('Página de producto: agregar, stepper, foco en Ir a mi pedido y quitar',async()=>{
+ cleanup();localStorage.clear();const product=products[0];
+ render(<Provider><ProductPage catalog={catalog} product={product} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:'https://wa.me/5491100000000?text=x'}} related={[products[1]]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/></Provider>);
+ const user=userEvent.setup({document:dom.window.document});
+ assert.equal(screen.getByRole('heading',{level:1}).textContent,'Almendras');
+ assert.equal(screen.getByRole('link',{name:'Consultar por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000?text=x');
+ await user.click(screen.getByRole('button',{name:'Agregar al pedido'}));
+ const go=await screen.findByRole('link',{name:'Ir a mi pedido'});assert.equal(go.getAttribute('href'),'/checkout');await waitFor(()=>assert.equal(document.activeElement,go));
+ assert(screen.getByText('Sumaste 1 a tu pedido.'));
+ await user.click(screen.getByRole('button',{name:'Sumar una presentación'}));assert(screen.getByText('Tenés 2 en tu pedido.'));assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,2);
+ await user.click(screen.getByRole('button',{name:'Quitar una presentación'}));await user.click(screen.getByRole('button',{name:'Quitar una presentación'}));
+ assert(screen.getByText('Quitaste el producto de tu pedido.'));assert(screen.getByRole('button',{name:'Agregar al pedido'}));
+ assert.equal(screen.getByRole('link',{name:'Chalita de harina de centeno y semilla de zapallo'}).getAttribute('href'),'/productos/chalita-de-harina-de-centeno-y-semilla-de-zapallo-n002');cleanup();
+});
+test('Página de producto agotado: WhatsApp como acción principal',async()=>{
+ cleanup();localStorage.clear();const product={...products[0],disponibilidad:'agotado'};
+ render(<Provider><ProductPage catalog={{...catalog,products:[product,...products.slice(1)]}} product={product} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:'https://wa.me/5491100000000?text=x'}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/></Provider>);
+ assert.equal(screen.queryByRole('button',{name:'Agregar al pedido'}),null);assert.equal(screen.getAllByRole('link',{name:'Consultar por WhatsApp'}).length,1);
+ assert(screen.getByText('Está agotado por ahora. Escribinos y te contamos cuándo vuelve.'));cleanup();
 });

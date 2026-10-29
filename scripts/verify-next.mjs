@@ -39,5 +39,18 @@ try{
  assert.equal((await fetch(base+'/robots.txt')).status,200);assert.equal((await fetch(base+'/sitemap.xml')).status,200);
  const order=await post(body),result=await order.json();assert.equal(order.status,200);assert.equal(result.total,product.precio*2);assert(result.message.includes('PEDIDO DE PRUEBA — NO CONFIRMAR'));assert(result.whatsappUrl.startsWith('https://wa.me/5491100000000'));
  assert.equal((await post({...body,name:''})).status,400);assert.equal((await post({...body,items:[{...body.items[0],expectedPrice:1}]})).status,409);
- console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
+ const productPage=await fetch(base+'/productos/granola-tradicional-n037'),productHtml=await productPage.text();assert.equal(productPage.status,200);
+ const productNonce=productPage.headers.get('content-security-policy').match(/'nonce-([^']+)'/)[1];
+ const productLd=productHtml.match(/<script type="application\/ld\+json" nonce="([^"]+)">(.*?)<\/script>/);assert.equal(productLd[1],productNonce);
+ const productJson=JSON.parse(productLd[2]);assert.equal(productJson['@type'],'Product');assert.equal(productJson.sku,'N037');assert.equal(productJson.offers.priceCurrency,'ARS');assert.equal(productJson.aggregateRating,undefined);
+ assert(productHtml.includes('<title>Granola tradicional · 1 KG · Vitalia</title>'));assert(productHtml.includes('href="https://www.vitalia.energy/productos/granola-tradicional-n037"'));
+ assert(productHtml.includes('Agregar al pedido'));assert(productHtml.includes('https://wa.me/5491100000000?text='));assert(!/\[A (COMPLETAR|CONFIRMAR)\]/.test(productHtml));
+ const renamed=await fetch(base+'/productos/granola-vieja-n037',{redirect:'manual'});assert.equal(renamed.status,308);assert.equal(new URL(renamed.headers.get('location'),base).pathname,'/productos/granola-tradicional-n037');
+ assert.equal((await fetch(base+'/productos/no-existe-n999')).status,404);assert.equal((await fetch(base+'/categorias/no-existe')).status,404);
+ const categoryPage=await fetch(base+'/categorias/granolas-y-cereales'),categoryHtml=await categoryPage.text();assert.equal(categoryPage.status,200);
+ assert(categoryHtml.includes('<title>Granolas y cereales · Vitalia Dietética</title>'));assert.match(categoryHtml,/<h1>Granolas y cereales<span aria-hidden="true">\.<\/span><\/h1>/);
+ assert.equal((categoryHtml.match(/class="product-card/g)||[]).length,24);assert(categoryHtml.includes('href="/productos/granola-tradicional-n037"'));
+ assert(html.includes('href="/productos/'));
+ const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert(!/-n29[67]</.test(sitemapXml));
+ console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, páginas de producto y categoría, 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
 }finally{server.kill('SIGTERM');}
