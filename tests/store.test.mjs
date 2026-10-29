@@ -79,11 +79,14 @@ test('Nombre, localidad y provincia son obligatorios y aparecen en el mensaje',(
  assert.match(order.message,/Provincia: Córdoba/);
 });
 
- test('Mensaje claro: sin presentación faltante, total compacto y dos emojis',()=>{
+ test('Mensaje claro: sin presentación faltante, total compacto y sin emojis',()=>{
  const p={id:'N001',nombre:'Pepas',precio:16500,presentacion:'',disponibilidad:'consultar'};
  const order=makeOrder({items:[{id:p.id,quantity:1,expectedPrice:p.precio}],name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},[p],settings);
- assert.ok(order.message.includes('☘️ ¡Hola, Vitalia!'));
- assert.ok(order.message.includes('✅ Total: $16.500,00'));
+ // wa.me reemplaza los emojis por U+FFFD al redirigir: el mensaje no lleva ninguno.
+ assert.ok(order.message.startsWith('PEDIDO DE PRUEBA — NO CONFIRMAR\n\n¡Hola, Vitalia! Quiero consultar este pedido:')||order.message.startsWith('¡Hola, Vitalia! Quiero consultar este pedido:'));
+ assert.ok(order.message.includes('\n\nTotal: $16.500,00\n\n'));
+ assert.ok(order.message.includes('• 1 × Pepas'));
+ assert.ok(!/\p{Extended_Pictographic}|\uFE0F/u.test(order.message));
  const decoded=new URL(order.whatsappUrl).searchParams.get('text');
  assert.equal(decoded,order.message);
  assert.ok(!/[\uFFFD\u{10000}-\u{10FFFF}]/u.test(decoded));
