@@ -22,6 +22,10 @@ const Store=(await import('../components/store.jsx')).default;
 const Checkout=(await import('../components/checkout.jsx')).default;
 const BoxBuilder=(await import('../components/box-builder.jsx')).default;
 const Boxes=(await import('../components/boxes.jsx')).default;
+const ProductPage=(await import('../components/product-page.jsx')).default;
+const CategoryPage=(await import('../components/category-page.jsx')).default;
+const EnviosPage=(await import('../components/envios-page.jsx')).default;
+const {enviosPageData}=await import('../lib/envios.js');
 const {useCart}=await import('../components/use-cart.js');
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
@@ -46,14 +50,14 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  const user=setup();await screen.findByText('3 productos');
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
- assert.equal(screen.getByRole('link',{name:/Ir a mi pedido/}).getAttribute('href'),'/checkout');
+ assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');
  assert.equal(document.querySelector('dialog.cart-dialog'),null);
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Quitar una presentación de Almendras'}));
  assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,1);
  assert.equal(screen.getByRole('link',{name:'Catálogo',exact:true}).getAttribute('href'),'/');
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
- await screen.findByRole('link',{name:/Ir a mi pedido, 1 presentaciones/});cleanup();
+ await screen.findByRole('link',{name:/^Mi pedido 1 productos/});cleanup();
 });
 test('Checkout: datos obligatorios y redirección directa sin vista previa',async()=>{
  const user=setup();await screen.findByText('3 productos');
@@ -69,7 +73,7 @@ test('Checkout: datos obligatorios y redirección directa sin vista previa',asyn
 test('React/Chakra: tema persistente y detalle de producto',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Activar modo oscuro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'dark'));assert.equal(localStorage.getItem('vitalia-theme'),'dark');
  await user.click(screen.getByRole('button',{name:'Activar modo claro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'light'));
- await user.click(screen.getByRole('button',{name:'Ver Almendras',exact:true}));const detail=await screen.findByRole('dialog',{name:'Almendras'});assert(within(detail).getByText('Disponibilidad a confirmar por WhatsApp'));await user.click(within(detail).getByRole('button',{name:'Cerrar',exact:true}));
+ assert.equal(screen.getByRole('link',{name:'Almendras',exact:true}).getAttribute('href'),'/productos/almendras-n001');
  goCheckout();await screen.findByText('Tu pedido');
  await user.click(screen.getByRole('button',{name:'Activar modo oscuro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'dark'));assert.equal(localStorage.getItem('vitalia-theme'),'dark');
  await user.click(screen.getByRole('button',{name:'Activar modo claro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'light'));cleanup();
@@ -120,7 +124,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
 test('Catálogo del servidor no se consulta otra vez al hidratar',async()=>{
  const user=setup(catalog);assert(screen.getByText('3 productos'));assert.equal(catalogReads,0);
  await user.type(screen.getByRole('searchbox'),'te verde');await user.click(screen.getByRole('button',{name:'Agregar Té verde',exact:true}));
- assert.equal(catalogReads,0);assert.equal(screen.getByRole('link',{name:/Ir a mi pedido/}).getAttribute('href'),'/checkout');cleanup();
+ assert.equal(catalogReads,0);assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');cleanup();
 });
 test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
@@ -166,4 +170,83 @@ test('Boxes no superan los límites del carrito ni agregan parcialmente al falla
  await user.click(screen.getByRole('button',{name:'Agregar selección al pedido'}));
  assert(screen.getByText('Máximo de 99 presentaciones de Té verde.'));
  assert.deepEqual(JSON.parse(localStorage.getItem('vitalia-cart-v1')),{N003:99});cleanup();
+});
+
+test('Tarjetas: N296 (aceite de CBD) linkea a su página como el resto',async()=>{
+ cleanup();localStorage.clear();const cbd={id:'N296',nombre:'Aceite de CBD al 40% — uso oral',categoria:'Suplementos',precio:9100,presentacion:'20 ml',imagen:'/images/product-001.webp',disponibilidad:'consultar',descripcion:''};
+ render(<Provider><Store initialCatalog={{...catalog,products:[...products,cbd]}}/></Provider>);
+ assert.equal(screen.getByRole('link',{name:'Aceite de CBD al 40% — uso oral',exact:true}).getAttribute('href'),'/productos/aceite-de-cbd-al-40-uso-oral-n296');
+ assert.equal(screen.getByRole('link',{name:'Ver Aceite de CBD al 40% — uso oral',exact:true}).getAttribute('href'),'/productos/aceite-de-cbd-al-40-uso-oral-n296');cleanup();
+});
+test('Página de producto: agregar, stepper, foco en Ir a mi pedido y quitar',async()=>{
+ cleanup();localStorage.clear();const product=products[0];
+ render(<Provider><ProductPage catalog={catalog} product={product} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:'https://wa.me/5491100000000?text=x'}} related={[products[1]]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/></Provider>);
+ const user=userEvent.setup({document:dom.window.document});
+ assert.equal(screen.getByRole('heading',{level:1}).textContent,'Almendras');
+ assert.equal(screen.getByRole('link',{name:'Consultar por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000?text=x');
+ await user.click(screen.getByRole('button',{name:'Agregar al pedido'}));
+ const go=await screen.findByRole('link',{name:'Ir a mi pedido'});assert.equal(go.getAttribute('href'),'/checkout');await waitFor(()=>assert.equal(document.activeElement,go));
+ assert(screen.getByText('Sumaste 1 a tu pedido.'));
+ await user.click(screen.getByRole('button',{name:'Sumar una presentación'}));assert(screen.getByText('Tenés 2 en tu pedido.'));assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,2);
+ await user.click(screen.getByRole('button',{name:'Quitar una presentación'}));await user.click(screen.getByRole('button',{name:'Quitar una presentación'}));
+ assert(screen.getByText('Quitaste el producto de tu pedido.'));assert(screen.getByRole('button',{name:'Agregar al pedido'}));
+ assert.equal(screen.getByRole('link',{name:'Chalita de harina de centeno y semilla de zapallo'}).getAttribute('href'),'/productos/chalita-de-harina-de-centeno-y-semilla-de-zapallo-n002');cleanup();
+});
+test('Página de producto agotado: WhatsApp como acción principal',async()=>{
+ cleanup();localStorage.clear();const product={...products[0],disponibilidad:'agotado'};
+ render(<Provider><ProductPage catalog={{...catalog,products:[product,...products.slice(1)]}} product={product} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:'https://wa.me/5491100000000?text=x'}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/></Provider>);
+ assert.equal(screen.queryByRole('button',{name:'Agregar al pedido'}),null);assert.equal(screen.getAllByRole('link',{name:'Consultar por WhatsApp'}).length,1);
+ assert(screen.getByText('Está agotado por ahora. Escribinos y te contamos cuándo vuelve.'));cleanup();
+});
+test('Carrito flotante: nombre accesible = texto visible, dentro de un landmark',async()=>{
+ cleanup();localStorage.clear();const {container}=render(<Provider><Store initialCatalog={catalog}/></Provider>);
+ const link=container.querySelector('#floating-cart');assert.equal(link.getAttribute('aria-label'),null);
+ assert.equal(link.closest('aside').getAttribute('aria-label'),'Tu pedido');
+ assert(screen.getByRole('complementary',{name:'Tu pedido'}));
+ assert.match(link.textContent,/^Mi pedido 0 productos Carrito vacío \$/);
+ assert(screen.getByRole('link',{name:/^Mi pedido 0 productos Carrito vacío/}));cleanup();
+});
+test('Footer de producto y categoría igual al de la home: WhatsApp e Instagram',async()=>{
+ cleanup();localStorage.clear();
+ render(<Provider><ProductPage catalog={catalog} product={products[0]} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:''}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
+ assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ assert.equal(screen.getByRole('link',{name:'Instagram @vitalia_energy'}).getAttribute('href'),'https://www.instagram.com/vitalia_energy/');
+ cleanup();localStorage.clear();
+ render(<Provider><CategoryPage catalog={catalog} category={{name:'Infusiones',slug:'infusiones',intro:''}} categories={[{name:'Infusiones',slug:'infusiones',count:1,href:'/categorias/infusiones'}]} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
+ assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ assert(screen.getByRole('link',{name:'Instagram @vitalia_energy'}));
+ assert.equal(document.querySelector('.results-category').textContent,' · Infusiones');
+ cleanup();
+});
+test('/envios: chips, secciones, tabla, retiro sin dirección, FAQ y footer con Instagram',async()=>{
+ cleanup();localStorage.clear();
+ const {container}=render(<Provider><EnviosPage catalog={catalog} page={enviosPageData('5491100000000')} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
+ const user=userEvent.setup({document:dom.window.document});
+ assert.equal(screen.getByRole('heading',{level:1}).textContent,'Envíos a Sierras Chicas y zona norte de Córdoba');
+ const chips=[...container.querySelectorAll('a.zone-chip')];assert.equal(chips.length,9);
+ for(const chip of chips)assert(container.querySelector(chip.getAttribute('href')),chip.getAttribute('href'));
+ assert.equal(screen.getByRole('link',{name:'Envíos'}).getAttribute('aria-current'),'page');
+ assert.equal(screen.getByRole('link',{name:'Pedir con envío a Mendiolaza'}).getAttribute('href'),'https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Mendiolaza.');
+ assert(screen.getByRole('heading',{name:'¿Qué dietética llega a Mendiolaza y El Talar?'}));
+ const rows=[...container.querySelectorAll('.ship-table tbody tr')].map(tr=>tr.textContent);
+ assert.deepEqual(rows,['Villa Allende, Mendiolaza, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
+ assert.equal(container.querySelector('.pickup-addr').textContent,'Retiro en Villa Allende, coordinamos la dirección por WhatsApp.');
+ const triggers=container.querySelectorAll('.faq-trigger');assert.equal(triggers.length,13);assert.equal(triggers[8].textContent,'¿Hay pedido mínimo?');
+ assert.equal(triggers[0].getAttribute('aria-expanded'),'true');assert.equal(triggers[1].getAttribute('aria-expanded'),'false');
+ assert(container.querySelector('#faq-a1').hidden);
+ await user.click(triggers[1]);assert.equal(triggers[1].getAttribute('aria-expanded'),'true');assert(!container.querySelector('#faq-a1').hidden);
+ await user.click(triggers[0]);assert(container.querySelector('#faq-a0').hidden);
+ assert(container.querySelector('#faq-a12').textContent.includes('al 11 0000-0000'));
+ assert.equal(screen.getByRole('link',{name:'Instagram @vitalia_energy'}).getAttribute('href'),'https://www.instagram.com/vitalia_energy/');
+ assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ const html=container.innerHTML;assert(!html.includes('[A '));assert(!html.includes('1504'));assert(!html.includes('De la Unión'));
+ cleanup();
+});
+test('Footer: Instagram y Envíos en catálogo, boxes y producto',async()=>{
+ for(const element of [<Store initialCatalog={catalog}/>,<Boxes initialCatalog={catalog}/>,<ProductPage catalog={catalog} product={products[0]} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:''}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/>]){
+  cleanup();localStorage.clear();render(<Provider>{element}</Provider>);
+  assert.equal(screen.getByRole('link',{name:'Instagram @vitalia_energy'}).getAttribute('href'),'https://www.instagram.com/vitalia_energy/');
+  assert.equal(screen.getByRole('link',{name:'Envíos'}).getAttribute('href'),'/envios');
+ }
+ cleanup();
 });

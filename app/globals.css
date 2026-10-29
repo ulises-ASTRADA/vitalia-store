@@ -227,3 +227,8 @@ select{background:var(--surface);color:var(--ink)}
 .boxes-page{padding-bottom:32px}
 .product-card .price-row{grid-template-columns:36px minmax(0,max-content) 36px;justify-content:center;gap:10px}
 @media(max-width:540px){.section-nav{padding:4px 16px 10px}.product-card .price-row{grid-template-columns:33px minmax(0,max-content) 33px;gap:6px}}
+@media(max-width:540px){.footer span a{display:inline-flex;align-items:center;min-height:44px;font-size:.875rem;color:var(--ink);text-decoration:underline;text-underline-offset:3px}}
+/* Fase 1 · revisión 28/10: chip activo en mobile igual que el activo del sidebar; contador corto; aire bajo el carrito flotante. */
+@media(max-width:850px){a.category-button[aria-current="page"]{background:var(--green);color:#fff;border-color:var(--green)}a.category-button[aria-current="page"] .category-count{color:var(--lime)}[data-theme="dark"] a.category-button[aria-current="page"]{border-color:#5a7156}}
+@media(max-width:540px){.results-category{display:none}}
+.product-page{padding-bottom:calc(var(--floating-cart-height,88px) + 16px)}

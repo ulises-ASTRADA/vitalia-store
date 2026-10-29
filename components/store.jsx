@@ -2,31 +2,18 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import NextImage from 'next/image';
 const Image = NextImage.default || NextImage;
-import { Button, IconButton, NativeSelect } from '@chakra-ui/react';
-import Icon from './icon';
+import { Button, NativeSelect } from '@chakra-ui/react';
 import SiteHeader from './site-header';
-import NextLink from 'next/link';
-const Link=NextLink.default||NextLink;
+import SiteFooter from './site-footer';
+import FloatingCart from './floating-cart';
 import {useCart} from './use-cart';
+import {ProductCard,Photo,pack} from './product-card';
+import {productPath} from '../lib/product-links';
+// Las tarjetas del home llevan a /productos/[slug]. Para volver al modal, poné false.
+const CARDS_LINK_TO_PAGE=true;
 const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const pack = product => product.presentacion || 'Presentación a confirmar';
-function Photo({product,className='',eager=false,context='card'}) {
-  const [broken,setBroken]=useState(false);
-  const src=broken?'/images/logo-web.webp':product.imagen||'/images/logo-web.webp';
-  const sizes=context==='detail'?'(max-width: 760px) calc(100vw - 88px), 400px':context==='cart'?'64px':'(max-width: 540px) calc((100vw - 48px)/2), (max-width: 1050px) 30vw, 260px';
-  return <Image src={src} alt={product.nombre} width={context==='detail'?800:360} height={context==='detail'?780:350} sizes={sizes} unoptimized={!src.startsWith('/images/')} loading={eager?'eager':'lazy'} className={className} onError={()=>setBroken(true)}/>;
-}
-function ProductCard({product,quantity,money,change,onDetail}) {
-  return <article className="product-card" data-product={product.id}>
-    <Button unstyled className="product-image-button" onClick={()=>onDetail(product)} aria-label={`Ver ${product.nombre}`}><Photo product={product}/>{quantity>0&&<span className="quantity-badge">{quantity}</span>}</Button>
-    <p className="product-category">{product.categoria}</p>
-    <Button unstyled className="product-name" onClick={()=>onDetail(product)}>{product.nombre}</Button>
-    <p className="product-pack">{product.disponibilidad==='agotado'?'Agotado':pack(product)}</p>
-    <div className="price-row"><IconButton unstyled className="add-button subtract-button" aria-label={`Quitar una presentación de ${product.nombre}`} disabled={!quantity} onClick={()=>change(product,-1)}>−</IconButton><span className="price">{money(product.precio)}</span><IconButton unstyled className="add-button" aria-label={`Agregar ${product.nombre}`} disabled={product.disponibilidad==='agotado'} onClick={()=>change(product,1)}>+</IconButton></div>
-  </article>;
-}
 const Modal=lazy(()=>import('./store-modal'));
-export default function Store({initialCatalog=null,initialQuery=''}) {
+export default function Store({initialCatalog=null,initialQuery='',whatsappUrl=''}) {
   const [products,setProducts]=useState(()=>initialCatalog?.products||[]), [settings,setSettings]=useState(()=>initialCatalog?.settings||{currency:'ARS',checkoutEnabled:false,name:'Vitalia'});
   const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(initialQuery),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
   const [detail,setDetail]=useState(null),[toast,setToast]=useState('');
@@ -83,14 +70,14 @@ export default function Store({initialCatalog=null,initialQuery=''}) {
       <section className="catalog-section" id="catalogo" aria-labelledby="catalog-title"><div className="catalog-top"><div><p className="eyebrow muted">ENCONTRÁ TUS FAVORITOS</p><h2 id="catalog-title">Nuestro catálogo<span>.</span></h2></div></div>
         <div className="catalog-layout"><aside className="categories"><h3>Categorías</h3><nav aria-label="Categorías de productos">{categories.map(name=><Button unstyled key={name} className="category-button" aria-pressed={name===category} onClick={()=>{setCategory(name);setLimit(24);}}><span>{name}</span><span className="category-count">{name==='Todos'?products.length:products.filter(p=>p.categoria===name).length}</span></Button>)}</nav><div className="side-note"><span className="tiny-rule"/><strong>De tu carrito<br/>a WhatsApp.</strong><p>Consultá disponibilidad y coordiná el pago y la entrega al enviar tu pedido.</p></div></aside>
         <div className="results" ref={results} style={searchLayout}><div className="results-toolbar"><p role="status" aria-live="polite">{status==='loading'?'Cargando productos…':status==='error'?'Catálogo no disponible':`${filtered.length} ${filtered.length===1?'producto':'productos'}${category==='Todos'?'':' · '+category}`}</p><label className="sort-label" htmlFor="sort">Ordenar <NativeSelect.Root className="chakra-sort" width={{base:'176px',sm:'188px'}}><NativeSelect.Field id="sort" value={sort} onChange={e=>{setSort(e.target.value);setLimit(24);}} bg="var(--surface)" color="var(--ink)" borderColor="var(--line)" paddingInlineStart="14px" paddingInlineEnd="44px" minHeight="44px"><option value="catalog">Según catálogo</option><option value="price-asc">Menor precio</option><option value="price-desc">Mayor precio</option><option value="name">Nombre: A a Z</option></NativeSelect.Field><NativeSelect.Indicator insetInlineEnd="14px" color="var(--ink)"/></NativeSelect.Root></label></div>
-          {status==='error'?<div className="status-panel"><h3>No pudimos cargar el catálogo</h3><p>Intentá nuevamente en unos minutos.</p><Button unstyled onClick={loadCatalog}>Reintentar</Button></div>:status==='ready'&&!filtered.length?<div className="status-panel"><h3>No encontramos esos productos</h3><p>Probá con otra palabra o explorá todas las categorías.</p><Button unstyled onClick={()=>{updateQuery('');setCategory('Todos');}}>Ver todo el catálogo</Button></div>:<div className="product-grid" aria-busy={status==='loading'}>{filtered.slice(0,limit).map(product=><ProductCard key={product.id} product={product} quantity={cart[product.id]||0} money={money} change={change} onDetail={setDetail}/>)}</div>}
+          {status==='error'?<div className="status-panel"><h3>No pudimos cargar el catálogo</h3><p>Intentá nuevamente en unos minutos.</p><Button unstyled onClick={loadCatalog}>Reintentar</Button></div>:status==='ready'&&!filtered.length?<div className="status-panel"><h3>No encontramos esos productos</h3><p>Probá con otra palabra o explorá todas las categorías.</p><Button unstyled onClick={()=>{updateQuery('');setCategory('Todos');}}>Ver todo el catálogo</Button></div>:<div className="product-grid" aria-busy={status==='loading'}>{filtered.slice(0,limit).map(product=><ProductCard key={product.id} product={product} quantity={cart[product.id]||0} money={money} change={change} href={CARDS_LINK_TO_PAGE?productPath(product):null} onDetail={setDetail}/>)}</div>}
           {filtered.length>limit&&<Button unstyled className="load-more" onClick={()=>setLimit(n=>n+24)}>Ver más productos ({Math.min(limit,filtered.length)} de {filtered.length})</Button>}
         </div></div>
       </section>
     </main>
-    <footer className="footer"><a href="/" className="footer-brand">Vitalia</a><p>Elegí. Sumá. Conversemos.</p></footer>
-    <Link href="/checkout" prefetch={false} id="floating-cart" className="floating-cart" aria-label={count?`Ir a mi pedido, ${count} presentaciones, total ${money(total)}`:'Ir a mi pedido, carrito vacío'}><Icon name="bag"/><span className="floating-cart-copy"><strong>Mi pedido <b>{count}</b></strong><span>{count?`${count} ${count===1?'presentación':'presentaciones'}`:'Carrito vacío'}</span></span><span className="floating-cart-total">{money(total)}</span></Link>
+    <SiteFooter whatsappUrl={whatsappUrl}/>
+    <FloatingCart count={count} total={total} money={money}/>
     <div className={`toast ${toast?'show':''}`} role="status" aria-live="polite">{toast}</div>
-    {detail&&<Suspense fallback={null}><Modal open={!!detail} onClose={()=>setDetail(null)} title={detail?.nombre||'Detalle de producto'}>{detail&&<div className="product-detail-layout"><Photo product={detail} className="detail-image" context="detail" eager/><div className="detail-content"><p className="eyebrow muted">{detail.categoria}</p><h2>{detail.nombre}</h2><p className="detail-meta">{detail.id} · {pack(detail)}</p>{detail.descripcion&&<p className="detail-description">{detail.descripcion}</p>}<p className="detail-price">{money(detail.precio)}</p><p className="detail-meta">Precio por la presentación indicada. Moneda: {settings.currency}.</p><p className="detail-stock">{detail.disponibilidad==='disponible'?'Disponible según catálogo':detail.disponibilidad==='agotado'?'Agotado':'Disponibilidad a confirmar por WhatsApp'}</p><Button unstyled className="primary" disabled={detail.disponibilidad==='agotado'} onClick={()=>{change(detail,1);setDetail(null);}}>Agregar al pedido</Button></div></div>}</Modal></Suspense>}
+    {detail&&<Suspense fallback={null}><Modal open={!!detail} onClose={()=>setDetail(null)} title={detail?.nombre||'Detalle de producto'}>{detail&&<div className="product-detail-layout"><Photo product={detail} className="detail-image" context="detail" eager frame={false}/><div className="detail-content"><p className="eyebrow muted">{detail.categoria}</p><h2>{detail.nombre}</h2><p className="detail-meta">{detail.id} · {pack(detail)}</p>{detail.descripcion&&<p className="detail-description">{detail.descripcion}</p>}<p className="detail-price">{money(detail.precio)}</p><p className="detail-meta">Precio por la presentación indicada. Moneda: {settings.currency}.</p><p className="detail-stock">{detail.disponibilidad==='disponible'?'Disponible según catálogo':detail.disponibilidad==='agotado'?'Agotado':'Disponibilidad a confirmar por WhatsApp'}</p><Button unstyled className="primary" disabled={detail.disponibilidad==='agotado'} onClick={()=>{change(detail,1);setDetail(null);}}>Agregar al pedido</Button></div></div>}</Modal></Suspense>}
   </>;
 }

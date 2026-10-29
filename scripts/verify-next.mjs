@@ -39,5 +39,54 @@ try{
  assert.equal((await fetch(base+'/robots.txt')).status,200);assert.equal((await fetch(base+'/sitemap.xml')).status,200);
  const order=await post(body),result=await order.json();assert.equal(order.status,200);assert.equal(result.total,product.precio*2);assert(result.message.includes('PEDIDO DE PRUEBA — NO CONFIRMAR'));assert(result.whatsappUrl.startsWith('https://wa.me/5491100000000'));
  assert.equal((await post({...body,name:''})).status,400);assert.equal((await post({...body,items:[{...body.items[0],expectedPrice:1}]})).status,409);
- console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
+ const productPage=await fetch(base+'/productos/granola-tradicional-n037'),productHtml=await productPage.text();assert.equal(productPage.status,200);
+ const productNonce=productPage.headers.get('content-security-policy').match(/'nonce-([^']+)'/)[1];
+ const productLd=productHtml.match(/<script type="application\/ld\+json" nonce="([^"]+)">(.*?)<\/script>/);assert.equal(productLd[1],productNonce);
+ const productJson=JSON.parse(productLd[2]);assert.equal(productJson['@type'],'Product');assert.equal(productJson.sku,'N037');assert.equal(productJson.offers.priceCurrency,'ARS');assert.equal(productJson.aggregateRating,undefined);if(data.products.find(p=>p.id==='N037').disponibilidad==='consultar')assert.equal('availability' in productJson.offers,false);
+ assert(productHtml.includes('<title>Granola tradicional · 1 KG · Vitalia</title>'));assert(productHtml.includes('href="https://www.vitalia.energy/productos/granola-tradicional-n037"'));
+ assert(productHtml.includes('Agregar al pedido'));assert(productHtml.includes('https://wa.me/5491100000000?text='));assert(!/\[A (COMPLETAR|CONFIRMAR)\]/.test(productHtml));
+ // Claims pendientes fuera de title/og/twitter/JSON-LD/slug (N219); h1 con el nombre original; meta sin "×500 GR".
+ const yerbaTitle='Yerba kalena sin agrotóxicos · 500 GR · Vitalia';
+ const yerba=await fetch(base+'/productos/yerba-kalena-sin-agrotoxicos-n219'),yerbaHtml=await yerba.text();assert.equal(yerba.status,200);
+ assert(yerbaHtml.includes(`<title>${yerbaTitle}</title>`));assert(yerbaHtml.includes(`<meta property="og:title" content="${yerbaTitle}"/>`));assert(yerbaHtml.includes(`<meta name="twitter:title" content="${yerbaTitle}"/>`));
+ assert(yerbaHtml.includes('"name":"Yerba kalena sin agrotóxicos"'));assert.match(yerbaHtml,/<meta name="description" content="Yerba kalena sin agrotóxicos \(500 GR\) a \$[\d.]+\. Pedilo en Vitalia y coordiná la entrega por WhatsApp\."\/>/);
+ assert.match(yerbaHtml,/<h1[^>]*>Yerba kalena sin agrotóxicos sin T\.A\.C\.C/);
+ const oldSlug=await fetch(base+'/productos/yerba-kalena-sin-agrotoxicos-sin-t-a-c-c-n219',{redirect:'manual'});assert.equal(oldSlug.status,308);assert.equal(new URL(oldSlug.headers.get('location'),base).pathname,'/productos/yerba-kalena-sin-agrotoxicos-n219');
+ const renamed=await fetch(base+'/productos/granola-vieja-n037',{redirect:'manual'});assert.equal(renamed.status,308);assert.equal(new URL(renamed.headers.get('location'),base).pathname,'/productos/granola-tradicional-n037');
+ assert.equal((await fetch(base+'/productos/no-existe-n999')).status,404);assert.equal((await fetch(base+'/categorias/no-existe')).status,404);
+ const categoryPage=await fetch(base+'/categorias/granolas-y-cereales'),categoryHtml=await categoryPage.text();assert.equal(categoryPage.status,200);
+ assert(categoryHtml.includes('<title>Granolas y cereales · Vitalia Dietética</title>'));assert.match(categoryHtml,/<h1>Granolas y cereales<span aria-hidden="true">\.<\/span><\/h1>/);
+ assert.equal((categoryHtml.match(/class="product-card/g)||[]).length,24);assert(categoryHtml.includes('href="/productos/granola-tradicional-n037"'));
+ assert(html.includes('href="/productos/'));
+ // Revisión 28/10: 308 por mayúsculas, meta de categoría, footer igual a la home, carrito flotante sin aria-label.
+ for(const path of ['/categorias/Granolas-y-Cereales','/categorias/GRANOLAS-Y-CEREALES','/productos/Granola-Tradicional-N037']){const r=await fetch(base+path,{redirect:'manual'});assert.equal(r.status,308,path);assert.equal(new URL(r.headers.get('location'),base).pathname,path.toLowerCase());}
+ const categoryMeta=categoryHtml.match(/<meta name="description" content="([^"]*)"/)[1];assert.match(categoryMeta,/^[^.!?]+[.!?] Pedidos por WhatsApp\.$/);
+ assert.match(productHtml.match(/<meta name="description" content="([^"]*)"/)[1],/^Granola tradicional \(1 KG\) a \$\d{1,3}(\.\d{3})*\. /);
+ for(const page of [html,productHtml,categoryHtml]){assert(page.includes('>Pedidos por WhatsApp</a>'));assert(page.includes('href="https://www.instagram.com/vitalia_energy/"'));assert(page.includes('<aside class="floating-cart-region" aria-label="Tu pedido">'));assert(!/id="floating-cart"[^>]*aria-label/.test(page));}
+ const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/productos/yerba-kalena-sin-agrotoxicos-n219'));assert.doesNotMatch(sitemapXml,/sin-t-a-c-c|sin-gluten|sin-azucar/);assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert.equal((sitemapXml.match(/\/productos\//g)||[]).length,data.products.length);
+ // /envios: 200, misma CSP que el baseline de producción (nonce enmascarado), JSON-LD con nonce, sin dirección ni marcadores.
+ const BASELINE_CSP="default-src 'self'; script-src 'self' 'nonce-X' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
+ const mask=policy=>policy.replace(/'nonce-[^']+'/,"'nonce-X'");
+ assert.equal(mask(csp),BASELINE_CSP);
+ const enviosPage=await fetch(base+'/envios'),enviosHtml=await enviosPage.text();assert.equal(enviosPage.status,200);
+ const enviosCsp=enviosPage.headers.get('content-security-policy');assert.equal(mask(enviosCsp),BASELINE_CSP);
+ const enviosNonce=enviosCsp.match(/'nonce-([^']+)'/)[1];
+ const enviosLd=enviosHtml.match(/<script type="application\/ld\+json" nonce="([^"]+)">(.*?)<\/script>/);assert.equal(enviosLd[1],enviosNonce);
+ const enviosGraph=JSON.parse(enviosLd[2])['@graph'];const faqLd=enviosGraph.find(n=>n['@type']==='FAQPage');assert.equal(faqLd.mainEntity.length,13);assert.equal(faqLd.mainEntity[8].name,'¿Hay pedido mínimo?');
+ assert.equal(enviosGraph.find(n=>n['@type']==='WebPage').about['@id'],'https://www.vitalia.energy/#tienda');
+ assert.equal((enviosHtml.match(/class="faq-trigger"/g)||[]).length,13);assert(enviosHtml.includes('<dt>Pedido mínimo</dt><dd>Sin pedido mínimo</dd>'));assert.equal((enviosHtml.match(/class="zone-chip"/g)||[]).length,9);assert.equal((enviosHtml.match(/class="zone-section"/g)||[]).length,9);
+ assert(enviosHtml.includes('<title>Envíos a Sierras Chicas y zona norte de Córdoba | Vitalia</title>'));
+ assert(enviosHtml.includes('<meta name="description" content="Llevamos tu pedido de la dietética a Villa Allende, Unquillo, Río Ceballos, Mendiolaza, La Calera, Saldán y zona norte de Córdoba."/>'));
+ assert(enviosHtml.includes('href="https://www.vitalia.energy/envios"'));
+ assert(enviosHtml.includes('https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Villa%20Allende.'));
+ assert(enviosHtml.includes('al 11 0000-0000'));assert(!enviosHtml.includes('394-7394'));
+ assert(enviosHtml.includes('aria-current="page" href="/envios"')||enviosHtml.includes('href="/envios" aria-current="page"'));
+ assert(!enviosHtml.includes('[A '));assert(!enviosHtml.includes('1504'));assert(!enviosHtml.includes('De la Unión'));assert(!/google\.[a-z.]+\/maps/.test(enviosHtml));
+ for(const [page,label] of [[html,'home'],[enviosHtml,'envios'],[productHtml,'producto']])assert(page.includes('class="footer-social" href="https://www.instagram.com/vitalia_energy/"'),label);
+ const homeStore=JSON.parse(html.match(/<script type="application\/ld\+json" nonce="[^"]+">(.*?)<\/script>/)[1])['@graph'].find(n=>n['@type']==='HealthFoodStore');
+ assert.deepEqual(homeStore.address,{'@type':'PostalAddress',addressLocality:'Villa Allende',addressRegion:'Córdoba',addressCountry:'AR'});assert.deepEqual(homeStore.sameAs,['https://www.instagram.com/vitalia_energy/']);assert.equal(homeStore.openingHours,undefined);assert.equal(homeStore.areaServed.length,9);
+ assert(sitemapXml.includes('https://www.vitalia.energy/envios'));
+ const llms=await (await fetch(base+'/llms.txt')).text();assert(llms.includes('https://www.vitalia.energy/envios'));assert(llms.includes('instagram.com/vitalia_energy'));assert(!llms.includes('1504'));
+ assert(productHtml.includes('href="/envios"'));
+ console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, páginas de producto y categoría, /envios (CSP = baseline, FAQPage 13, sin dirección), 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
 }finally{server.kill('SIGTERM');}
