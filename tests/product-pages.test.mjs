@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {slugify,productSlug,productPath,findBySlug} from '../lib/product-links.js';
 import * as productLinks from '../lib/product-links.js';
 import localCatalog from '../data/catalog.json' with {type:'json'};
-import {cleanDescription,pricePerKilo,productPageData,relatedProducts,categoryList,categoryPageData,pageProducts,resolveProduct,assertNoPlaceholders,whatsappConsultUrl,offerAvailability} from '../lib/product-pages.js';
+import {cleanDescription,pricePerKilo,productPageData,relatedProducts,categoryList,categoryPageData,pageProducts,resolveProduct,assertNoPlaceholders,whatsappConsultUrl,offerAvailability,metaMoney,stripPendingClaims,FILTER_PENDING_CLAIMS} from '../lib/product-pages.js';
 import categorias from '../data/categorias.json' with {type:'json'};
+const fixtureCatalog=()=>(Array.isArray(localCatalog)?localCatalog:localCatalog.products);
 const p=(id,nombre,categoria,extra={})=>({id,nombre,categoria,precio:1000,presentacion:'1 KG',disponibilidad:'consultar',descripcion:'',imagen:`/images/product-${id}.webp`,...extra});
 
 test('Slugs: nombre + código, sin acentos ni símbolos',()=>{
@@ -39,7 +40,7 @@ test('N296 y N297 (aceites de CBD) tienen página como cualquier producto, aunqu
   const page=productPageData(products[1],{phone:'5491100000000'});
   assert.equal(page.title,'Aceite de CBD al 40% — uso oral · 20 ml · Vitalia');
   assert.equal(page.description,'');assert.equal(page.jsonLd.description,undefined);
-  assert.equal(page.metaDescription,'Aceite de CBD al 40% — uso oral (20 ml) a $\u00a09.100,00. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  assert.equal(page.metaDescription,'Aceite de CBD al 40% — uso oral (20 ml) a $9.100. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
   assert.equal(page.jsonLd.offers.availability,undefined);assert.equal(page.jsonLd.offers.price,9100);
   assert.doesNotMatch(JSON.stringify(page),/salud|terap|medic|beneficio|dolor|ansiedad/i);
 });
@@ -71,7 +72,7 @@ test('Datos de la página: título, meta, JSON-LD y WhatsApp',()=>{
   const product=p('N037','Granola tradicional','Granolas y cereales',{precio:7700,disponibilidad:'disponible',descripcion:'Avena, arroz, copos de maíz, mix de semillas, miel, maní y coco'});
   const page=productPageData(product,{currency:'ARS',phone:'5491100000000'});
   assert.equal(page.title,'Granola tradicional · 1 KG · Vitalia');
-  assert.match(page.metaDescription,/^Granola tradicional \(1 KG\) a \$\s7\.700,00\. Avena, .* Pedilo en Vitalia y coordiná la entrega por WhatsApp\.$/);
+  assert.match(page.metaDescription,/^Granola tradicional \(1 KG\) a \$7\.700\. Avena, .* Pedilo en Vitalia y coordiná la entrega por WhatsApp\.$/);
   assert.equal(page.jsonLd['@type'],'Product');assert.equal(page.jsonLd.offers.price,7700);assert.equal(page.jsonLd.offers.priceCurrency,'ARS');
   assert.equal(page.jsonLd.offers.availability,'https://schema.org/InStock');assert.equal(page.jsonLd.image,'https://www.vitalia.energy/images/product-N037.webp');
   assert.equal(page.jsonLd.aggregateRating,undefined);assert.equal(page.jsonLd.review,undefined);
@@ -103,4 +104,48 @@ test('Un marcador en los datos de la página corta el build',()=>{
   const product=p('N1','Granola [A COMPLETAR]','Granolas');
   assert.throws(()=>assertNoPlaceholders(productPageData(product),'/productos'),/A COMPLETAR/);
   assert.throws(()=>assertNoPlaceholders({intro:'Texto [A CONFIRMAR]'},'/categorias'),/A CONFIRMAR/);
+});
+
+test('Meta description: hasta 155 caracteres, corte en palabra con "…"',()=>{
+  const long='Avena arrollada, arroz inflado, copos de maíz, mix de semillas de girasol, lino y sésamo, miel pura de abejas, maní tostado sin sal y coco rallado de primera calidad';
+  const page=productPageData(p('N037','Granola tradicional','Granolas y cereales',{precio:7700,descripcion:long}));
+  assert(page.metaDescription.length<=155,page.metaDescription.length);
+  assert.match(page.metaDescription,/^Granola tradicional \(1 KG\) a \$7\.700\. Avena arrollada, .*\S… Pedilo en Vitalia y coordiná la entrega por WhatsApp\.$/);
+  const cut=page.metaDescription.split(' Pedilo')[0];assert(long.includes(cut.replace(/^.*?\. /,'').replace('…','')));
+  assert.ok(page.metaDescription.length>140,'usa el espacio disponible');
+  const short=productPageData(p('N1','Maní','Frutos secos',{precio:4200,descripcion:'Tostado sin sal'}));
+  assert.equal(short.metaDescription,'Maní (1 KG) a $4.200. Tostado sin sal. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  for(const product of fixtureCatalog())assert(productPageData(product,{products:fixtureCatalog()}).metaDescription.length<=155,product.id);
+});
+test('Precios sin centavos en title/meta y títulos de más de 60 sin " · Vitalia"',()=>{
+  assert.equal(metaMoney(9100),'$9.100');assert.equal(metaMoney(7839.999999999999),'$7.840');assert.equal(metaMoney(950),'$950');
+  const long=productPageData(p('N9','Mix de frutos secos premium tostados con miel y sal marina','Frutos secos',{presentacion:'500 GR'}));
+  assert.equal(long.title,'Mix de frutos secos premium tostados con miel y sal marina · 500 GR');
+  const ok=productPageData(p('N9','Granola tradicional','Granolas'));assert.equal(ok.title,'Granola tradicional · 1 KG · Vitalia');
+  for(const product of fixtureCatalog()){const t=productPageData(product).title;assert(t.length<=60||!t.endsWith(' · Vitalia'),t);}
+});
+test('Nombres repetidos: el título suma presentación o código para no duplicarse',()=>{
+  const list=[p('N184','Almohaditas de avellana','Cereales',{presentacion:'1 KG'}),p('N188','Almohaditas de avellana','Cereales',{presentacion:'1 KG'}),p('N185','Almohaditas de chocolate','Cereales',{presentacion:'1 KG'}),p('N191','Almohaditas de chocolate','Cereales',{presentacion:'2.5 KG'}),p('N048','Gelatina sin sabor premium','X',{presentacion:'1 KG'}),p('N328','Gelatina sin sabor premium','X',{presentacion:'1 kg'})];
+  const titles=list.map(x=>productPageData(x,{products:list}).title);
+  assert.deepEqual(titles,['Almohaditas de avellana · 1 KG · N184 · Vitalia','Almohaditas de avellana · 1 KG · N188 · Vitalia','Almohaditas de chocolate · 1 KG · Vitalia','Almohaditas de chocolate · 2.5 KG · Vitalia','Gelatina sin sabor premium · 1 KG · N048 · Vitalia','Gelatina sin sabor premium · 1 kg · N328 · Vitalia']);
+  const all=fixtureCatalog();const seen=new Set();
+  for(const product of all){const t=productPageData(product,{products:all}).title;assert(!seen.has(t),`título repetido: ${t}`);seen.add(t);}
+});
+test('Claims sin confirmar (T.A.C.C., gluten, azúcar) fuera de meta y JSON-LD; el texto visible no cambia',()=>{
+  assert.equal(FILTER_PENDING_CLAIMS,true);
+  const cases={'Sin T.A.C.C':'','Libre de gluten, sin T.A.C.C':'','Gluten free':'','Sin azúcar agregada, sin T.A.C.C':'','Barrita de avena sin T.A.C.C.':'Barrita de avena','Huevo, avena y durazno. Sin harinas refinadas ni azúcar':'Huevo, avena y durazno.','Nachos sabor Calabrés sin gluten y sin lácteos':'Nachos sabor Calabrés sin lácteos','Crackers al Curry sin gluten, sin conservantes ni lácteos':'Crackers al Curry sin conservantes ni lácteos','Alfajor brownie — Calafate (sin gluten)':'Alfajor brownie — Calafate','Chips de chocolate. Sin harinas refinadas.':'Chips de chocolate.','Avena y miel. Sin TACC':'Avena y miel.'};
+  for(const [input,expected] of Object.entries(cases))assert.equal(stripPendingClaims(input),expected,input);
+  const product=p('N173','Galletitas de arroz','Snacks',{precio:3000,descripcion:'Arroz yamaní tostado. Libre de gluten, sin T.A.C.C'});
+  const page=productPageData(product);
+  assert.equal(page.description,'Arroz yamaní tostado. Libre de gluten, sin T.A.C.C','visible sin cambios');
+  assert.doesNotMatch(page.metaDescription,/t\.?a\.?c\.?c|gluten/i);assert.doesNotMatch(page.jsonLd.description,/t\.?a\.?c\.?c|gluten/i);
+  assert.equal(page.jsonLd.description,'Arroz yamaní tostado.');
+  const named=productPageData(p('N175','Copos sin azúcar','Cereales',{descripcion:'Sin T.A.C.C'}));
+  assert.equal(named.jsonLd.description,undefined);assert.equal(named.jsonLd.name,'Copos sin azúcar');assert.equal(named.title,'Copos sin azúcar · 1 KG · Vitalia','el nombre visible y el título no cambian');assert.equal(named.metaDescription,'Copos (1 KG) a $1.000. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  for(const product of fixtureCatalog()){const d=productPageData(product);const text=[stripPendingClaims(d.description),d.jsonLd.description||''].join(' ');assert.doesNotMatch(text,/t\.\s*a\.\s*c\.\s*c|gluten|sin az[uú]car/i,product.id);}
+});
+test('Meta de categoría: primera oración de la intro + "Pedidos por WhatsApp."',()=>{
+  const data=categoryPageData([p('N1','A','Granolas y cereales')],'granolas-y-cereales');
+  const first=categorias['Granolas y cereales'].intro.match(/^.*?[.!?](?=\s|$)/)[0];
+  assert.equal(data.metaDescription,`${first} Pedidos por WhatsApp.`);assert.equal(data.intro,categorias['Granolas y cereales'].intro);
 });

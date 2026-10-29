@@ -3,6 +3,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import NextLink from 'next/link';
 import {Button} from '@chakra-ui/react';
 import SiteHeader from './site-header';
+import SiteFooter from './site-footer';
 import Icon from './icon';
 import FloatingCart from './floating-cart';
 import ShipLine from './ship-line';
@@ -12,7 +13,7 @@ import {productPath} from '../lib/product-links';
 const Link=NextLink.default||NextLink;
 const STOCK={disponible:'Disponible según catálogo',agotado:'Agotado',consultar:'Disponibilidad a confirmar por WhatsApp'};
 
-export default function ProductPage({catalog,product,page,related,category}) {
+export default function ProductPage({catalog,product,page,related,category,storeWhatsappUrl}) {
   const {products,settings}=catalog;
   const {cart,loaded,count,total,change}=useCart(products);
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
@@ -62,7 +63,7 @@ export default function ProductPage({catalog,product,page,related,category}) {
         <div className="product-grid">{related.map(item=><ProductCard key={item.id} product={item} quantity={loaded?cart[item.id]||0:0} money={money} change={changeRelated} href={productPath(item)}/>)}</div>
         <Link className="load-more" href={category.href}>Ver todo {product.categoria} ({category.count})</Link></section>}
     </main>
-    <footer className="footer"><Link href="/" className="footer-brand">Vitalia</Link><p>Elegí. Sumá. Conversemos.</p></footer>
+    <SiteFooter whatsappUrl={storeWhatsappUrl}/>
     <FloatingCart count={count} total={total} money={money}/>
     <div className={`toast ${toast?'show':''}`} role="status" aria-live="polite">{toast}</div>
   </>;

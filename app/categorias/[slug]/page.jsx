@@ -2,8 +2,8 @@ import {headers} from 'next/headers';
 import {notFound} from 'next/navigation';
 import CategoryPage from '../../../components/category-page';
 import {getInitialCatalog} from '../../../lib/render-catalog';
-import {getCatalog} from '../../../lib/catalog';
-import {serializeJsonLd} from '../../../lib/seo';
+import {getCatalog,storeSettings} from '../../../lib/catalog';
+import {serializeJsonLd,whatsappUrl} from '../../../lib/seo';
 import {categoryPath} from '../../../lib/product-links';
 import {categoryList,categoryPageData,assertNoPlaceholders} from '../../../lib/product-pages';
 export const revalidate=60;
@@ -34,9 +34,9 @@ export async function generateMetadata({params}) {
   const {data}=await load(params);
   return {
     title:{absolute:data.title},
-    ...(data.intro?{description:data.intro}:{}),
+    ...(data.metaDescription?{description:data.metaDescription}:{}),
     alternates:{canonical:categoryPath(data.name)},
-    openGraph:{type:'website',url:categoryPath(data.name),siteName:'Vitalia',locale:'es_AR',title:data.title,...(data.intro?{description:data.intro}:{}),images:[{url:'/images/logo.png',width:1536,height:1024,alt:'Vitalia Dietética'}]}
+    openGraph:{type:'website',url:categoryPath(data.name),siteName:'Vitalia',locale:'es_AR',title:data.title,...(data.metaDescription?{description:data.metaDescription}:{}),images:[{url:'/images/logo.png',width:1536,height:1024,alt:'Vitalia Dietética'}]}
   };
 }
 
@@ -46,6 +46,6 @@ export default async function Page({params}) {
   const categories=categoryList(catalog.products).map(c=>({...c,href:categoryPath(c.name)}));
   return <>
     <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{__html:serializeJsonLd(data.jsonLd)}}/>
-    <CategoryPage catalog={catalog} category={{name:data.name,slug:data.slug,intro:data.intro}} categories={categories}/>
+    <CategoryPage catalog={catalog} category={{name:data.name,slug:data.slug,intro:data.intro}} categories={categories} storeWhatsappUrl={whatsappUrl(storeSettings().phone)}/>
   </>;
 }

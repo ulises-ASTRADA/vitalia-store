@@ -23,6 +23,7 @@ const Checkout=(await import('../components/checkout.jsx')).default;
 const BoxBuilder=(await import('../components/box-builder.jsx')).default;
 const Boxes=(await import('../components/boxes.jsx')).default;
 const ProductPage=(await import('../components/product-page.jsx')).default;
+const CategoryPage=(await import('../components/category-page.jsx')).default;
 const {useCart}=await import('../components/use-cart.js');
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
@@ -47,14 +48,14 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  const user=setup();await screen.findByText('3 productos');
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
- assert.equal(screen.getByRole('link',{name:/Ir a mi pedido/}).getAttribute('href'),'/checkout');
+ assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');
  assert.equal(document.querySelector('dialog.cart-dialog'),null);
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Quitar una presentación de Almendras'}));
  assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,1);
  assert.equal(screen.getByRole('link',{name:'Catálogo',exact:true}).getAttribute('href'),'/');
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
- await screen.findByRole('link',{name:/Ir a mi pedido, 1 presentaciones/});cleanup();
+ await screen.findByRole('link',{name:/^Mi pedido 1 productos/});cleanup();
 });
 test('Checkout: datos obligatorios y redirección directa sin vista previa',async()=>{
  const user=setup();await screen.findByText('3 productos');
@@ -121,7 +122,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
 test('Catálogo del servidor no se consulta otra vez al hidratar',async()=>{
  const user=setup(catalog);assert(screen.getByText('3 productos'));assert.equal(catalogReads,0);
  await user.type(screen.getByRole('searchbox'),'te verde');await user.click(screen.getByRole('button',{name:'Agregar Té verde',exact:true}));
- assert.equal(catalogReads,0);assert.equal(screen.getByRole('link',{name:/Ir a mi pedido/}).getAttribute('href'),'/checkout');cleanup();
+ assert.equal(catalogReads,0);assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');cleanup();
 });
 test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
@@ -194,4 +195,24 @@ test('Página de producto agotado: WhatsApp como acción principal',async()=>{
  render(<Provider><ProductPage catalog={{...catalog,products:[product,...products.slice(1)]}} product={product} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:'https://wa.me/5491100000000?text=x'}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/></Provider>);
  assert.equal(screen.queryByRole('button',{name:'Agregar al pedido'}),null);assert.equal(screen.getAllByRole('link',{name:'Consultar por WhatsApp'}).length,1);
  assert(screen.getByText('Está agotado por ahora. Escribinos y te contamos cuándo vuelve.'));cleanup();
+});
+test('Carrito flotante: nombre accesible = texto visible, dentro de un landmark',async()=>{
+ cleanup();localStorage.clear();const {container}=render(<Provider><Store initialCatalog={catalog}/></Provider>);
+ const link=container.querySelector('#floating-cart');assert.equal(link.getAttribute('aria-label'),null);
+ assert.equal(link.closest('aside').getAttribute('aria-label'),'Tu pedido');
+ assert(screen.getByRole('complementary',{name:'Tu pedido'}));
+ assert.match(link.textContent,/^Mi pedido 0 productos Carrito vacío \$/);
+ assert(screen.getByRole('link',{name:/^Mi pedido 0 productos Carrito vacío/}));cleanup();
+});
+test('Footer de producto y categoría igual al de la home: WhatsApp e Instagram',async()=>{
+ cleanup();localStorage.clear();
+ render(<Provider><ProductPage catalog={catalog} product={products[0]} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:''}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
+ assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ assert.equal(screen.getByRole('link',{name:'Instagram @vitalia_energy'}).getAttribute('href'),'https://www.instagram.com/vitalia_energy/');
+ cleanup();localStorage.clear();
+ render(<Provider><CategoryPage catalog={catalog} category={{name:'Infusiones',slug:'infusiones',intro:''}} categories={[{name:'Infusiones',slug:'infusiones',count:1,href:'/categorias/infusiones'}]} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
+ assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ assert(screen.getByRole('link',{name:'Instagram @vitalia_energy'}));
+ assert.equal(document.querySelector('.results-category').textContent,' · Infusiones');
+ cleanup();
 });

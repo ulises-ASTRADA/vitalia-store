@@ -3,7 +3,7 @@ import {notFound,permanentRedirect} from 'next/navigation';
 import ProductPage from '../../../components/product-page';
 import {getInitialCatalog} from '../../../lib/render-catalog';
 import {getCatalog,storeSettings} from '../../../lib/catalog';
-import {serializeJsonLd} from '../../../lib/seo';
+import {serializeJsonLd,whatsappUrl} from '../../../lib/seo';
 import {categoryPath} from '../../../lib/product-links';
 import {pageProducts,productPageData,relatedProducts,resolveProduct,assertNoPlaceholders} from '../../../lib/product-pages';
 export const revalidate=60;
@@ -24,7 +24,7 @@ export async function generateStaticParams() {
 }
 
 function pageModel(products,product,{currency,phone}) {
-  const page=productPageData(product,{currency,phone});
+  const page=productPageData(product,{currency,phone,products});
   const related=relatedProducts(products,product);
   const count=products.filter(p=>p.categoria===product.categoria).length;
   return {product,page,related,category:{href:categoryPath(product.categoria),count}};
@@ -62,6 +62,6 @@ export default async function Page({params}) {
   const {jsonLd,...client}=page;
   return <>
     <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{__html:serializeJsonLd(jsonLd)}}/>
-    <ProductPage catalog={catalog} page={client} {...rest}/>
+    <ProductPage catalog={catalog} page={client} {...rest} storeWhatsappUrl={whatsappUrl(storeSettings().phone)}/>
   </>;
 }

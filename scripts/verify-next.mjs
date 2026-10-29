@@ -51,6 +51,11 @@ try{
  assert(categoryHtml.includes('<title>Granolas y cereales · Vitalia Dietética</title>'));assert.match(categoryHtml,/<h1>Granolas y cereales<span aria-hidden="true">\.<\/span><\/h1>/);
  assert.equal((categoryHtml.match(/class="product-card/g)||[]).length,24);assert(categoryHtml.includes('href="/productos/granola-tradicional-n037"'));
  assert(html.includes('href="/productos/'));
+ // Revisión 28/10: 308 por mayúsculas, meta de categoría, footer igual a la home, carrito flotante sin aria-label.
+ for(const path of ['/categorias/Granolas-y-Cereales','/categorias/GRANOLAS-Y-CEREALES','/productos/Granola-Tradicional-N037']){const r=await fetch(base+path,{redirect:'manual'});assert.equal(r.status,308,path);assert.equal(new URL(r.headers.get('location'),base).pathname,path.toLowerCase());}
+ const categoryMeta=categoryHtml.match(/<meta name="description" content="([^"]*)"/)[1];assert.match(categoryMeta,/^[^.!?]+[.!?] Pedidos por WhatsApp\.$/);
+ assert.match(productHtml.match(/<meta name="description" content="([^"]*)"/)[1],/^Granola tradicional \(1 KG\) a \$\d{1,3}(\.\d{3})*\. /);
+ for(const page of [html,productHtml,categoryHtml]){assert(page.includes('>Pedidos por WhatsApp</a>'));assert(page.includes('href="https://www.instagram.com/vitalia_energy/"'));assert(page.includes('<aside class="floating-cart-region" aria-label="Tu pedido">'));assert(!/id="floating-cart"[^>]*aria-label/.test(page));}
  const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert.equal((sitemapXml.match(/\/productos\//g)||[]).length,data.products.length);
  console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, páginas de producto y categoría, 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
 }finally{server.kill('SIGTERM');}
