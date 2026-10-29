@@ -1,0 +1,37 @@
+# Vitalia
+
+> Vitalia es una dietética online de Córdoba, Argentina. Vende pepas de harina de almendra, cookies endulzadas con miel y stevia, chalitas y mixes de frutos secos, la mayoría por kilo. El pedido se arma en la web y se confirma por WhatsApp.
+
+## Zonas de envío
+
+- Río Ceballos
+- Unquillo
+- Mendiolaza
+- Villa Allende
+- La Calera
+- Saldán
+- Argüello
+- Cerro de las Rosas
+- Villa Rivera Indarte
+
+Costos, días de entrega y medios de pago: consultar por WhatsApp.
+
+## Productos
+
+- Pepas de harina de almendra.
+- Cookies endulzadas con miel y stevia.
+- Chalitas.
+- Mixes de frutos secos por kilo.
+
+El catálogo completo, con precios actualizados, está en https://www.vitalia.energy/#catalogo
+
+## Cómo comprar
+
+1. Elegís los productos en https://www.vitalia.energy/ y los sumás al carrito.
+2. Enviás el pedido por WhatsApp: https://wa.me/5493513947394
+3. Por WhatsApp se confirman disponibilidad, pago y entrega. El sitio no cobra ni reserva stock.
+
+## Páginas
+
+- [Inicio y catálogo](https://www.vitalia.energy/)
+- [Boxes](https://www.vitalia.energy/boxes)

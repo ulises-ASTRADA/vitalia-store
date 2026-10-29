@@ -26,7 +26,7 @@ function ProductCard({product,quantity,money,change,onDetail}) {
   </article>;
 }
 const Modal=lazy(()=>import('./store-modal'));
-export default function Store({initialCatalog=null,initialQuery=''}) {
+export default function Store({initialCatalog=null,initialQuery='',whatsappUrl=''}) {
   const [products,setProducts]=useState(()=>initialCatalog?.products||[]), [settings,setSettings]=useState(()=>initialCatalog?.settings||{currency:'ARS',checkoutEnabled:false,name:'Vitalia'});
   const [status,setStatus]=useState(initialCatalog?'ready':'loading'),[category,setCategory]=useState('Todos'),[query,setQuery]=useState(initialQuery),[sort,setSort]=useState('catalog'),[limit,setLimit]=useState(24);
   const [detail,setDetail]=useState(null),[toast,setToast]=useState('');
@@ -88,7 +88,7 @@ export default function Store({initialCatalog=null,initialQuery=''}) {
         </div></div>
       </section>
     </main>
-    <footer className="footer"><a href="/" className="footer-brand">Vitalia</a><p>Elegí. Sumá. Conversemos.</p></footer>
+    <footer className="footer"><a href="/" className="footer-brand">Vitalia</a><p>Elegí. Sumá. Conversemos.</p>{whatsappUrl&&<span><a href={whatsappUrl} rel="noopener">Pedidos por WhatsApp</a></span>}</footer>
     <Link href="/checkout" prefetch={false} id="floating-cart" className="floating-cart" aria-label={count?`Ir a mi pedido, ${count} presentaciones, total ${money(total)}`:'Ir a mi pedido, carrito vacío'}><Icon name="bag"/><span className="floating-cart-copy"><strong>Mi pedido <b>{count}</b></strong><span>{count?`${count} ${count===1?'presentación':'presentaciones'}`:'Carrito vacío'}</span></span><span className="floating-cart-total">{money(total)}</span></Link>
     <div className={`toast ${toast?'show':''}`} role="status" aria-live="polite">{toast}</div>
     {detail&&<Suspense fallback={null}><Modal open={!!detail} onClose={()=>setDetail(null)} title={detail?.nombre||'Detalle de producto'}>{detail&&<div className="product-detail-layout"><Photo product={detail} className="detail-image" context="detail" eager/><div className="detail-content"><p className="eyebrow muted">{detail.categoria}</p><h2>{detail.nombre}</h2><p className="detail-meta">{detail.id} · {pack(detail)}</p>{detail.descripcion&&<p className="detail-description">{detail.descripcion}</p>}<p className="detail-price">{money(detail.precio)}</p><p className="detail-meta">Precio por la presentación indicada. Moneda: {settings.currency}.</p><p className="detail-stock">{detail.disponibilidad==='disponible'?'Disponible según catálogo':detail.disponibilidad==='agotado'?'Agotado':'Disponibilidad a confirmar por WhatsApp'}</p><Button unstyled className="primary" disabled={detail.disponibilidad==='agotado'} onClick={()=>{change(detail,1);setDetail(null);}}>Agregar al pedido</Button></div></div>}</Modal></Suspense>}

@@ -3,6 +3,7 @@ import Provider from '../components/provider';
 import {headers} from 'next/headers';
 import { Analytics } from '@vercel/analytics/next';
 export const metadata = {
+  metadataBase: new URL('https://www.vitalia.energy'),
   title: 'Vitalia · Dietética',
   description: 'Explorá el catálogo de Vitalia. Armá tu carrito y coordiná tu pedido por WhatsApp.',
   icons: { icon: '/images/favicon.webp' }
