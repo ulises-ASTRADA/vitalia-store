@@ -2,7 +2,7 @@
 
 Cuenta de proyectos personales: `ulises-ASTRADA`.
 Repositorio creado: https://github.com/ulises-ASTRADA/vitalia-store, privado.
-Proyecto Vercel existente: `vitalia-store`, del equipo `ulisesastrada1-9233s-projects`.
+Proyecto Vercel existente: `vitalia-store`.
 
 ## Estado actual
 
@@ -10,7 +10,7 @@ El workflow `.github/workflows/ci.yml` está preparado localmente. Ejecuta prueb
 
 La API de GitHub confirmó la cuenta `ulises-ASTRADA` y creó el repositorio privado el 8 de octubre de 2026. Git local está inicializado en `main`, sin commits ni remoto. La subida sigue pendiente: `git add` falla con `Unable to create .git/index.lock: Operation not permitted` dentro de esta sesión. Se verificó que `.env.local`, `.vercel/`, `node_modules/` y `.next/` estén excluidos.
 
-No se ha conectado el repositorio con Vercel. El conector devuelve 403 al consultar el proyecto existente bajo el equipo `ulisesastrada1-9233s-projects`; la CLI también falla al acceder a la API. No se publicó en producción, no se cambió la protección y no hay una URL de preview nueva.
+No se ha conectado el repositorio con Vercel. El conector devuelve 403 al consultar el proyecto existente; la CLI también falla al acceder a la API. No se publicó en producción, no se cambió la protección y no hay una URL de preview nueva.
 
 ### Completar la subida desde la Terminal de Mac
 
