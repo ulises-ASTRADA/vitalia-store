@@ -5,7 +5,6 @@ import { Analytics } from '@vercel/analytics/next';
 export const metadata = {
   title: 'Vitalia · Dietética',
   description: 'Explorá el catálogo de Vitalia. Armá tu carrito y coordiná tu pedido por WhatsApp.',
-  robots: { index: false, follow: false },
   icons: { icon: '/images/favicon.webp' }
 };
 export default async function RootLayout({ children }) {
