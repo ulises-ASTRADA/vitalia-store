@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {slugify,productSlug,productPath,findBySlug} from '../lib/product-links.js';
 import * as productLinks from '../lib/product-links.js';
 import localCatalog from '../data/catalog.json' with {type:'json'};
-import {cleanDescription,pricePerKilo,productPageData,relatedProducts,categoryList,categoryPageData,pageProducts,resolveProduct,assertNoPlaceholders,whatsappConsultUrl,offerAvailability,metaMoney,stripPendingClaims,FILTER_PENDING_CLAIMS} from '../lib/product-pages.js';
+import {cleanDescription,pricePerKilo,productPageData,relatedProducts,categoryList,categoryPageData,pageProducts,resolveProduct,assertNoPlaceholders,whatsappConsultUrl,offerAvailability,metaMoney,stripPendingClaims,FILTER_PENDING_CLAIMS,claimFreeName,metaExcerptSource} from '../lib/product-pages.js';
 import categorias from '../data/categorias.json' with {type:'json'};
 const fixtureCatalog=()=>(Array.isArray(localCatalog)?localCatalog:localCatalog.products);
 const p=(id,nombre,categoria,extra={})=>({id,nombre,categoria,precio:1000,presentacion:'1 KG',disponibilidad:'consultar',descripcion:'',imagen:`/images/product-${id}.webp`,...extra});
@@ -141,11 +141,41 @@ test('Claims sin confirmar (T.A.C.C., gluten, azúcar) fuera de meta y JSON-LD; 
   assert.doesNotMatch(page.metaDescription,/t\.?a\.?c\.?c|gluten/i);assert.doesNotMatch(page.jsonLd.description,/t\.?a\.?c\.?c|gluten/i);
   assert.equal(page.jsonLd.description,'Arroz yamaní tostado.');
   const named=productPageData(p('N175','Copos sin azúcar','Cereales',{descripcion:'Sin T.A.C.C'}));
-  assert.equal(named.jsonLd.description,undefined);assert.equal(named.jsonLd.name,'Copos sin azúcar');assert.equal(named.title,'Copos sin azúcar · 1 KG · Vitalia','el nombre visible y el título no cambian');assert.equal(named.metaDescription,'Copos (1 KG) a $1.000. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  assert.equal(named.jsonLd.description,undefined);assert.equal(named.jsonLd.name,'Copos');assert.equal(named.title,'Copos · 1 KG · Vitalia','"sin azúcar" pasa por el mismo filtro que T.A.C.C. y gluten');assert.equal(named.metaDescription,'Copos (1 KG) a $1.000. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
   for(const product of fixtureCatalog()){const d=productPageData(product);const text=[stripPendingClaims(d.description),d.jsonLd.description||''].join(' ');assert.doesNotMatch(text,/t\.\s*a\.\s*c\.\s*c|gluten|sin az[uú]car/i,product.id);}
 });
 test('Meta de categoría: primera oración de la intro + "Pedidos por WhatsApp."',()=>{
   const data=categoryPageData([p('N1','A','Granolas y cereales')],'granolas-y-cereales');
   const first=categorias['Granolas y cereales'].intro.match(/^.*?[.!?](?=\s|$)/)[0];
   assert.equal(data.metaDescription,`${first} Pedidos por WhatsApp.`);assert.equal(data.intro,categorias['Granolas y cereales'].intro);
+});
+
+test('Claims fuera de title, og/twitter, JSON-LD y slug: N219 "sin T.A.C.C"; el nombre visible no cambia',()=>{
+  const n219=p('N219','Yerba kalena sin agrotóxicos sin T.A.C.C','Infusiones',{precio:7420,presentacion:'500 GR',descripcion:'×500 GR'});
+  assert.equal(productSlug(n219),'yerba-kalena-sin-agrotoxicos-n219');assert.equal(productPath(n219),'/productos/yerba-kalena-sin-agrotoxicos-n219');
+  const page=productPageData(n219,{products:[n219]});
+  assert.equal(page.slug,'yerba-kalena-sin-agrotoxicos-n219');assert(page.url.endsWith('/productos/yerba-kalena-sin-agrotoxicos-n219'));
+  assert.equal(page.title,'Yerba kalena sin agrotóxicos · 500 GR · Vitalia');assert.equal(page.jsonLd.name,'Yerba kalena sin agrotóxicos');
+  assert.equal(n219.nombre,'Yerba kalena sin agrotóxicos sin T.A.C.C','el producto (h1, tarjeta) no se toca');
+  assert.equal(page.metaDescription,'Yerba kalena sin agrotóxicos (500 GR) a $7.420. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  assert.equal(findBySlug([n219],'yerba-kalena-sin-agrotoxicos-sin-t-a-c-c-n219').id,'N219','el slug viejo resuelve (y redirige al canónico)');
+  assert.equal(resolveProduct([n219],'yerba-kalena-sin-agrotoxicos-sin-t-a-c-c-n219').canonicalSlug,'yerba-kalena-sin-agrotoxicos-n219');
+  const cases={'Galletitas Marmoladas sin gluten sin conservantes y sin lácteos':'Galletitas Marmoladas sin conservantes y sin lácteos','Alfajor brownie — Calafate (sin gluten)':'Alfajor brownie — Calafate','Dulce leche sin fructosa sin azúcar endulzado con stevia':'Dulce leche sin fructosa endulzado con stevia','Copos sin azúcar':'Copos','Barrita sin T.A.C.C.':'Barrita','Sin gluten':'Sin gluten','Yerba kalena sin agrotóxicos':'Yerba kalena sin agrotóxicos'};
+  for(const [input,expected] of Object.entries(cases))assert.equal(claimFreeName(input),expected,input);
+  const claim=/t\.?\s*a\.?\s*c\.?\s*c|gluten|sin\s+az[uú]car/i;
+  const all=fixtureCatalog();const titles=new Set();
+  for(const product of all){const d=productPageData(product,{products:all});
+    for(const [field,value] of Object.entries({title:d.title,ld:d.jsonLd.name,slug:d.slug.replace(/-/g,' '),meta:d.metaDescription}))assert.doesNotMatch(value,claim,`${product.id} ${field}`);
+    assert(!titles.has(d.title.toLowerCase()),`título repetido ${d.title}`);titles.add(d.title.toLowerCase());}
+});
+test('Meta sin restos de la planilla ("por 450", "×500 GR", "Presentación: 50ml.") y sin inventar texto',()=>{
+  const cases={'por 450':'','×500 GR':'','x 500 gr':'','Presentación: 50ml.':'','Por 250cc':'','2lt':'','1 KG':'','Durazno, peras, ciruela y damascos. Por 1 KG':'Durazno, peras, ciruela y damascos.','Lino, chía, sésamo y girasol Por 1 KG':'Lino, chía, sésamo y girasol','Complemento nutricional Por 160 GR':'Complemento nutricional','en pote':'En pote','Caja 12 unidades':'Caja 12 unidades','Sésamo negro, romero, albahaca y orégano':'Sésamo negro, romero, albahaca y orégano','Hebras de salvado. No contiene sodio.':'Hebras de salvado. No contiene sodio.'};
+  for(const [input,expected] of Object.entries(cases))assert.equal(metaExcerptSource(input),expected,input);
+  const n252=productPageData(p('N252','Aceituna negra 000','Aceites y conservas',{precio:6720,descripcion:'por 450'}));
+  assert.equal(n252.metaDescription,'Aceituna negra 000 (1 KG) a $6.720. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  const n253=productPageData(p('N253','Aceituna verde 00','Aceites y conservas',{precio:5180,descripcion:'por 450'}));
+  assert.equal(n253.metaDescription,'Aceituna verde 00 (1 KG) a $5.180. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  const all=fixtureCatalog();
+  for(const product of all){const m=productPageData(product,{products:all}).metaDescription;
+    assert(m.length<=155,product.id);assert.doesNotMatch(m,/\.\s*(?:por|x|×)\s*\d+[^.]*\.\s*Pedilo|\.\s*\d+\s*(?:kg|gr?|ml|cc|lt?)\.\s*Pedilo|Presentaci[oó]n:/i,`${product.id}: ${m}`);}
 });
