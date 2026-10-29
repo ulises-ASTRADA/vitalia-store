@@ -86,7 +86,9 @@ test('/envios: formato del teléfono para la FAQ 13 sale de WHATSAPP_NUMBER',()=
 test('llms.txt: zonas, costos, pagos, Instagram y /envios, sin dirección',()=>{
   const llms=readFileSync(new URL('../public/llms.txt',import.meta.url),'utf8');
   for(const z of zones)assert(llms.includes(z.name),z.name);
-  for(const t of costTiers())assert(llms.includes(`${t.label} a ${t.zones.join(', ').replace(/, ([^,]+)$/,' y $1')}`),t.label);
+  // llms.txt nombra El Talar junto a Mendiolaza (mismo costo, confirmado por Ulises el 28/10).
+  const withTalar=zs=>zs.flatMap(z=>z==='Mendiolaza'?[z,'El Talar']:[z]);
+  for(const t of costTiers())assert(llms.includes(`${t.label} a ${withTalar(t.zones).join(', ').replace(/, ([^,]+)$/,' y $1')}`),t.label);
   assert(llms.includes('Gratis en compras de más de $70.000'));
   assert(llms.includes('transferencia o efectivo'));
   assert(llms.includes('https://www.vitalia.energy/envios'));

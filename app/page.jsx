@@ -2,16 +2,15 @@ import {headers} from 'next/headers';
 import Store from '../components/store';
 import { getInitialCatalog } from '../lib/render-catalog';
 import { storeSettings } from '../lib/catalog';
+import { shareMetadata } from '../lib/og';
 import { HOME_TITLE, HOME_DESCRIPTION, homeJsonLd, serializeJsonLd, whatsappUrl } from '../lib/seo';
 export const revalidate = 60;
 export const runtime = 'nodejs';
-const ogImage={url:'/images/logo.png',width:1536,height:1024,alt:'Vitalia Dietética'};
 export const metadata = {
   title: {absolute:HOME_TITLE},
   description: HOME_DESCRIPTION,
   alternates: {canonical:'/'},
-  openGraph: {type:'website',url:'/',siteName:'Vitalia',locale:'es_AR',title:HOME_TITLE,description:HOME_DESCRIPTION,images:[ogImage]},
-  twitter: {card:'summary_large_image',title:HOME_TITLE,description:HOME_DESCRIPTION,images:[ogImage.url]}
+  ...shareMetadata({path:'/',title:HOME_TITLE,description:HOME_DESCRIPTION})
 };
 export default async function Page({searchParams}) {
   const [initialCatalog,params,requestHeaders] = await Promise.all([getInitialCatalog(),searchParams,headers()]);

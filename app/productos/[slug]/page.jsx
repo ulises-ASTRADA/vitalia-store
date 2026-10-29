@@ -1,3 +1,4 @@
+import {shareMetadata,productShareImage} from '../../../lib/og';
 import {headers} from 'next/headers';
 import {notFound,permanentRedirect} from 'next/navigation';
 import ProductPage from '../../../components/product-page';
@@ -45,13 +46,11 @@ async function load(params) {
 
 export async function generateMetadata({params}) {
   const {model:{product,page}}=await load(params);
-  const image=product.imagen?.startsWith('/images/')?[{url:product.imagen,alt:product.nombre}]:undefined;
   return {
     title:{absolute:page.title},
     description:page.metaDescription,
     alternates:{canonical:`/productos/${page.slug}`},
-    openGraph:{type:'website',url:`/productos/${page.slug}`,siteName:'Vitalia',locale:'es_AR',title:page.title,description:page.metaDescription,images:image},
-    twitter:{card:'summary_large_image',title:page.title,description:page.metaDescription,images:image?.map(i=>i.url)}
+    ...shareMetadata({path:`/productos/${page.slug}`,title:page.title,description:page.metaDescription,image:productShareImage(product)})
   };
 }
 
