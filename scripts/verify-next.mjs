@@ -45,6 +45,13 @@ try{
  const productJson=JSON.parse(productLd[2]);assert.equal(productJson['@type'],'Product');assert.equal(productJson.sku,'N037');assert.equal(productJson.offers.priceCurrency,'ARS');assert.equal(productJson.aggregateRating,undefined);if(data.products.find(p=>p.id==='N037').disponibilidad==='consultar')assert.equal('availability' in productJson.offers,false);
  assert(productHtml.includes('<title>Granola tradicional · 1 KG · Vitalia</title>'));assert(productHtml.includes('href="https://www.vitalia.energy/productos/granola-tradicional-n037"'));
  assert(productHtml.includes('Agregar al pedido'));assert(productHtml.includes('https://wa.me/5491100000000?text='));assert(!/\[A (COMPLETAR|CONFIRMAR)\]/.test(productHtml));
+ // Claims pendientes fuera de title/og/twitter/JSON-LD/slug (N219); h1 con el nombre original; meta sin "×500 GR".
+ const yerbaTitle='Yerba kalena sin agrotóxicos · 500 GR · Vitalia';
+ const yerba=await fetch(base+'/productos/yerba-kalena-sin-agrotoxicos-n219'),yerbaHtml=await yerba.text();assert.equal(yerba.status,200);
+ assert(yerbaHtml.includes(`<title>${yerbaTitle}</title>`));assert(yerbaHtml.includes(`<meta property="og:title" content="${yerbaTitle}"/>`));assert(yerbaHtml.includes(`<meta name="twitter:title" content="${yerbaTitle}"/>`));
+ assert(yerbaHtml.includes('"name":"Yerba kalena sin agrotóxicos"'));assert.match(yerbaHtml,/<meta name="description" content="Yerba kalena sin agrotóxicos \(500 GR\) a \$[\d.]+\. Pedilo en Vitalia y coordiná la entrega por WhatsApp\."\/>/);
+ assert.match(yerbaHtml,/<h1[^>]*>Yerba kalena sin agrotóxicos sin T\.A\.C\.C/);
+ const oldSlug=await fetch(base+'/productos/yerba-kalena-sin-agrotoxicos-sin-t-a-c-c-n219',{redirect:'manual'});assert.equal(oldSlug.status,308);assert.equal(new URL(oldSlug.headers.get('location'),base).pathname,'/productos/yerba-kalena-sin-agrotoxicos-n219');
  const renamed=await fetch(base+'/productos/granola-vieja-n037',{redirect:'manual'});assert.equal(renamed.status,308);assert.equal(new URL(renamed.headers.get('location'),base).pathname,'/productos/granola-tradicional-n037');
  assert.equal((await fetch(base+'/productos/no-existe-n999')).status,404);assert.equal((await fetch(base+'/categorias/no-existe')).status,404);
  const categoryPage=await fetch(base+'/categorias/granolas-y-cereales'),categoryHtml=await categoryPage.text();assert.equal(categoryPage.status,200);
@@ -56,7 +63,7 @@ try{
  const categoryMeta=categoryHtml.match(/<meta name="description" content="([^"]*)"/)[1];assert.match(categoryMeta,/^[^.!?]+[.!?] Pedidos por WhatsApp\.$/);
  assert.match(productHtml.match(/<meta name="description" content="([^"]*)"/)[1],/^Granola tradicional \(1 KG\) a \$\d{1,3}(\.\d{3})*\. /);
  for(const page of [html,productHtml,categoryHtml]){assert(page.includes('>Pedidos por WhatsApp</a>'));assert(page.includes('href="https://www.instagram.com/vitalia_energy/"'));assert(page.includes('<aside class="floating-cart-region" aria-label="Tu pedido">'));assert(!/id="floating-cart"[^>]*aria-label/.test(page));}
- const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert.equal((sitemapXml.match(/\/productos\//g)||[]).length,data.products.length);
+ const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/productos/yerba-kalena-sin-agrotoxicos-n219'));assert.doesNotMatch(sitemapXml,/sin-t-a-c-c|sin-gluten|sin-azucar/);assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert.equal((sitemapXml.match(/\/productos\//g)||[]).length,data.products.length);
  // /envios: 200, misma CSP que el baseline de producción (nonce enmascarado), JSON-LD con nonce, sin dirección ni marcadores.
  const BASELINE_CSP="default-src 'self'; script-src 'self' 'nonce-X' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
  const mask=policy=>policy.replace(/'nonce-[^']+'/,"'nonce-X'");
