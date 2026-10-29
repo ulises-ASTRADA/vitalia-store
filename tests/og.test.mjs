@@ -66,3 +66,23 @@ test('Cada foto de producto (local o del Sheet) tiene su JPG para compartir: <30
  assert(OG_PRODUCT_IMAGES['/images/product-001.webp'].bytes<300*1024);
  assert.match(readFileSync(new URL('../package.json',import.meta.url),'utf8'),/node scripts\/og-products\.mjs && next build/);
 });
+
+test('Descarga de fotos: tope de 15 MB por content-length y por bytes recibidos',async()=>{
+ const {readCapped,MAX_DOWNLOAD}=await import('../scripts/og-download.mjs');
+ assert.equal(MAX_DOWNLOAD,15*1024*1024);
+ let pulled=0;
+ const body=n=>new ReadableStream({pull(c){pulled++;if(pulled>n)c.close();else c.enqueue(new Uint8Array(1024));}});
+ // header mayor al tope: se rechaza sin leer el cuerpo
+ pulled=0;let ab=new AbortController();
+ await assert.rejects(readCapped(new Response(body(10),{headers:{'content-length':String(MAX_DOWNLOAD+1)}}),MAX_DOWNLOAD,ab),/demasiado grande/);
+ assert.equal(ab.signal.aborted,true);assert(pulled<=1,String(pulled));
+ // sin header (o header falso chico): corta apenas se pasa del tope
+ pulled=0;ab=new AbortController();
+ await assert.rejects(readCapped(new Response(body(1e6)),4096,ab),/demasiado grande/);
+ assert.equal(ab.signal.aborted,true);assert(pulled<10,String(pulled));
+ pulled=0;
+ await assert.rejects(readCapped(new Response(body(1e6),{headers:{'content-length':'100'}}),4096),/demasiado grande/);
+ assert(pulled<10,String(pulled));
+ // dentro del tope: devuelve todo
+ pulled=0;const b=await readCapped(new Response(body(3)),4096);assert.equal(b.length,3072);
+});

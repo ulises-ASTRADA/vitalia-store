@@ -17,7 +17,7 @@ No se ha conectado el repositorio con Vercel. El conector devuelve 403 al consul
 Estos comandos corresponden al estado actual: repositorio local sin commits ni remoto y repositorio remoto vacío. No usar `--force`.
 
 ```bash
-cd /Users/ulises/Desktop/projects/ecom-mily/vitalia-store
+cd vitalia-store
 gh api user --jq .login
 git remote add origin https://github.com/ulises-ASTRADA/vitalia-store.git
 git add .
