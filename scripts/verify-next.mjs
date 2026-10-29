@@ -57,5 +57,29 @@ try{
  assert.match(productHtml.match(/<meta name="description" content="([^"]*)"/)[1],/^Granola tradicional \(1 KG\) a \$\d{1,3}(\.\d{3})*\. /);
  for(const page of [html,productHtml,categoryHtml]){assert(page.includes('>Pedidos por WhatsApp</a>'));assert(page.includes('href="https://www.instagram.com/vitalia_energy/"'));assert(page.includes('<aside class="floating-cart-region" aria-label="Tu pedido">'));assert(!/id="floating-cart"[^>]*aria-label/.test(page));}
  const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert.equal((sitemapXml.match(/\/productos\//g)||[]).length,data.products.length);
- console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, páginas de producto y categoría, 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
+ // /envios: 200, misma CSP que el baseline de producción (nonce enmascarado), JSON-LD con nonce, sin dirección ni marcadores.
+ const BASELINE_CSP="default-src 'self'; script-src 'self' 'nonce-X' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
+ const mask=policy=>policy.replace(/'nonce-[^']+'/,"'nonce-X'");
+ assert.equal(mask(csp),BASELINE_CSP);
+ const enviosPage=await fetch(base+'/envios'),enviosHtml=await enviosPage.text();assert.equal(enviosPage.status,200);
+ const enviosCsp=enviosPage.headers.get('content-security-policy');assert.equal(mask(enviosCsp),BASELINE_CSP);
+ const enviosNonce=enviosCsp.match(/'nonce-([^']+)'/)[1];
+ const enviosLd=enviosHtml.match(/<script type="application\/ld\+json" nonce="([^"]+)">(.*?)<\/script>/);assert.equal(enviosLd[1],enviosNonce);
+ const enviosGraph=JSON.parse(enviosLd[2])['@graph'];const faqLd=enviosGraph.find(n=>n['@type']==='FAQPage');assert.equal(faqLd.mainEntity.length,13);assert.equal(faqLd.mainEntity[8].name,'¿Hay pedido mínimo?');
+ assert.equal(enviosGraph.find(n=>n['@type']==='WebPage').about['@id'],'https://www.vitalia.energy/#tienda');
+ assert.equal((enviosHtml.match(/class="faq-trigger"/g)||[]).length,13);assert(enviosHtml.includes('<dt>Pedido mínimo</dt><dd>Sin pedido mínimo</dd>'));assert.equal((enviosHtml.match(/class="zone-chip"/g)||[]).length,9);assert.equal((enviosHtml.match(/class="zone-section"/g)||[]).length,9);
+ assert(enviosHtml.includes('<title>Envíos a Sierras Chicas y zona norte de Córdoba | Vitalia</title>'));
+ assert(enviosHtml.includes('<meta name="description" content="Llevamos tu pedido de la dietética a Villa Allende, Unquillo, Río Ceballos, Mendiolaza, La Calera, Saldán y zona norte de Córdoba."/>'));
+ assert(enviosHtml.includes('href="https://www.vitalia.energy/envios"'));
+ assert(enviosHtml.includes('https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Villa%20Allende.'));
+ assert(enviosHtml.includes('al 11 0000-0000'));assert(!enviosHtml.includes('394-7394'));
+ assert(enviosHtml.includes('aria-current="page" href="/envios"')||enviosHtml.includes('href="/envios" aria-current="page"'));
+ assert(!enviosHtml.includes('[A '));assert(!enviosHtml.includes('1504'));assert(!enviosHtml.includes('De la Unión'));assert(!/google\.[a-z.]+\/maps/.test(enviosHtml));
+ for(const [page,label] of [[html,'home'],[enviosHtml,'envios'],[productHtml,'producto']])assert(page.includes('class="footer-social" href="https://www.instagram.com/vitalia_energy/"'),label);
+ const homeStore=JSON.parse(html.match(/<script type="application\/ld\+json" nonce="[^"]+">(.*?)<\/script>/)[1])['@graph'].find(n=>n['@type']==='HealthFoodStore');
+ assert.deepEqual(homeStore.address,{'@type':'PostalAddress',addressLocality:'Villa Allende',addressRegion:'Córdoba',addressCountry:'AR'});assert.deepEqual(homeStore.sameAs,['https://www.instagram.com/vitalia_energy/']);assert.equal(homeStore.openingHours,undefined);assert.equal(homeStore.areaServed.length,9);
+ assert(sitemapXml.includes('https://www.vitalia.energy/envios'));
+ const llms=await (await fetch(base+'/llms.txt')).text();assert(llms.includes('https://www.vitalia.energy/envios'));assert(llms.includes('instagram.com/vitalia_energy'));assert(!llms.includes('1504'));
+ assert(productHtml.includes('href="/envios"'));
+ console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, páginas de producto y categoría, /envios (CSP = baseline, FAQPage 13, sin dirección), 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
 }finally{server.kill('SIGTERM');}

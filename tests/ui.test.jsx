@@ -24,6 +24,8 @@ const BoxBuilder=(await import('../components/box-builder.jsx')).default;
 const Boxes=(await import('../components/boxes.jsx')).default;
 const ProductPage=(await import('../components/product-page.jsx')).default;
 const CategoryPage=(await import('../components/category-page.jsx')).default;
+const EnviosPage=(await import('../components/envios-page.jsx')).default;
+const {enviosPageData}=await import('../lib/envios.js');
 const {useCart}=await import('../components/use-cart.js');
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
@@ -214,5 +216,37 @@ test('Footer de producto y categoría igual al de la home: WhatsApp e Instagram'
  assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
  assert(screen.getByRole('link',{name:'Instagram @vitalia_energy'}));
  assert.equal(document.querySelector('.results-category').textContent,' · Infusiones');
+ cleanup();
+});
+test('/envios: chips, secciones, tabla, retiro sin dirección, FAQ y footer con Instagram',async()=>{
+ cleanup();localStorage.clear();
+ const {container}=render(<Provider><EnviosPage catalog={catalog} page={enviosPageData('5491100000000')} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
+ const user=userEvent.setup({document:dom.window.document});
+ assert.equal(screen.getByRole('heading',{level:1}).textContent,'Envíos a Sierras Chicas y zona norte de Córdoba');
+ const chips=[...container.querySelectorAll('a.zone-chip')];assert.equal(chips.length,9);
+ for(const chip of chips)assert(container.querySelector(chip.getAttribute('href')),chip.getAttribute('href'));
+ assert.equal(screen.getByRole('link',{name:'Envíos'}).getAttribute('aria-current'),'page');
+ assert.equal(screen.getByRole('link',{name:'Pedir con envío a Mendiolaza'}).getAttribute('href'),'https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Mendiolaza.');
+ assert(screen.getByRole('heading',{name:'¿Qué dietética llega a Mendiolaza y El Talar?'}));
+ const rows=[...container.querySelectorAll('.ship-table tbody tr')].map(tr=>tr.textContent);
+ assert.deepEqual(rows,['Villa Allende, Mendiolaza, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
+ assert.equal(container.querySelector('.pickup-addr').textContent,'Retiro en Villa Allende, coordinamos la dirección por WhatsApp.');
+ const triggers=container.querySelectorAll('.faq-trigger');assert.equal(triggers.length,13);assert.equal(triggers[8].textContent,'¿Hay pedido mínimo?');
+ assert.equal(triggers[0].getAttribute('aria-expanded'),'true');assert.equal(triggers[1].getAttribute('aria-expanded'),'false');
+ assert(container.querySelector('#faq-a1').hidden);
+ await user.click(triggers[1]);assert.equal(triggers[1].getAttribute('aria-expanded'),'true');assert(!container.querySelector('#faq-a1').hidden);
+ await user.click(triggers[0]);assert(container.querySelector('#faq-a0').hidden);
+ assert(container.querySelector('#faq-a12').textContent.includes('al 11 0000-0000'));
+ assert.equal(screen.getByRole('link',{name:'Instagram @vitalia_energy'}).getAttribute('href'),'https://www.instagram.com/vitalia_energy/');
+ assert.equal(screen.getByRole('link',{name:'Pedidos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ const html=container.innerHTML;assert(!html.includes('[A '));assert(!html.includes('1504'));assert(!html.includes('De la Unión'));
+ cleanup();
+});
+test('Footer: Instagram y Envíos en catálogo, boxes y producto',async()=>{
+ for(const element of [<Store initialCatalog={catalog}/>,<Boxes initialCatalog={catalog}/>,<ProductPage catalog={catalog} product={products[0]} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:''}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/>]){
+  cleanup();localStorage.clear();render(<Provider>{element}</Provider>);
+  assert.equal(screen.getByRole('link',{name:'Instagram @vitalia_energy'}).getAttribute('href'),'https://www.instagram.com/vitalia_energy/');
+  assert.equal(screen.getByRole('link',{name:'Envíos'}).getAttribute('href'),'/envios');
+ }
  cleanup();
 });

@@ -19,5 +19,5 @@ export function proxy(request) {
   response.headers.set('Cache-Control','private, no-store');
   return response;
 }
-// Las páginas de producto y categoría también llevan nonce: la política es la misma.
-export const config={matcher:['/','/checkout','/boxes','/productos/:path*','/categorias/:path*']};
+// Las páginas de producto, categoría y /envios también llevan nonce: la política es la misma.
+export const config={matcher:['/','/checkout','/boxes','/productos/:path*','/categorias/:path*','/envios']};
