@@ -1,6 +1,7 @@
 import './globals.css';
 import Provider from '../components/provider';
 import {headers} from 'next/headers';
+import { Analytics } from '@vercel/analytics/next';
 export const metadata = {
   title: 'Vitalia · Dietética',
   description: 'Explorá el catálogo de Vitalia. Armá tu carrito y coordiná tu pedido por WhatsApp.',
@@ -9,5 +10,5 @@ export const metadata = {
 };
 export default async function RootLayout({ children }) {
   const nonce=(await headers()).get('x-nonce')||undefined;
-  return <html lang="es-AR" suppressHydrationWarning><body><Provider nonce={nonce}>{children}</Provider></body></html>;
+  return <html lang="es-AR" suppressHydrationWarning><body><Provider nonce={nonce}>{children}</Provider><Analytics /></body></html>;
 }
