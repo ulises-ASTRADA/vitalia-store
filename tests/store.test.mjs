@@ -7,7 +7,7 @@ import {POST} from '../server/checkout.js';
 
 const settings={name:'Vitalia',currency:'ARS',phone:'5493512136078',testCheckout:true};
 const products=[{id:'A',nombre:'Cookies',precio:7800,presentacion:'500 gramos',disponibilidad:'consultar'},{id:'B',nombre:'Aceite',precio:15200,presentacion:'500 ml',disponibilidad:'disponible'}];
-const valid=()=>({items:[{id:'A',quantity:2,expectedPrice:7800},{id:'B',quantity:1,expectedPrice:15200}],name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:'Consulta Córdoba'});
+const valid=()=>({items:[{id:'A',quantity:2,expectedPrice:7800},{id:'B',quantity:1,expectedPrice:15200}],name:'Ana',locality:'Villa Allende',province:'Córdoba',notes:'Consulta Córdoba'});
 
 test('Pedido de prueba: total, cantidades, destino y texto UTF-8',()=>{
  const order=makeOrder(valid(),products,settings);
@@ -26,7 +26,7 @@ test('No acepta precio manipulado, cambios de disponibilidad ni IDs ocultos',()=
 test('Rechaza cantidades, líneas duplicadas y carrito vacío',()=>{
  for(const qty of [-1,0,1.5,100,'2']){const body=valid();body.items[0].quantity=qty;assert.throws(()=>makeOrder(body,products,settings),e=>e.status===400);}
  const body=valid();body.items.push(body.items[0]);assert.throws(()=>makeOrder(body,products,settings));
- assert.throws(()=>makeOrder({items:[],name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},products,settings));
+ assert.throws(()=>makeOrder({items:[],name:'Ana',locality:'Villa Allende',province:'Córdoba',notes:''},products,settings));
 });
 test('Catálogo: precios numéricos, inactivos, IDs duplicados y vacíos',()=>{
  const headers=['id','nombre','precio','activo','disponibilidad'];
@@ -45,7 +45,7 @@ test('Catálogo: disponibilidad 0 significa agotado y bloquea el pedido',()=>{
 });
 test('Pedidos largos conservan el mensaje completo en el enlace de WhatsApp',()=>{
  const rows=Array.from({length:50},(_,i)=>({...products[0],id:'P'+i,nombre:'Nombre largo de producto que necesita una presentación completa '+i}));
- const order=makeOrder({items:rows.map(p=>({id:p.id,quantity:1,expectedPrice:p.precio})),name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},rows,settings);
+ const order=makeOrder({items:rows.map(p=>({id:p.id,quantity:1,expectedPrice:p.precio})),name:'Ana',locality:'Villa Allende',province:'Córdoba',notes:''},rows,settings);
  assert.equal(new URL(order.whatsappUrl).searchParams.get('text'),order.message);assert.match(order.message,/P49/);
 });
 test('Extracción: 295 IDs, 295 fotos y precios idénticos a transcripción PDF',async()=>{
@@ -72,16 +72,16 @@ test('Nombre, localidad y provincia son obligatorios y aparecen en el mensaje',(
    assert.throws(()=>makeOrder(body,products,settings),e=>e.status===400);
   }
  }
- const body=valid();body.name='  Ulises  ';
+ const body=valid();body.name='  Ana  ';
  const order=makeOrder(body,products,settings);
- assert.match(order.message,/Nombre: Ulises/);
+ assert.match(order.message,/Nombre: Ana/);
  assert.match(order.message,/Localidad: Villa Allende/);
  assert.match(order.message,/Provincia: Córdoba/);
 });
 
  test('Mensaje claro: sin presentación faltante, total compacto y sin emojis',()=>{
  const p={id:'N001',nombre:'Pepas',precio:16500,presentacion:'',disponibilidad:'consultar'};
- const order=makeOrder({items:[{id:p.id,quantity:1,expectedPrice:p.precio}],name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},[p],settings);
+ const order=makeOrder({items:[{id:p.id,quantity:1,expectedPrice:p.precio}],name:'Ana',locality:'Villa Allende',province:'Córdoba',notes:''},[p],settings);
  // wa.me reemplaza los emojis por U+FFFD al redirigir: el mensaje no lleva ninguno.
  assert.ok(order.message.startsWith('PEDIDO DE PRUEBA — NO CONFIRMAR\n\n¡Hola, Vitalia! Quiero consultar este pedido:')||order.message.startsWith('¡Hola, Vitalia! Quiero consultar este pedido:'));
  assert.ok(order.message.includes('\n\nTotal: $16.500,00\n\n'));

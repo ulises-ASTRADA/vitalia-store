@@ -40,6 +40,10 @@ try{
  const order=await post(body),result=await order.json();assert.equal(order.status,200);assert.equal(result.total,product.precio*2);assert(result.message.includes('PEDIDO DE PRUEBA — NO CONFIRMAR'));assert(result.whatsappUrl.startsWith('https://wa.me/5491100000000'));
  assert.equal((await post({...body,name:''})).status,400);assert.equal((await post({...body,items:[{...body.items[0],expectedPrice:1}]})).status,409);
  const productPage=await fetch(base+'/productos/granola-tradicional-n037'),productHtml=await productPage.text();assert.equal(productPage.status,200);
+ // Vista previa al compartir: JPG liviano con medidas (algunas versiones de WhatsApp no muestran webp ni imágenes de más de 300 KB).
+ {const og=productHtml.match(/<meta property="og:image" content="https:\/\/www\.vitalia\.energy(\/og\/products\/[\w-]+\.jpg)"/);assert(og,'og:image JPG');
+  assert.match(productHtml,/<meta property="og:image:type" content="image\/jpeg"/);assert.match(productHtml,/<meta property="og:image:width" content="\d+"/);assert.match(productHtml,/<meta property="og:image:height" content="\d+"/);
+  for(const path of [og[1],'/og/products/product-001.jpg']){const r=await fetch(base+path),b=await r.arrayBuffer();assert.equal(r.status,200,path);assert.equal(r.headers.get('content-type'),'image/jpeg',path);assert(b.byteLength<300*1024,path);}}
  const productNonce=productPage.headers.get('content-security-policy').match(/'nonce-([^']+)'/)[1];
  const productLd=productHtml.match(/<script type="application\/ld\+json" nonce="([^"]+)">(.*?)<\/script>/);assert.equal(productLd[1],productNonce);
  const productJson=JSON.parse(productLd[2]);assert.equal(productJson['@type'],'Product');assert.equal(productJson.sku,'N037');assert.equal(productJson.offers.priceCurrency,'ARS');assert.equal(productJson.aggregateRating,undefined);if(data.products.find(p=>p.id==='N037').disponibilidad==='consultar')assert.equal('availability' in productJson.offers,false);

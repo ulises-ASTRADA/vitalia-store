@@ -64,7 +64,7 @@ test('Checkout: datos obligatorios y redirección directa sin vista previa',asyn
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));assert.equal(orders.length,0);
- await user.type(screen.getByLabelText('Tu nombre'),'Ulises');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
  await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
  assert.equal(screen.queryByLabelText('Mensaje del pedido'),null);assert.equal(screen.queryByRole('button',{name:'Copiar mensaje'}),null);
@@ -129,7 +129,7 @@ test('Catálogo del servidor no se consulta otra vez al hidratar',async()=>{
 test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
- await user.type(screen.getByLabelText('Tu nombre'),'Ulises');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  let freshReads=0;
  globalThis.fetch=async url=>{
   if(url==='/api/checkout')return Response.json({code:'CATALOG_CHANGED',error:'Cambió un precio. Revisá el total actualizado antes de continuar.'},{status:409});
@@ -229,7 +229,7 @@ test('/envios: chips, secciones, tabla, retiro sin dirección, FAQ y footer con 
  assert.equal(screen.getByRole('link',{name:'Pedir con envío a Mendiolaza'}).getAttribute('href'),'https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Mendiolaza.');
  assert(screen.getByRole('heading',{name:'¿Qué dietética llega a Mendiolaza y El Talar?'}));
  const rows=[...container.querySelectorAll('.ship-table tbody tr')].map(tr=>tr.textContent);
- assert.deepEqual(rows,['Villa Allende, Mendiolaza, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
+ assert.deepEqual(rows,['Villa Allende, Mendiolaza, El Talar, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
  assert.equal(container.querySelector('.pickup-addr').textContent,'Retiro en Villa Allende, coordinamos la dirección por WhatsApp.');
  const triggers=container.querySelectorAll('.faq-trigger');assert.equal(triggers.length,13);assert.equal(triggers[8].textContent,'¿Hay pedido mínimo?');
  assert.equal(triggers[0].getAttribute('aria-expanded'),'true');assert.equal(triggers[1].getAttribute('aria-expanded'),'false');

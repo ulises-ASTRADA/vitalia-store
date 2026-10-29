@@ -16,14 +16,14 @@ test('/envios: 9 zonas, una sola lista de costos para secciones, tabla, respuest
   assert.deepEqual(zones.map(z=>z.name).sort(),DELIVERY_ZONES.map(z=>z.name).sort());
   for(const z of zones){assert.equal(z.costLine,`Envío a ${z.name}: ${pesos(SHIPPING_COST[z.slug])}.`);assert.equal(z.freeLine,'Gratis en compras de más de $70.000.');}
   assert.deepEqual(page.table.map(r=>[r.label,r.value]),[
-    ['Villa Allende, Mendiolaza, Saldán y Villa Rivera Indarte','$3.000'],
+    ['Villa Allende, Mendiolaza, El Talar, Saldán y Villa Rivera Indarte','$3.000'],
     ['Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas','$5.000'],
     ['Compras de más de $70.000, todas las zonas','Gratis']]);
   // Cada zona aparece exactamente en una fila de la tabla, con su costo.
   for(const z of zones)assert.equal(costTiers().filter(t=>t.zones.includes(z.name)&&t.cost===z.cost).length,1);
   assert.match(page.answer,/El envío cuesta \$3\.000 o \$5\.000 según la zona, y es gratis en compras de más de \$70\.000\./);
   const faq=faqItems('5491100000000');
-  assert.match(faq[6].a,/^Depende de la zona: \$3\.000 a Villa Allende, Mendiolaza, Saldán y Villa Rivera Indarte, y \$5\.000 a Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas\./);
+  assert.match(faq[6].a,/^Depende de la zona: \$3\.000 a Villa Allende, Mendiolaza, El Talar, Saldán y Villa Rivera Indarte, y \$5\.000 a Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas\./);
 });
 
 test('/envios: datos confirmados el 28/10 (El Talar, countries, Golf/Lomas/Parque, retiro sin calle)',()=>{
@@ -38,7 +38,7 @@ test('/envios: datos confirmados el 28/10 (El Talar, countries, Golf/Lomas/Parqu
   assert.equal(page.pickup.mapsUrl,'');
   for(const banned of ['1504','De la Unión','De La Union','streetAddress','google.com/maps','openingHours'])assert(!allText.includes(banned),banned);
   assert.equal(ENVIOS_PAGE,true);
-  // Sin pedido mínimo (Ulises, 28/10): FAQ 9 justo después de "¿Hay envío gratis?" y línea en las condiciones.
+  // Sin pedido mínimo (confirmado por la tienda, 28/10): FAQ 9 justo después de "¿Hay envío gratis?" y línea en las condiciones.
   const faq=faqItems();assert.equal(faq[7].q,'¿Hay envío gratis?');
   assert.deepEqual(faq[8],{q:'¿Hay pedido mínimo?',a:'No, no hay pedido mínimo: podés pedir el monto que quieras. En compras de más de $70.000, el envío es gratis.'});
   assert.deepEqual(page.terms.at(-1),['Pedido mínimo','Sin pedido mínimo']);
@@ -86,9 +86,7 @@ test('/envios: formato del teléfono para la FAQ 13 sale de WHATSAPP_NUMBER',()=
 test('llms.txt: zonas, costos, pagos, Instagram y /envios, sin dirección',()=>{
   const llms=readFileSync(new URL('../public/llms.txt',import.meta.url),'utf8');
   for(const z of zones)assert(llms.includes(z.name),z.name);
-  // llms.txt nombra El Talar junto a Mendiolaza (mismo costo, confirmado por Ulises el 28/10).
-  const withTalar=zs=>zs.flatMap(z=>z==='Mendiolaza'?[z,'El Talar']:[z]);
-  for(const t of costTiers())assert(llms.includes(`${t.label} a ${withTalar(t.zones).join(', ').replace(/, ([^,]+)$/,' y $1')}`),t.label);
+  for(const t of costTiers())assert(llms.includes(`${t.label} a ${t.zones.join(', ').replace(/, ([^,]+)$/,' y $1')}`),t.label);
   assert(llms.includes('Gratis en compras de más de $70.000'));
   assert(llms.includes('transferencia o efectivo'));
   assert(llms.includes('https://www.vitalia.energy/envios'));
