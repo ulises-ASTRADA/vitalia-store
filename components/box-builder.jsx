@@ -1,7 +1,8 @@
 'use client';
 import {useMemo,useRef,useState} from 'react';
 import {Button,Input} from '@chakra-ui/react';
-import Image from 'next/image';
+import NextImage from 'next/image';
+const Image = NextImage.default || NextImage;
 import {BOXES,BOX_GOALS,buildBox} from '../lib/boxes';
 
 export default function BoxBuilder({products,money,onAdd,ready}){
