@@ -4,7 +4,7 @@ import {categoryPath,productPath} from '../lib/product-links';
 import {categoryList,pageProducts} from '../lib/product-pages';
 export const revalidate=60;
 
-// Home, boxes, categorías con productos y productos con página propia (sin la lista de exclusión).
+// Home, boxes, categorías con productos y todos los productos activos.
 export default async function sitemap() {
   const pages=['','/boxes'];
   try {

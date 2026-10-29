@@ -42,7 +42,7 @@ try{
  const productPage=await fetch(base+'/productos/granola-tradicional-n037'),productHtml=await productPage.text();assert.equal(productPage.status,200);
  const productNonce=productPage.headers.get('content-security-policy').match(/'nonce-([^']+)'/)[1];
  const productLd=productHtml.match(/<script type="application\/ld\+json" nonce="([^"]+)">(.*?)<\/script>/);assert.equal(productLd[1],productNonce);
- const productJson=JSON.parse(productLd[2]);assert.equal(productJson['@type'],'Product');assert.equal(productJson.sku,'N037');assert.equal(productJson.offers.priceCurrency,'ARS');assert.equal(productJson.aggregateRating,undefined);
+ const productJson=JSON.parse(productLd[2]);assert.equal(productJson['@type'],'Product');assert.equal(productJson.sku,'N037');assert.equal(productJson.offers.priceCurrency,'ARS');assert.equal(productJson.aggregateRating,undefined);if(data.products.find(p=>p.id==='N037').disponibilidad==='consultar')assert.equal('availability' in productJson.offers,false);
  assert(productHtml.includes('<title>Granola tradicional · 1 KG · Vitalia</title>'));assert(productHtml.includes('href="https://www.vitalia.energy/productos/granola-tradicional-n037"'));
  assert(productHtml.includes('Agregar al pedido'));assert(productHtml.includes('https://wa.me/5491100000000?text='));assert(!/\[A (COMPLETAR|CONFIRMAR)\]/.test(productHtml));
  const renamed=await fetch(base+'/productos/granola-vieja-n037',{redirect:'manual'});assert.equal(renamed.status,308);assert.equal(new URL(renamed.headers.get('location'),base).pathname,'/productos/granola-tradicional-n037');
@@ -51,6 +51,6 @@ try{
  assert(categoryHtml.includes('<title>Granolas y cereales · Vitalia Dietética</title>'));assert.match(categoryHtml,/<h1>Granolas y cereales<span aria-hidden="true">\.<\/span><\/h1>/);
  assert.equal((categoryHtml.match(/class="product-card/g)||[]).length,24);assert(categoryHtml.includes('href="/productos/granola-tradicional-n037"'));
  assert(html.includes('href="/productos/'));
- const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert(!/-n29[67]</.test(sitemapXml));
+ const sitemapXml=await (await fetch(base+'/sitemap.xml')).text();assert(sitemapXml.includes('/productos/granola-tradicional-n037'));assert(sitemapXml.includes('/categorias/granolas-y-cereales'));assert.equal((sitemapXml.match(/\/productos\//g)||[]).length,data.products.length);
  console.log('Next.js HTTP: CSP con nonce único, HSTS, páginas dinámicas, catálogo compartido, robots/sitemap, origen requerido, páginas de producto y categoría, 24 tarjetas SSR, imágenes optimizadas y checkout validados. No se abre WhatsApp.');
 }finally{server.kill('SIGTERM');}

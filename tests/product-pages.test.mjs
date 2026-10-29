@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {slugify,productSlug,productPath,findBySlug,NO_PRODUCT_PAGE} from '../lib/product-links.js';
-import {cleanDescription,pricePerKilo,productPageData,relatedProducts,categoryList,categoryPageData,pageProducts,resolveProduct,assertNoPlaceholders,whatsappConsultUrl} from '../lib/product-pages.js';
+import {slugify,productSlug,productPath,findBySlug} from '../lib/product-links.js';
+import * as productLinks from '../lib/product-links.js';
+import localCatalog from '../data/catalog.json' with {type:'json'};
+import {cleanDescription,pricePerKilo,productPageData,relatedProducts,categoryList,categoryPageData,pageProducts,resolveProduct,assertNoPlaceholders,whatsappConsultUrl,offerAvailability} from '../lib/product-pages.js';
 import categorias from '../data/categorias.json' with {type:'json'};
 const p=(id,nombre,categoria,extra={})=>({id,nombre,categoria,precio:1000,presentacion:'1 KG',disponibilidad:'consultar',descripcion:'',imagen:`/images/product-${id}.webp`,...extra});
 
@@ -19,15 +21,37 @@ test('Se resuelve por el código del final, aunque cambie el nombre',()=>{
   assert.equal(findBySlug(products,'nada-n999'),null);
   assert.deepEqual(resolveProduct(products,'granola-vieja-n037').canonicalSlug,'granola-tradicional-n037');
 });
-test('N296 y N297 no tienen página ni link, pero siguen en la categoría',()=>{
-  assert.deepEqual([...NO_PRODUCT_PAGE].sort(),['N296','N297']);
-  const products=[p('N295','Aceite de oliva','Aceites y conservas'),p('N296','Producto A','Aceites y conservas'),p('N297','Producto B','Aceites y conservas')];
-  assert.equal(productPath(products[1]),null);
-  assert.equal(productPath(products[0]),'/productos/aceite-de-oliva-n295');
-  assert.deepEqual(pageProducts(products).map(x=>x.id),['N295']);
-  assert.equal(resolveProduct(products,'producto-a-n296'),null);
-  assert.equal(categoryPageData(products,'aceites-y-conservas').items.length,3);
-  assert.deepEqual(relatedProducts(products,products[0]),[]);
+test('N296 y N297 (aceites de CBD) tienen página como cualquier producto, aunque el catálogo local no los tenga',()=>{
+  assert.equal(productLinks.NO_PRODUCT_PAGE,undefined);
+  // Fixture con los datos de la planilla en vivo (28/10): el data/catalog.json local no trae N296/N297 activos.
+  assert.equal(localCatalog.some(x=>['N296','N297'].includes(x.id)&&x.activo!==false),false);
+  const cbd=(id,nombre,precio,presentacion)=>p(id,nombre,'Suplementos',{precio,presentacion,descripcion:'',disponibilidad:'consultar'});
+  const products=[p('N165','Maca peruana','Suplementos',{presentacion:'500 GR'}),cbd('N296','Aceite de CBD al 40% — uso oral',9100,'20 ml'),cbd('N297','Aceite de CBD al 20% — uso oral',11200,'40 ml')];
+  assert.equal(productPath(products[1]),'/productos/aceite-de-cbd-al-40-uso-oral-n296');
+  assert.equal(productPath(products[2]),'/productos/aceite-de-cbd-al-20-uso-oral-n297');
+  assert.deepEqual(pageProducts(products).map(x=>x.id),['N165','N296','N297']);
+  assert.equal(resolveProduct(products,'aceite-de-cbd-al-40-uso-oral-n296').product.id,'N296');
+  assert.equal(resolveProduct(products,'otro-nombre-n297').canonicalSlug,'aceite-de-cbd-al-20-uso-oral-n297');
+  assert.equal(categoryPageData(products,'suplementos').items.length,3);
+  assert.deepEqual(relatedProducts(products,products[0]).map(x=>x.id),['N296','N297']);
+  assert.deepEqual(relatedProducts(products,products[1]).map(x=>x.id),['N165','N297']);
+  // Página solo con datos de la planilla: sin descripción (se oculta), sin texto de salud, sin availability inventado.
+  const page=productPageData(products[1],{phone:'5491100000000'});
+  assert.equal(page.title,'Aceite de CBD al 40% — uso oral · 20 ml · Vitalia');
+  assert.equal(page.description,'');assert.equal(page.jsonLd.description,undefined);
+  assert.equal(page.metaDescription,'Aceite de CBD al 40% — uso oral (20 ml) a $\u00a09.100,00. Pedilo en Vitalia y coordiná la entrega por WhatsApp.');
+  assert.equal(page.jsonLd.offers.availability,undefined);assert.equal(page.jsonLd.offers.price,9100);
+  assert.doesNotMatch(JSON.stringify(page),/salud|terap|medic|beneficio|dolor|ansiedad/i);
+});
+test('Disponibilidad del JSON-LD: InStock solo si está disponible, OutOfStock si está agotado, y nada si es a consultar',()=>{
+  const base=p('N1','X','Y');
+  assert.equal(offerAvailability({...base,disponibilidad:'disponible'}),'https://schema.org/InStock');
+  assert.equal(offerAvailability({...base,disponibilidad:'agotado'}),'https://schema.org/OutOfStock');
+  assert.equal(offerAvailability({...base,disponibilidad:'consultar'}),undefined);
+  assert.equal(offerAvailability({...base,disponibilidad:''}),undefined);
+  const offers=productPageData({...base,disponibilidad:'consultar'}).jsonLd.offers;
+  assert.equal('availability' in offers,false);
+  assert.equal(productPageData({...base,disponibilidad:'disponible'}).jsonLd.offers.availability,'https://schema.org/InStock');
 });
 test('Descripción sin la presentación repetida',()=>{
   assert.equal(cleanDescription(p('N018','X','Y',{descripcion:'1 KG'})),'');
@@ -44,7 +68,7 @@ test('Precio por kilo solo para pesos distintos de 1 kg',()=>{
   assert.equal(pricePerKilo(p('a','X','Y',{presentacion:'14 unidades'})),null);
 });
 test('Datos de la página: título, meta, JSON-LD y WhatsApp',()=>{
-  const product=p('N037','Granola tradicional','Granolas y cereales',{precio:7700,descripcion:'Avena, arroz, copos de maíz, mix de semillas, miel, maní y coco'});
+  const product=p('N037','Granola tradicional','Granolas y cereales',{precio:7700,disponibilidad:'disponible',descripcion:'Avena, arroz, copos de maíz, mix de semillas, miel, maní y coco'});
   const page=productPageData(product,{currency:'ARS',phone:'5491100000000'});
   assert.equal(page.title,'Granola tradicional · 1 KG · Vitalia');
   assert.match(page.metaDescription,/^Granola tradicional \(1 KG\) a \$\s7\.700,00\. Avena, .* Pedilo en Vitalia y coordiná la entrega por WhatsApp\.$/);
@@ -68,11 +92,12 @@ test('Categorías: intro de diseño, 404 si no existe',()=>{
   assert.equal(categoryPageData(products,'categoria-nueva').intro,'');
   assert.equal(categoryPageData(products,'nada'),null);
 });
-test('Intros sin marcadores ni productos excluidos',()=>{
+test('Intros sin marcadores ni texto de salud; Suplementos nombra los aceites de CBD',()=>{
   for(const [name,{intro}] of Object.entries(categorias)){
     assert.doesNotThrow(()=>assertNoPlaceholders(intro,name));
-    assert.doesNotMatch(intro,/cbd|cannabi/i,name);
+    assert.doesNotMatch(intro,/salud|terap|medicinal|beneficio/i,name);
   }
+  assert.match(categorias.Suplementos.intro,/^Maca peruana, colágeno hidrolizado y aceites de CBD\./);
 });
 test('Un marcador en los datos de la página corta el build',()=>{
   const product=p('N1','Granola [A COMPLETAR]','Granolas');

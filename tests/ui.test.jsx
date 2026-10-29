@@ -169,11 +169,11 @@ test('Boxes no superan los límites del carrito ni agregan parcialmente al falla
  assert.deepEqual(JSON.parse(localStorage.getItem('vitalia-cart-v1')),{N003:99});cleanup();
 });
 
-test('Tarjetas: N296 sin página propia abre el detalle como antes',async()=>{
- cleanup();localStorage.clear();const cbd={id:'N296',nombre:'Producto sin página',categoria:'Aceites y conservas',precio:300,presentacion:'30 ML',imagen:'/images/product-001.webp',disponibilidad:'consultar'};
- render(<Provider><Store initialCatalog={{...catalog,products:[...products,cbd]}}/></Provider>);const user=userEvent.setup({document:dom.window.document});
- assert.equal(screen.queryByRole('link',{name:'Producto sin página',exact:true}),null);
- await user.click(screen.getByRole('button',{name:'Ver Producto sin página',exact:true}));const detail=await screen.findByRole('dialog',{name:'Producto sin página'});assert(within(detail).getByText('Disponibilidad a confirmar por WhatsApp'));await user.click(within(detail).getByRole('button',{name:'Cerrar',exact:true}));cleanup();
+test('Tarjetas: N296 (aceite de CBD) linkea a su página como el resto',async()=>{
+ cleanup();localStorage.clear();const cbd={id:'N296',nombre:'Aceite de CBD al 40% — uso oral',categoria:'Suplementos',precio:9100,presentacion:'20 ml',imagen:'/images/product-001.webp',disponibilidad:'consultar',descripcion:''};
+ render(<Provider><Store initialCatalog={{...catalog,products:[...products,cbd]}}/></Provider>);
+ assert.equal(screen.getByRole('link',{name:'Aceite de CBD al 40% — uso oral',exact:true}).getAttribute('href'),'/productos/aceite-de-cbd-al-40-uso-oral-n296');
+ assert.equal(screen.getByRole('link',{name:'Ver Aceite de CBD al 40% — uso oral',exact:true}).getAttribute('href'),'/productos/aceite-de-cbd-al-40-uso-oral-n296');cleanup();
 });
 test('Página de producto: agregar, stepper, foco en Ir a mi pedido y quitar',async()=>{
  cleanup();localStorage.clear();const product=products[0];

@@ -10,7 +10,7 @@ import {useCart} from './use-cart';
 import {productPath} from '../lib/product-links';
 const Link=NextLink.default||NextLink;
 
-// categories: [{name,slug,count,href}]. Los productos sin página propia quedan en la grilla, sin link.
+// categories: [{name,slug,count,href}].
 export default function CategoryPage({catalog,category,categories}) {
   const {products,settings}=catalog;
   const {cart,loaded,count,total,change}=useCart(products);
