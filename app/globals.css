@@ -227,3 +227,4 @@ select{background:var(--surface);color:var(--ink)}
 .boxes-page{padding-bottom:32px}
 .product-card .price-row{grid-template-columns:36px minmax(0,max-content) 36px;justify-content:center;gap:10px}
 @media(max-width:540px){.section-nav{padding:4px 16px 10px}.product-card .price-row{grid-template-columns:33px minmax(0,max-content) 33px;gap:6px}}
+@media(max-width:540px){.footer span a{display:inline-flex;align-items:center;min-height:44px;font-size:.875rem;color:var(--ink);text-decoration:underline;text-underline-offset:3px}}
