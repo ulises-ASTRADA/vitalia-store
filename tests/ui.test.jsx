@@ -6,6 +6,7 @@ const dom=new JSDOM('<!doctype html><html><body></body></html>',{url:'http://loc
 for(const name of ['window','document','navigator','HTMLElement','HTMLInputElement','HTMLTextAreaElement','Element','Node','SVGElement','MutationObserver','CustomEvent','Event','DocumentFragment'])Object.defineProperty(globalThis,name,{value:dom.window[name],configurable:true});
 globalThis.self=dom.window;
 globalThis.localStorage=dom.window.localStorage;
+globalThis.sessionStorage=dom.window.sessionStorage;
 globalThis.getComputedStyle=dom.window.getComputedStyle.bind(dom.window);
 globalThis.requestAnimationFrame=fn=>setTimeout(fn,0);
 globalThis.cancelAnimationFrame=clearTimeout;
@@ -27,15 +28,23 @@ const CategoryPage=(await import('../components/category-page.jsx')).default;
 const EnviosPage=(await import('../components/envios-page.jsx')).default;
 const {enviosPageData}=await import('../lib/envios.js');
 const {useCart}=await import('../components/use-cart.js');
+const {makeOrder}=await import('../lib/checkout.js');
+const WelcomePopup=(await import('../components/welcome-popup.jsx')).default;
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
 {id:'N002',nombre:'Chalita de harina de centeno y semilla de zapallo',categoria:'Galletitas y panificados',precio:200,presentacion:'1 KG',imagen:'/images/product-002.webp',disponibilidad:'consultar'},
 {id:'N003',nombre:'Té verde',categoria:'Infusiones',precio:150,presentacion:'500 GR',imagen:'/images/product-003.webp',disponibilidad:'consultar'}
 ];
-let orders=[],catalogReads=0;
+let orders=[],catalogReads=0,codeChecks=[],signups=[],serverProducts=products;
 function setup(initialCatalog=null){
- cleanup();localStorage.clear();dom.reconfigure({url:'http://localhost'});orders=[];catalogReads=0;
- globalThis.fetch=async(url,options)=>{if(url==='/api/catalog'){catalogReads++;return Response.json({products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}});}assert.equal(url,'/api/checkout');const body=JSON.parse(options.body);orders.push(body);return Response.json({message:'PEDIDO DE PRUEBA — NO CONFIRMAR\nTotal: $200,00',total:200,whatsappUrl:'http://localhost/#whatsapp-prueba'});};
+ cleanup();localStorage.clear();dom.reconfigure({url:'http://localhost'});orders=[];catalogReads=0;codeChecks=[];signups=[];serverProducts=products;
+ globalThis.fetch=async(url,options)=>{if(url==='/api/catalog'){catalogReads++;return Response.json({products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}});}const body=JSON.parse(options.body);
+  if(url==='/api/cart/code'){codeChecks.push(body);return body.code==='BV-7K2Q-9MXD'?Response.json({ok:true,code:body.code,rate:10}):Response.json({error:'Este código ya se usó.',code:'CODE_USED'},{status:409});}
+  if(url==='/api/welcome'){signups.push(body);return Response.json({ok:true,cartToken:'a'.repeat(64)});}
+  assert.equal(url,'/api/checkout');orders.push(body);
+  // El servidor de prueba arma el pedido con la misma lógica que el real.
+  const {totals,items,...order}=makeOrder(body,serverProducts,{name:'Vitalia',currency:'ARS',phone:'5491100000000',testCheckout:true},{orderRef:'V-0001',code:body.code||null});
+  return Response.json({...order,whatsappUrl:'http://localhost/#whatsapp-prueba',...(body.code?{codeToken:'b'.repeat(64)}:{})});};
  render(<Provider><Store initialCatalog={initialCatalog}/></Provider>);return userEvent.setup({document:dom.window.document});
 }
 test('React/Chakra: búsqueda, orden y categorías',async()=>{
@@ -59,14 +68,14 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
  await screen.findByRole('link',{name:/^Mi pedido 1 productos/});cleanup();
 });
-test('Checkout: datos obligatorios y redirección directa sin vista previa',async()=>{
+test('Checkout: datos obligatorios, número de pedido del servidor y envío por WhatsApp',async()=>{
  const user=setup();await screen.findByText('3 productos');
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));assert.equal(orders.length,0);
  await user.type(screen.getByLabelText('Tu nombre'),'Ulises');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
- await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
+ await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
  assert.equal(screen.queryByLabelText('Mensaje del pedido'),null);assert.equal(screen.queryByRole('button',{name:'Copiar mensaje'}),null);
  await user.type(screen.getByLabelText('Tu nombre'),' Astrada');assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
 });
@@ -114,7 +123,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
  await user.click(screen.getByRole('button',{name:'Sumar una presentación de Chalita de harina de centeno y semilla de zapallo'}));
  assert(screen.getByText('$ 530,00',{selector:'.total-row strong'}));
  await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.type(screen.getByLabelText('Localidad'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
- await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));
+ await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));
  assert.equal(orders[0].items.find(i=>i.id==='N002').offerSourceId,'N003');
  await user.click(screen.getByRole('button',{name:'Quitar Té verde',exact:true}));
  assert(screen.getByText('$ 400,00',{selector:'.total-row strong'}));
@@ -249,4 +258,88 @@ test('Footer: Instagram y Envíos en catálogo, boxes y producto',async()=>{
   assert.equal(screen.getByRole('link',{name:'Envíos'}).getAttribute('href'),'/envios');
  }
  cleanup();
+});
+
+const bigCatalog={products:[{...products[0],precio:100000},products[1],products[2]],settings:catalog.settings};
+async function bigCheckout(quantity){
+ setup();cleanup();serverProducts=bigCatalog.products;localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:quantity}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);await screen.findByText('Productos elegidos');
+ return userEvent.setup({document:dom.window.document});
+}
+test('Carrito ≥ $400.000: 10% automático con la etiqueta "desde", envío gratis y meta cumplida',async()=>{
+ await bigCheckout(4);
+ assert(screen.getByText('Descuento por compra desde $400.000 (10%)'));
+ assert(screen.getByText('$ 360.000,00',{selector:'.total-row strong'}));
+ assert.equal(document.querySelector('.sum-lines div:last-child dd').textContent,'Gratis');
+ assert.match(document.querySelector('.goal').className,/done/);
+ cleanup();
+});
+test('Carrito por debajo de $400.000: meta muestra lo que falta y no hay descuento',async()=>{
+ await bigCheckout(3);
+ assert.equal(screen.queryByText('Descuento por compra desde $400.000 (10%)'),null);
+ assert.match(document.querySelector('.goal').textContent,/Te faltan \$\s100\.000,00 para el 10% off/);
+ cleanup();
+});
+test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y viaja al checkout',async()=>{
+ const user=await bigCheckout(4);
+ await user.click(screen.getByRole('button',{name:'¿Tenés un código de descuento?'}));
+ const input=screen.getByLabelText('Código de descuento');
+ await user.type(input,'BV-2222-3333');await user.click(screen.getByRole('button',{name:'Aplicar'}));
+ assert.equal((await screen.findByRole('alert')).textContent,'Este código ya se usó.');assert.equal(input.getAttribute('aria-invalid'),'true');
+ await user.clear(input);await user.type(input,'bv 7k2q 9mxd');await user.click(screen.getByRole('button',{name:'Aplicar'}));
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(codeChecks.at(-1).code,'BV-7K2Q-9MXD');
+ assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));assert(screen.getByText('Ahorrás $ 80.000,00'));
+ await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.type(screen.getByLabelText('Localidad'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
+ await screen.findByRole('heading',{name:'Pedido listo para enviar'});
+ assert.equal(orders[0].code,'BV-7K2Q-9MXD');assert.equal(orders[0].total,undefined);
+ assert.equal(document.querySelector('.ref b').textContent,'#V-0001');
+ assert.match(document.querySelector('.wa-preview').textContent,/Codigo de bienvenida BV-7K2Q-9MXD \(10%\): -\$40\.000,00/);
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'b'.repeat(64));
+ // Cambiar el carrito vuelve al resumen editable.
+ await user.click(screen.getByRole('button',{name:'Sumar una presentación de Almendras'}));
+ assert(await screen.findByRole('button',{name:'Continuar por WhatsApp'}));
+ await user.click(screen.getByRole('button',{name:'Quitar el código BV-7K2Q-9MXD'}));
+ assert(screen.getByText('$ 450.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Popup: exit intent en compu, consentimiento obligatorio, código nunca en pantalla, no vuelve a aparecer',async()=>{
+ setup();cleanup();
+ const previous=dom.window.matchMedia;dom.window.matchMedia=()=>({matches:true,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});
+ try{
+  render(<Provider><WelcomePopup/></Provider>);
+  const user=userEvent.setup({document:dom.window.document});
+  document.dispatchEvent(new dom.window.MouseEvent('mouseout',{clientY:0,bubbles:true}));
+  const dialog=await screen.findByRole('dialog',{name:'10% off en tu primera compra'});
+  assert.equal(dialog.getAttribute('aria-modal'),'true');
+  assert.equal(screen.getByLabelText(/Acepto recibir novedades/).checked,false);
+  await user.type(screen.getByLabelText('Nombre'),'Prueba');await user.type(screen.getByLabelText('Email'),'prueba@mail.com');
+  await user.click(screen.getByRole('button',{name:'Quiero mi 10%'}));
+  assert.equal(signups.length,0);assert(screen.getByText('Para mandarte el código necesitamos que aceptes recibir mails.'));
+  await user.click(screen.getByLabelText(/Acepto recibir novedades/));await user.click(screen.getByRole('button',{name:'Quiero mi 10%'}));
+  await screen.findByRole('heading',{name:'¡Listo, Prueba!'});
+  assert.deepEqual(signups[0],{name:'Prueba',email:'prueba@mail.com',consent:true,website:''});
+  assert.doesNotMatch(document.body.textContent,/BV-/);
+  assert.equal(localStorage.getItem('vt_popup_subscribed'),'1');assert.equal(localStorage.getItem('vt_cart_token'),'a'.repeat(64));
+  await user.click(screen.getByRole('button',{name:'Seguir comprando'}));
+  assert.equal(screen.queryByRole('dialog'),null);
+ }finally{dom.window.matchMedia=previous;cleanup();}
+});
+test('Popup: "No, gracias" lo cierra y queda oculto 30 días; no aparece por exit intent en celu',async()=>{
+ setup();cleanup();sessionStorage.clear();
+ render(<Provider><WelcomePopup/></Provider>);
+ document.dispatchEvent(new dom.window.MouseEvent('mouseout',{clientY:0,bubbles:true}));
+ await new Promise(r=>setTimeout(r,20));assert.equal(screen.queryByRole('dialog'),null);
+ cleanup();
+ const previous=dom.window.matchMedia;dom.window.matchMedia=()=>({matches:true,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});
+ try{
+  render(<Provider><WelcomePopup/></Provider>);const user=userEvent.setup({document:dom.window.document});
+  document.dispatchEvent(new dom.window.MouseEvent('mouseout',{clientY:0,bubbles:true}));
+  await screen.findByRole('dialog');await user.click(screen.getByRole('button',{name:'No, gracias'}));
+  assert.equal(screen.queryByRole('dialog'),null);assert.ok(Number(localStorage.getItem('vt_popup_dismissed_at'))>0);
+  cleanup();sessionStorage.clear();render(<Provider><WelcomePopup/></Provider>);
+  document.dispatchEvent(new dom.window.MouseEvent('mouseout',{clientY:0,bubbles:true}));
+  await new Promise(r=>setTimeout(r,20));assert.equal(screen.queryByRole('dialog'),null);
+ }finally{dom.window.matchMedia=previous;cleanup();}
 });

@@ -15,7 +15,7 @@ test('Pedido de prueba: total, cantidades, destino y texto UTF-8',()=>{
  const url=new URL(order.whatsappUrl);
  assert.equal(url.hostname,'wa.me');assert.equal(url.pathname,'/5493512136078');
  assert.equal(url.searchParams.get('text'),order.message);
- assert.match(order.message,/PEDIDO DE PRUEBA/);assert.match(order.message,/2 × Cookies \(500 gramos\)/);assert.match(order.message,/Consulta Córdoba/);
+ assert.match(order.message,/PEDIDO DE PRUEBA/);assert.match(order.message,/- 2 x Cookies \(500 gramos\): \$15\.600,00/);assert.match(order.message,/Consulta Córdoba/);
 });
 test('No acepta precio manipulado, cambios de disponibilidad ni IDs ocultos',()=>{
  for(const edit of [b=>b.items[0].expectedPrice=1,b=>b.items[0].id='OCULTO']){
@@ -46,7 +46,7 @@ test('Catálogo: disponibilidad 0 significa agotado y bloquea el pedido',()=>{
 test('Pedidos largos conservan el mensaje completo en el enlace de WhatsApp',()=>{
  const rows=Array.from({length:50},(_,i)=>({...products[0],id:'P'+i,nombre:'Nombre largo de producto que necesita una presentación completa '+i}));
  const order=makeOrder({items:rows.map(p=>({id:p.id,quantity:1,expectedPrice:p.precio})),name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},rows,settings);
- assert.equal(new URL(order.whatsappUrl).searchParams.get('text'),order.message);assert.match(order.message,/P49/);
+ assert.equal(new URL(order.whatsappUrl).searchParams.get('text'),order.message);assert.match(order.message,/completa 49 \(500 gramos\)/);
 });
 test('Extracción: 295 IDs, 295 fotos y precios idénticos a transcripción PDF',async()=>{
  const raw=JSON.parse(await readFile(new URL('../data/catalog.json',import.meta.url),'utf8'));
@@ -83,9 +83,9 @@ test('Nombre, localidad y provincia son obligatorios y aparecen en el mensaje',(
  const p={id:'N001',nombre:'Pepas',precio:16500,presentacion:'',disponibilidad:'consultar'};
  const order=makeOrder({items:[{id:p.id,quantity:1,expectedPrice:p.precio}],name:'Ulises',locality:'Villa Allende',province:'Córdoba',notes:''},[p],settings);
  // wa.me reemplaza los emojis por U+FFFD al redirigir: el mensaje no lleva ninguno.
- assert.ok(order.message.startsWith('PEDIDO DE PRUEBA — NO CONFIRMAR\n\n¡Hola, Vitalia! Quiero consultar este pedido:')||order.message.startsWith('¡Hola, Vitalia! Quiero consultar este pedido:'));
- assert.ok(order.message.includes('\n\nTotal: $16.500,00\n\n'));
- assert.ok(order.message.includes('• 1 × Pepas'));
+ assert.ok(order.message.startsWith('PEDIDO DE PRUEBA — NO CONFIRMAR\n\nHola Vitalia! Quiero hacer este pedido:')||order.message.startsWith('Hola Vitalia! Quiero hacer este pedido:'));
+ assert.ok(order.message.includes('\nTotal: $16.500,00\n\n'));
+ assert.ok(order.message.includes('- 1 x Pepas: $16.500,00'));
  assert.ok(!/\p{Extended_Pictographic}|\uFE0F/u.test(order.message));
  const decoded=new URL(order.whatsappUrl).searchParams.get('text');
  assert.equal(decoded,order.message);

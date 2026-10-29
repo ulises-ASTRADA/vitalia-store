@@ -3,16 +3,30 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {canOffer,priceCart} from '../lib/cart-offers';
 const KEY='vitalia-cart-v1';
 const OFFERS_KEY='vitalia-cart-offers-v1';
+// Token opaco que recibe solo quien se suscribió en el popup (con consentimiento). Sin token no se guarda nada.
+export const CART_TOKEN_KEY='vt_cart_token';
+export const CART_CODE_KEY='vt_cart_code';
+let syncTimer;
+function syncAbandonedCart(next) {
+  let token;try{token=localStorage.getItem(CART_TOKEN_KEY);}catch{return;}
+  if(!token||!/^[0-9a-f]{64}$/.test(token))return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{
+    fetch('/api/cart/save',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({cartToken:token,items:Object.entries(next).map(([id,quantity])=>({id,quantity}))})})
+      .then(response=>{if(response.status===404)try{localStorage.removeItem(CART_TOKEN_KEY);}catch{}}).catch(()=>{});
+  },1500);
+}
 export function useCart(products,{catalogReady=true}={}) {
   const [cart,setCart]=useState({}),[loaded,setLoaded]=useState(false);
   const [offers,setOffers]=useState({});
   const currentOffers=useRef({});
   const current=useRef(cart),hydrated=useRef(false);
-  function commit(next,nextOffers=currentOffers.current){
+  function commit(next,nextOffers=currentOffers.current,{sync=true}={}){
     const lines=Object.entries(next).map(([id,quantity])=>({product:products.find(p=>p.id===id),quantity})).filter(i=>i.product);
     const validOffers=Object.fromEntries(priceCart(lines,nextOffers).filter(i=>i.offerSourceId).map(i=>[i.product.id,i.offerSourceId]));
     current.current=next;currentOffers.current=validOffers;setCart(next);setOffers(validOffers);
     try{localStorage.setItem(KEY,JSON.stringify(next));localStorage.setItem(OFFERS_KEY,JSON.stringify(validOffers));}catch{}
+    if(sync)syncAbandonedCart(next);
   }
   useEffect(()=>{
     if(!catalogReady)return;
@@ -23,11 +37,11 @@ export function useCart(products,{catalogReady=true}={}) {
       let savedOffers={};try{savedOffers=JSON.parse(localStorage.getItem(OFFERS_KEY)||'{}');}catch{}
       if(!savedOffers||typeof savedOffers!=='object'||Array.isArray(savedOffers))savedOffers={};
       currentOffers.current=savedOffers;
-      commit(Object.fromEntries(Object.entries(saved).filter(([id,q])=>/^[A-Za-z0-9_-]{1,60}$/.test(id)&&Number.isInteger(q)&&q>0&&q<=99&&products.some(p=>p.id===id&&p.disponibilidad!=='agotado'))));
+      commit(Object.fromEntries(Object.entries(saved).filter(([id,q])=>/^[A-Za-z0-9_-]{1,60}$/.test(id)&&Number.isInteger(q)&&q>0&&q<=99&&products.some(p=>p.id===id&&p.disponibilidad!=='agotado'))),undefined,{sync:false});
       setLoaded(true);
     }else{
       const next=Object.fromEntries(Object.entries(current.current).filter(([id])=>products.some(p=>p.id===id&&p.disponibilidad!=='agotado')));
-      commit(next);
+      commit(next,undefined,{sync:false});
     }
   },[products,catalogReady]);
   const items=useMemo(()=>priceCart(Object.entries(cart).map(([id,quantity])=>({product:products.find(p=>p.id===id),quantity})).filter(item=>item.product),offers),[cart,products,offers]);
@@ -64,5 +78,5 @@ export function useCart(products,{catalogReady=true}={}) {
     if(Object.keys(next).length>50)return 'Podés incluir hasta 50 productos por pedido. Quitá alguno antes de sumar el box.';
     commit(next);return '';
   }
-  return {cart,loaded,items,change,remove,acceptOffer,addSelection,count:items.reduce((s,i)=>s+i.quantity,0),savings:items.reduce((s,i)=>s+Math.round(i.savings*100),0)/100,total:items.reduce((s,i)=>s+Math.round(i.subtotal*100),0)/100};
+  return {cart,loaded,items,change,remove,acceptOffer,addSelection,count:items.reduce((s,i)=>s+i.quantity,0),savings:items.reduce((s,i)=>s+Math.round(i.savings*100),0)/100,grossCents:items.reduce((s,i)=>s+Math.round(i.product.precio*100)*i.quantity,0),suggestionCents:items.reduce((s,i)=>s+Math.round(i.savings*100),0),total:items.reduce((s,i)=>s+Math.round(i.subtotal*100),0)/100};
 }

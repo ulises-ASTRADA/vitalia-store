@@ -2,7 +2,8 @@ import {spawn} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 const port=Number(process.env.TEST_PORT||3102),base=`http://127.0.0.1:${port}`;
-const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{env:{...process.env,PREVIEW_MODE:'true',ALLOW_TEST_CHECKOUT:'true',WHATSAPP_NUMBER:'5491100000000'},stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{env:{...process.env,PREVIEW_MODE:'true',ALLOW_TEST_CHECKOUT:'true',WHATSAPP_NUMBER:'5491100000000',SUPABASE_SERVICE_ROLE_KEY:'dummy',RESEND_API_KEY:'dummy',VERCEL:''},stdio:['ignore','pipe','pipe']});
+let serverLog='';server.stdout.on('data',chunk=>{serverLog+=String(chunk);});
 try{
  await new Promise((resolve,reject)=>{server.stdout.on('data',chunk=>{if(String(chunk).includes('Ready'))resolve();});server.stderr.on('data',chunk=>process.stderr.write(chunk));server.on('exit',code=>reject(Error('Servidor terminó: '+code)));setTimeout(()=>reject(Error('Timeout servidor')),10000).unref();});
  const pageResponse=await fetch(base),html=await pageResponse.text();
@@ -38,6 +39,23 @@ try{
  assert.equal((await fetch(base+'/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).status,403);
  assert.equal((await fetch(base+'/robots.txt')).status,200);assert.equal((await fetch(base+'/sitemap.xml')).status,200);
  const order=await post(body),result=await order.json();assert.equal(order.status,200);assert.equal(result.total,product.precio*2);assert(result.message.includes('PEDIDO DE PRUEBA — NO CONFIRMAR'));assert(result.whatsappUrl.startsWith('https://wa.me/5491100000000'));
+ assert.match(result.orderRef,/^V-(\d{4,}|X[A-Z2-9]{5})$/);assert(result.message.includes(`Pedido #${result.orderRef}`));
+ // Growth pack: barra fija, catálogo con las 8 claves públicas, alta con honeypot, código solo por mail y de un solo uso.
+ assert(html.includes('class="annc"'));assert(html.replace(/<!-- -->/g,'').includes('10% off</b> en todo el carrito desde $400.000'));assert(!checkoutHtml.includes('class="vp '));
+ for(const p of data.products){assert.ok(Object.keys(p).length<=8,'allowlist de 8 claves');assert.doesNotMatch(Object.keys(p).join(),/mayor|costo|cost|whole/i);}assert(!JSON.stringify(data).includes('@'),'sin mails en el catálogo');
+ const welcome=payload=>fetch(base+'/api/welcome',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify(payload)});
+ assert.equal((await fetch(base+'/api/welcome',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
+ assert.deepEqual(await (await welcome({name:'Bot',email:'bot@example.com',consent:true,website:'x'})).json(),{ok:true});
+ assert.equal((await welcome({name:'Prueba',email:'sin-arroba',consent:true,website:''})).status,400);
+ assert.equal((await welcome({name:'Prueba',email:'verificacion@example.com',consent:false,website:''})).status,400);
+ const signup=await welcome({name:'Prueba',email:'verificacion@example.com',consent:true,website:''}),signupText=await signup.text();assert.equal(signup.status,200);
+ await new Promise(r=>setTimeout(r,200));
+ const mailed=serverLog.match(/BV-[A-Z2-9]{4}-[A-Z2-9]{4}/)?.[0];assert(mailed,'el mailer de prueba registra el mail');assert(!signupText.includes(mailed));assert(!serverLog.includes('re_'));
+ assert.equal((await welcome({name:'Prueba',email:'verificacion@example.com',consent:true,website:''})).status,409);
+ const codeCheck=await fetch(base+'/api/cart/code',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify({code:mailed.toLowerCase()})});assert.equal(codeCheck.status,200);
+ const withCode=await post({...body,code:mailed}),codeResult=await withCode.json();assert.equal(withCode.status,200);
+ assert.equal(codeResult.codeDiscount,Math.round(product.precio*2*10)/100);assert(codeResult.message.includes(`Codigo de bienvenida ${mailed} (10%)`));
+ const reused=await post({...body,code:mailed});assert.equal(reused.status,409);assert.equal((await reused.json()).code,'CODE_USED');
  assert.equal((await post({...body,name:''})).status,400);assert.equal((await post({...body,items:[{...body.items[0],expectedPrice:1}]})).status,409);
  const productPage=await fetch(base+'/productos/granola-tradicional-n037'),productHtml=await productPage.text();assert.equal(productPage.status,200);
  const productNonce=productPage.headers.get('content-security-policy').match(/'nonce-([^']+)'/)[1];

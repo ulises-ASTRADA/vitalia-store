@@ -15,7 +15,7 @@ test('Descuento real del 10% en una unidad: redondeo, total y mensaje de prueba'
   assert.equal(offerPrice(11.11),10);
   const result=makeOrder(order(),products,settings);
   assert.equal(result.total,530);assert.equal(result.savings,20);
-  assert.match(result.message,/10% en una presentación/);assert.match(result.message,/Ahorro por sugerencias: \$20,00/);
+  assert.match(result.message,/- 2 x Cookies: \$400,00 \(10% en una presentación sugerida\)/);assert.match(result.message,/Ahorro por sugerencias \(10%\): -\$20,00/);
   assert.match(result.message,/PEDIDO DE PRUEBA/);
   assert.equal(products[1].precio,200);
   assert.equal(priceCart([{product:products[0],quantity:1},{product:products[1],quantity:2}],{cookies:'tea'})[1].subtotal,380);

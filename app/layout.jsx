@@ -1,6 +1,8 @@
 import './globals.css';
 import './fase1.css';
+import './growth.css';
 import Provider from '../components/provider';
+import WelcomePopup from '../components/welcome-popup';
 import {headers} from 'next/headers';
 import { Analytics } from '@vercel/analytics/next';
 export const metadata = {
@@ -11,5 +13,5 @@ export const metadata = {
 };
 export default async function RootLayout({ children }) {
   const nonce=(await headers()).get('x-nonce')||undefined;
-  return <html lang="es-AR" suppressHydrationWarning><body><Provider nonce={nonce}>{children}</Provider><Analytics /></body></html>;
+  return <html lang="es-AR" suppressHydrationWarning><body><Provider nonce={nonce}>{children}<WelcomePopup/></Provider><Analytics /></body></html>;
 }

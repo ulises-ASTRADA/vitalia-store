@@ -6,6 +6,7 @@ import {Button,Input} from '@chakra-ui/react';
 import Icon from './icon';
 import ThemeToggle from './theme-toggle';
 import SectionNav from './section-nav';
+import AnnouncementBar from './announcement-bar';
 const Image=NextImage.default||NextImage,Link=NextLink.default||NextLink;
 const Modal=lazy(()=>import('./store-modal'));
 
@@ -23,6 +24,7 @@ export default function SiteHeader({current,headerRef,query,onQueryChange}) {
     return()=>{observer.disconnect();document.removeEventListener('keydown',shortcut);};
   },[ref]);
   return <>
+    <AnnouncementBar/>
     <div className="sticky-header" ref={ref}>
       <header className="header"><Link className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 88px, 112px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></Link>
         <form className="search" role="search" action="/" method="get" onSubmit={onQueryChange?event=>event.preventDefault():undefined}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" name="q" ref={search} type="search" placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onChange={onQueryChange?event=>onQueryChange(event.target.value):undefined}/><kbd>/</kbd></form>
