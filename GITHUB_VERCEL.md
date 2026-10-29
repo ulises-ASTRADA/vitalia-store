@@ -41,7 +41,7 @@ Antes de confirmar, revisar el resumen de archivos y comprobar que no incluya se
 | --- | --- |
 | PREVIEW_MODE | false |
 | ALLOW_TEST_CHECKOUT | true |
-| WHATSAPP_NUMBER | 5493512136078 |
+| WHATSAPP_NUMBER | 5493513947394 |
 | STORE_NAME | Vitalia |
 | STORE_CURRENCY | ARS |
 | GOOGLE_SHEETS_ID | 1A91ud3m6bhslJ8EA8yIOSob62Sri2I9UOXZxtcBzi84 |

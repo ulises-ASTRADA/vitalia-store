@@ -55,7 +55,7 @@ Seleccionar el proyecto existente al vincular. Usar --prod publica en su URL pri
 
 ## 5. Verificar
 
-`/api/catalog` debe indicar source=sheets y settings.testCheckout=true, y reflejar los productos activos de la planilla (293 al momento de la migración). Buscar un producto, agregar y quitar cantidades, recargar para comprobar el carrito, cambiar tema y preparar un pedido con nombre/localidad/provincia. Revisar total, destino 5493512136078 y marcador PEDIDO DE PRUEBA — NO CONFIRMAR. No enviar el mensaje.
+`/api/catalog` debe indicar source=sheets y settings.testCheckout=true, y reflejar los productos activos de la planilla (293 al momento de la migración). Buscar un producto, agregar y quitar cantidades, recargar para comprobar el carrito, cambiar tema y preparar un pedido con nombre/localidad/provincia. Revisar total, destino 5493513947394 y marcador PEDIDO DE PRUEBA — NO CONFIRMAR. No enviar el mensaje.
 
 Si cambian precios o disponibilidad, revisar el carrito y preparar nuevamente el pedido. La tienda no cobra ni reserva stock.
 

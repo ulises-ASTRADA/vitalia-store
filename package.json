@@ -10,7 +10,7 @@
     "dev": "next dev --webpack",
     "build": "node scripts/optimize-logo.mjs && next build --webpack",
     "test": "node --test tests/*.test.mjs",
-    "deploy:prueba": "npx vercel deploy --yes --env PREVIEW_MODE=false --env ALLOW_TEST_CHECKOUT=true --env WHATSAPP_NUMBER=5493512136078 --env STORE_NAME=\"Vitalia\" --env STORE_CURRENCY=ARS --env GOOGLE_SHEETS_ID=1A91ud3m6bhslJ8EA8yIOSob62Sri2I9UOXZxtcBzi84 --env GOOGLE_SHEETS_PUBLIC=true --env GOOGLE_SHEETS_TAB=Productos --build-env PREVIEW_MODE=false --build-env ALLOW_TEST_CHECKOUT=true --build-env WHATSAPP_NUMBER=5493512136078 --build-env STORE_NAME=Vitalia --build-env STORE_CURRENCY=ARS --build-env GOOGLE_SHEETS_ID=1A91ud3m6bhslJ8EA8yIOSob62Sri2I9UOXZxtcBzi84 --build-env GOOGLE_SHEETS_PUBLIC=true --build-env GOOGLE_SHEETS_TAB=Productos",
+    "deploy:prueba": "npx vercel deploy --yes --env PREVIEW_MODE=false --env ALLOW_TEST_CHECKOUT=true --env WHATSAPP_NUMBER=5493513947394 --env STORE_NAME=\"Vitalia\" --env STORE_CURRENCY=ARS --env GOOGLE_SHEETS_ID=1A91ud3m6bhslJ8EA8yIOSob62Sri2I9UOXZxtcBzi84 --env GOOGLE_SHEETS_PUBLIC=true --env GOOGLE_SHEETS_TAB=Productos --build-env PREVIEW_MODE=false --build-env ALLOW_TEST_CHECKOUT=true --build-env WHATSAPP_NUMBER=5493513947394 --build-env STORE_NAME=Vitalia --build-env STORE_CURRENCY=ARS --build-env GOOGLE_SHEETS_ID=1A91ud3m6bhslJ8EA8yIOSob62Sri2I9UOXZxtcBzi84 --build-env GOOGLE_SHEETS_PUBLIC=true --build-env GOOGLE_SHEETS_TAB=Productos",
     "start": "next start",
     "test:ui": "TSX_TSCONFIG_PATH=jsconfig.json node --import tsx --test tests/ui.test.jsx",
     "test:http": "node scripts/verify-next.mjs"
