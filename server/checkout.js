@@ -29,6 +29,7 @@ export async function POST(request) {
     });
     return Response.json({...result, orderId}, {headers:{'Cache-Control':'no-store'}});
   } catch(error) {
+    console.error('[vitalia] checkout error', error?.message || error, error?.stack);
     return Response.json({error:error instanceof StoreError?error.message:'No pudimos preparar el pedido. Intentá nuevamente.',code:error.code||'UNAVAILABLE'},{status:error.status||503,headers:{'Cache-Control':'no-store'}});
   }
 }
