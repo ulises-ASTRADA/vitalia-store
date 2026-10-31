@@ -12,6 +12,7 @@ export async function POST(request) {
     let body;
     try {body=JSON.parse(text);} catch {throw new StoreError('Pedido no válido.',400);}
     const settings=storeSettings();
+    console.log(`[vitalia] checkout phone=${(settings.phone||'').length>=3?settings.phone.slice(0,3)+'***':settings.phone}`);
     if (!settings.checkoutEnabled) throw new StoreError('Los pedidos por WhatsApp todavía no están habilitados.',503,'CHECKOUT_DISABLED');
     const {products}=await getCachedCatalog();
     return Response.json(makeOrder(body,products,settings),{headers:{'Cache-Control':'no-store'}});
