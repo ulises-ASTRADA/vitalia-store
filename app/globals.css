@@ -24,7 +24,8 @@ html{scroll-padding-top:0}
 .floating-cart:hover{background:#354f32}
 .floating-cart>svg{width:26px;height:26px}
 .floating-cart-badge{position:absolute;top:-4px;right:-4px;background:var(--lime);color:var(--green);border-radius:50%;min-width:22px;height:22px;padding:0 6px;font-size:.75rem;display:grid;place-items:center;border:2px solid var(--green)}
-.floating-cart-region .floating-cart-panel{position:fixed;right:max(24px,env(safe-area-inset-right));bottom:calc(24px + env(safe-area-inset-bottom));z-index:9;width:320px;max-width:calc(100% - 48px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px #0003;overflow:hidden}
+.floating-cart-region .floating-cart-panel{position:fixed;right:max(24px,env(safe-area-inset-right));bottom:calc(24px + 64px + env(safe-area-inset-bottom));z-index:8;width:320px;max-width:calc(100% - 48px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px #0003;overflow:hidden}
+.floating-cart-region .floating-cart-panel::after{content:'';position:absolute;bottom:-8px;right:24px;width:16px;height:16px;background:var(--surface);border:1px solid var(--line);border-top:none;border-left:none;transform:rotate(45deg);z-index:-1}
 .floating-cart-region .floating-cart-panel-inner{padding:18px 20px;display:flex;flex-direction:column;gap:6px}
 .floating-cart-region .floating-cart-panel-inner strong{display:flex;align-items:center;gap:8px;font-size:1rem}
 .floating-cart-region .floating-cart-panel-inner strong b{background:var(--green);color:white;border-radius:50%;min-width:22px;height:22px;display:grid;place-items:center;font-size:.75rem;padding:0 6px}
@@ -34,7 +35,7 @@ html{scroll-padding-top:0}
 .floating-cart-region .floating-cart-checkout:hover{background:#354f32}
 .footer{margin-top:32px;padding-top:20px;padding-bottom:48px}
 .toast{bottom:122px}
-@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:52px;height:52px;padding:0}.floating-cart-region .floating-cart-panel{right:16px;left:16px;width:auto;max-width:none;border-radius:14px}.toast{bottom:112px}.footer{padding-bottom:100px}}
+@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:52px;height:52px;padding:0}.floating-cart-region .floating-cart-panel{right:16px;left:16px;width:auto;max-width:none;bottom:calc(16px + 60px + env(safe-area-inset-bottom));border-radius:14px}.toast{bottom:112px}.footer{padding-bottom:100px}}
 
 /* Restar y sumar presentaciones desde cada tarjeta. */
 .price-row{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:5px}
