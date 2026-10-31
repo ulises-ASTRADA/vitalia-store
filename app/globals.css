@@ -20,17 +20,13 @@ html{scroll-padding-top:0}
 .search input:focus,.search input:focus-visible{outline:none;box-shadow:none}
 @media(forced-colors:active){.search:focus-within{outline:2px solid Highlight;outline-offset:2px}}
 .sticky-header{position:sticky;top:0;z-index:8;background:#fff;box-shadow:0 3px 16px #22362a0d}
-.floating-cart{position:fixed;right:max(24px,env(safe-area-inset-right));bottom:calc(24px + env(safe-area-inset-bottom));z-index:9;display:flex;align-items:center;gap:14px;min-width:270px;padding:16px 20px;border:1px solid #405841;border-radius:16px;background:var(--green);color:white;box-shadow:0 8px 30px #14211730;text-align:left}
+.floating-cart{position:fixed;right:max(24px,env(safe-area-inset-right));bottom:calc(24px + env(safe-area-inset-bottom));z-index:9;width:56px;height:56px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--green);color:white;border:1px solid #405841;box-shadow:0 8px 30px #14211730;cursor:pointer;gap:0}
 .floating-cart:hover{background:#354f32}
-.floating-cart>svg{width:28px;height:28px}
-.floating-cart-copy{display:flex;flex-direction:column;gap:5px}
-.floating-cart-copy strong{display:flex;align-items:center;gap:9px;font-size:.9375rem}
-.floating-cart-copy b{display:grid;place-items:center;background:var(--lime);color:var(--green);border-radius:50%;min-width:23px;height:23px;font-size:.75rem}
-.floating-cart-copy>span{color:#e0e6d9;font-size:.8125rem}
-.floating-cart-total{margin-left:auto;padding-left:10px;font-size:1rem;font-weight:700;white-space:nowrap}
+.floating-cart>svg{width:26px;height:26px}
+.floating-cart-badge{position:absolute;top:-4px;right:-4px;background:var(--lime);color:var(--green);border-radius:50%;min-width:22px;height:22px;padding:0 6px;font-size:.75rem;display:grid;place-items:center;border:2px solid var(--green)}
 .footer{margin-top:32px;padding-top:20px;padding-bottom:48px}
 .toast{bottom:122px}
-@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));min-width:0;width:calc(100% - 32px);padding:13px 16px;gap:11px}.floating-cart-total{font-size:.9375rem}.toast{bottom:112px}.footer{padding-bottom:100px}}
+@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:52px;height:52px;padding:0}.floating-cart-panel{right:16px;left:16px;width:auto;max-width:none;border-radius:14px}.toast{bottom:112px}.footer{padding-bottom:100px}}
 
 /* Restar y sumar presentaciones desde cada tarjeta. */
 .price-row{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:5px}
