@@ -24,23 +24,21 @@ html{scroll-padding-top:0}
 .floating-cart:hover{background:#354f32}
 .floating-cart>svg{width:26px;height:26px;transition:opacity .15s}
 .floating-cart-badge{position:absolute;top:-4px;right:-4px;background:var(--lime);color:var(--green);border-radius:50%;min-width:22px;height:22px;padding:0 6px;font-size:.75rem;display:grid;place-items:center;border:2px solid var(--green);transition:opacity .15s}
-.floating-cart.is-open{border-radius:16px 16px 0 0;width:320px;max-width:calc(100% - 48px);height:auto;min-height:56px;padding:18px 20px 18px 70px;transform:translateY(-100%);transform-origin:bottom right;box-shadow:0 20px 60px #0003}
-.floating-cart-panel{position:absolute;right:0;bottom:100%;display:none}
+.floating-cart.is-open{border-radius:16px 16px 0 0;width:320px;max-width:calc(100% - 48px);height:auto;min-height:56px;padding:18px 20px;transform-origin:bottom right;box-shadow:0 20px 60px #0003}
+.floating-cart.is-open .floating-cart-icon{opacity:0;width:0;height:0;overflow:hidden}
+.floating-cart.is-open .floating-cart-badge{display:none}
+.floating-cart-panel{display:none}
 .floating-cart.is-open .floating-cart-panel{display:block}
-.floating-cart-panel-inner{display:flex;flex-direction:column;gap:6px}
+.floating-cart-panel-inner{display:flex;flex-direction:column;gap:6px;padding:0}
 .floating-cart-panel-inner strong{display:flex;align-items:center;gap:8px;font-size:1rem}
 .floating-cart-panel-inner strong b{background:var(--green);color:white;border-radius:50%;min-width:22px;height:22px;display:grid;place-items:center;font-size:.75rem;padding:0 6px}
 .floating-cart-panel-inner span{color:var(--muted);font-size:.875rem}
 .floating-cart-total{margin-top:4px;font-size:1.15rem;font-weight:700}
 .floating-cart-checkout{display:block;margin-top:10px;padding:12px;border-radius:8px;background:var(--green);color:white;text-align:center;font-weight:600;text-decoration:none}
 .floating-cart-checkout:hover{background:#354f32}
-
-.floating-cart-region .floating-cart-total{margin-top:4px;font-size:1.15rem;font-weight:700}
-.floating-cart-region .floating-cart-checkout{display:block;margin-top:10px;padding:12px;border-radius:8px;background:var(--green);color:white;text-align:center;font-weight:600;text-decoration:none}
-.floating-cart-region .floating-cart-checkout:hover{background:#354f32}
 .footer{margin-top:32px;padding-top:20px;padding-bottom:48px}
 .toast{bottom:122px}
-@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:52px;height:52px;padding:0}.floating-cart.is-open{right:16px;left:auto;width:min(320px,calc(100% - 32px));max-width:none;border-radius:14px;padding:18px 20px;transform:translateY(-100%) translateX(-100%)}.toast{bottom:112px}.footer{padding-bottom:100px}}
+@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:52px;height:52px;padding:0}.floating-cart.is-open{right:16px;left:auto;width:min(320px,calc(100% - 32px));max-width:none;border-radius:14px;padding:18px 20px}.toast{bottom:112px}.footer{padding-bottom:100px}}
 
 /* Restar y sumar presentaciones desde cada tarjeta. */
 .price-row{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:5px}
