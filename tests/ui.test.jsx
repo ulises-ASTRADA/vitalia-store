@@ -223,6 +223,13 @@ test('Carrito flotante: nombre accesible = texto visible, dentro de un landmark'
  assert.match(link.textContent,/^Mi pedido 0presentacionesCarrito vacío\$/);
  assert(screen.getByRole('link',{name:/^Mi pedido 0presentacionesCarrito vacío/}));cleanup();
 });
+test('Carrito flotante mobile: burbuja, total, CTA y minimizar',async()=>{
+ const user=setup(catalog);await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
+ const bubble=screen.getByRole('button',{name:'Abrir resumen del pedido, 2 presentaciones'});assert.equal(within(bubble).getByText('2').textContent,'2');
+ await user.click(bubble);assert(screen.getByText('Total del pedido'));assert.match(document.querySelector('.mobile-cart-summary strong').textContent,/200,00/);
+ assert.equal(screen.getByRole('link',{name:'Ir al carrito'}).getAttribute('href'),'/checkout');
+ await user.click(screen.getByRole('button',{name:'Minimizar resumen del pedido'}));assert(screen.getByRole('button',{name:'Abrir resumen del pedido, 2 presentaciones'}));assert.equal(screen.queryByRole('link',{name:'Ir al carrito'}),null);cleanup();
+});
 test('Footer de producto y categoría igual al de la home: WhatsApp e Instagram',async()=>{
  cleanup();localStorage.clear();
  render(<Provider><ProductPage catalog={catalog} product={products[0]} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:''}} related={[]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);
