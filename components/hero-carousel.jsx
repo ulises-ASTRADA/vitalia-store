@@ -80,6 +80,7 @@ export default function HeroCarousel({slides=HERO_SLIDES,interval=HERO_INTERVAL}
 
   return <section ref={root} className={`hero-photos hero-carousel${enhanced?' is-enhanced':''}${reduced?' is-reduced':''}`} aria-roledescription="carrusel" aria-label="Productos destacados" data-playing={running?'true':'false'}
     onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onFocus={onFocus} onBlur={onBlur}>
+    <div className="hero-frame">
     <div className="hero-track" aria-live={enhanced&&playing?'off':'polite'} onPointerDown={enhanced?onPointerDown:undefined} onPointerUp={enhanced?onPointerEnd:undefined} onPointerCancel={enhanced?onPointerEnd:undefined}>
       {slides.map((slide,s)=>{
         const active=s===index,single=slide.photos.length===1;
@@ -88,7 +89,7 @@ export default function HeroCarousel({slides=HERO_SLIDES,interval=HERO_INTERVAL}
             const first=s===0&&p===0;
             const href=productPath(photo);
             return <a key={photo.id} className={`hero-photo-link${single?' photo-solo':` photo-${POSITIONS[p]}`}`} href={href}>
-              <Image className="hero-photo" src={photo.imagen} width={240} height={250} alt={photo.nombre} sizes="(max-width: 760px) 180px, 240px" loading={first?'eager':'lazy'} fetchPriority={first?'high':'auto'}/>
+              <Image className="hero-photo" src={photo.imagen} width={240} height={250} alt={photo.nombre} sizes={single?'(max-width: 767px) calc(100vw - 68px), 240px':'(max-width: 767px) 36vw, 240px'} loading={first?'eager':'lazy'} fetchPriority={first?'high':'auto'}/>
             </a>;
           })}
         </div>;
@@ -97,8 +98,9 @@ export default function HeroCarousel({slides=HERO_SLIDES,interval=HERO_INTERVAL}
     <span className="hero-stamp" aria-hidden="true">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span>
     <button type="button" className="hero-arrow hero-prev" hidden={!enhanced} aria-label="Foto anterior" onClick={()=>goTo(index-1)}><Arrow dir="prev"/></button>
     <button type="button" className="hero-arrow hero-next" hidden={!enhanced} aria-label="Foto siguiente" onClick={()=>goTo(index+1)}><Arrow dir="next"/></button>
-    <div className="hero-controls" hidden={!enhanced}>
-      {slides.map((_,s)=><button key={s} type="button" className="hero-dot" aria-label={`Foto ${s+1} de ${total}`} aria-current={s===index?'true':undefined} onClick={()=>goTo(s)}><span/></button>)}
+    </div>
+    <div className="hero-controls">
+      <div className="hero-dots">{slides.map((_,s)=><button key={s} type="button" className="hero-dot" aria-label={`Foto ${s+1} de ${total}`} aria-current={s===index?'true':undefined} onClick={()=>goTo(s)}><span/></button>)}</div>
       <button type="button" className="hero-toggle" aria-label={playing?'Pausar':'Reanudar'} onClick={()=>setPlaying(p=>!p)}>
         {playing?<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>:<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>}
       </button>
