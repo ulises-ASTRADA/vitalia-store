@@ -14,14 +14,14 @@ test('/envios: 9 zonas, una sola lista de costos para secciones, tabla, respuest
   assert.equal(zones.length,9);
   assert.deepEqual(new Set(zones.map(z=>z.slug)),new Set(Object.keys(SHIPPING_COST)));
   assert.deepEqual(zones.map(z=>z.name).sort(),DELIVERY_ZONES.map(z=>z.name).sort());
-  for(const z of zones){assert.equal(z.costLine,`Envío a ${z.name}: ${pesos(SHIPPING_COST[z.slug])}.`);assert.equal(z.freeLine,'Gratis en compras de más de $70.000.');}
+  for(const z of zones){assert.equal(z.costLine,`Envío a ${z.name}: ${pesos(SHIPPING_COST[z.slug])}.`);assert.equal(z.freeLine,'Gratis en compras desde $70.000.');}
   assert.deepEqual(page.table.map(r=>[r.label,r.value]),[
     ['Villa Allende (incluye Villa Allende Golf, Lomas y Villa Allende Parque), Mendiolaza (incluye El Talar), Saldán y Villa Rivera Indarte','$3.000'],
     ['Río Ceballos, Unquillo, La Calera (incluye countries y barrios cerrados), Argüello y Cerro de las Rosas','$5.000'],
-    ['Compras de más de $70.000, todas las zonas','Gratis']]);
+    ['Compras desde $70.000, todas las zonas','Gratis']]);
   // Cada zona aparece exactamente en una fila de la tabla, con su costo.
   for(const z of zones)assert.equal(costTiers().filter(t=>t.slugs.includes(z.slug)&&t.cost===z.cost).length,1);
-  assert.match(page.answer,/El envío cuesta \$3\.000 o \$5\.000 según la zona, y es gratis en compras de más de \$70\.000\./);
+  assert.match(page.answer,/El envío cuesta \$3\.000 o \$5\.000 según la zona, y es gratis en compras desde \$70\.000\./);
   const faq=faqItems('5491100000000');
   assert.match(faq[6].a,/^Depende de la zona: \$3\.000 a Villa Allende \(incluye Villa Allende Golf, Lomas y Villa Allende Parque\), Mendiolaza \(incluye El Talar\), Saldán y Villa Rivera Indarte, y \$5\.000 a Río Ceballos, Unquillo, La Calera \(incluye countries y barrios cerrados\), Argüello y Cerro de las Rosas\./);
 });
@@ -40,7 +40,7 @@ test('/envios: datos confirmados el 28/10 (El Talar, countries, Golf/Lomas/Parqu
   assert.equal(ENVIOS_PAGE,true);
   // Sin pedido mínimo (confirmado por la tienda, 28/10): FAQ 9 justo después de "¿Hay envío gratis?" y línea en las condiciones.
   const faq=faqItems();assert.equal(faq[7].q,'¿Hay envío gratis?');
-  assert.deepEqual(faq[8],{q:'¿Hay pedido mínimo?',a:'No, no hay pedido mínimo: podés pedir el monto que quieras. En compras de más de $70.000, el envío es gratis.'});
+  assert.deepEqual(faq[8],{q:'¿Hay pedido mínimo?',a:'No, no hay pedido mínimo: podés pedir el monto que quieras. En compras desde $70.000, el envío es gratis.'});
   assert.deepEqual(page.terms.at(-1),['Pedido mínimo','Sin pedido mínimo']);
 });
 
@@ -87,7 +87,7 @@ test('llms.txt: zonas, costos, pagos, Instagram y /envios, sin dirección',()=>{
   const llms=readFileSync(new URL('../public/llms.txt',import.meta.url),'utf8');
   for(const z of zones)assert(llms.includes(z.name),z.name);
   for(const t of costTiers())assert(llms.includes(`${t.label} a ${t.zones.join(', ').replace(/, ([^,]+)$/,' y $1')}`),t.label);
-  assert(llms.includes('Gratis en compras de más de $70.000'));
+  assert(llms.includes('Gratis en compras desde $70.000'));
   assert(llms.includes('transferencia o efectivo'));
   assert(llms.includes('https://www.vitalia.energy/envios'));
   assert(llms.includes('https://www.instagram.com/vitalia_energy/'));

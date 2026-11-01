@@ -362,7 +362,7 @@ test('/envios: chips, secciones, tabla, retiro sin dirección, FAQ y footer con 
  assert.equal(screen.getByRole('link',{name:'Pedir con envío a Mendiolaza'}).getAttribute('href'),'https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Mendiolaza.');
  assert(screen.getByRole('heading',{name:'¿Qué dietética llega a Mendiolaza y El Talar?'}));
  const rows=[...container.querySelectorAll('.ship-table tbody tr')].map(tr=>tr.textContent);
- assert.deepEqual(rows,['Villa Allende (incluye Villa Allende Golf, Lomas y Villa Allende Parque), Mendiolaza (incluye El Talar), Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera (incluye countries y barrios cerrados), Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
+ assert.deepEqual(rows,['Villa Allende (incluye Villa Allende Golf, Lomas y Villa Allende Parque), Mendiolaza (incluye El Talar), Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera (incluye countries y barrios cerrados), Argüello y Cerro de las Rosas$5.000','Compras desde $70.000, todas las zonasGratis']);
  assert.equal(container.querySelector('.pickup-addr').textContent,'Retiro en Villa Allende, coordinamos la dirección por WhatsApp.');
  const triggers=container.querySelectorAll('.faq-trigger');assert.equal(triggers.length,13);assert.equal(triggers[8].textContent,'¿Hay pedido mínimo?');
  assert.equal(triggers[0].getAttribute('aria-expanded'),'true');assert.equal(triggers[1].getAttribute('aria-expanded'),'false');
