@@ -9,9 +9,9 @@ import FloatingCart from './floating-cart';
 import {useCart} from './use-cart';
 import {ProductCard,Photo,pack} from './product-card';
 import {productPath} from '../lib/product-links';
+import {rankProducts,searchSuggestions as suggestProducts} from '../lib/search';
 // Las tarjetas del home llevan a /productos/[slug]. Para volver al modal, poné false.
 const CARDS_LINK_TO_PAGE=true;
-const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const Modal=lazy(()=>import('./store-modal'));
 export default function Store({initialCatalog=null,initialQuery='',whatsappUrl=''}) {
   const [products,setProducts]=useState(()=>initialCatalog?.products||[]), [settings,setSettings]=useState(()=>initialCatalog?.settings||{currency:'ARS',checkoutEnabled:false,name:'Vitalia'});
@@ -29,6 +29,17 @@ export default function Store({initialCatalog=null,initialQuery='',whatsappUrl='
   useEffect(()=>{
     if(!initialCatalog)loadCatalog();
   },[loadCatalog,initialCatalog]);
+  // Llegando con /?q= desde otra página, los resultados quedan a la vista.
+  useEffect(()=>{if(initialQuery.trim())document.getElementById('catalogo')?.scrollIntoView({block:'start'});},[]);// eslint-disable-line react-hooks/exhaustive-deps
+  // Si se llegó con /?q= (buscando desde otra página), la URL sigue al buscador: al borrar o cambiar
+  // el término no queda un ?q viejo. Sin ?q en la URL no se toca el historial.
+  useEffect(()=>{
+    const url=new URL(window.location.href);
+    if(!url.searchParams.has('q'))return;
+    const term=query.trim();
+    if(term)url.searchParams.set('q',term);else url.searchParams.delete('q');
+    if(url.href!==window.location.href)window.history.replaceState(window.history.state,'',url);
+  },[query]);
   useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),2300);return()=>clearTimeout(timer);},[toast]);
   useEffect(()=>{document.title=`${settings.name} · Dietética`;},[settings.name]);
   useEffect(()=>{
@@ -47,14 +58,8 @@ export default function Store({initialCatalog=null,initialQuery='',whatsappUrl='
   },[searching]);
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
   const money=value=>formatter.format(value);
-  const filtered=useMemo(()=>{const result=products.filter(p=>(category==='Todos'||p.categoria===category)&&(!query||normalize([p.nombre,p.descripcion,p.categoria,p.id,p.presentacion].join(' ')).includes(normalize(query))));if(sort==='price-asc')result.sort((a,b)=>a.precio-b.precio);if(sort==='price-desc')result.sort((a,b)=>b.precio-a.precio);if(sort==='name')result.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));return result;},[products,category,query,sort]);
-  const searchSuggestions=useMemo(()=>{
-    const term=normalize(query.trim());
-    if(!term)return [];
-    return products
-      .filter(product=>(category==='Todos'||product.categoria===category)&&normalize(product.nombre)!==term&&normalize([product.nombre,product.categoria,product.presentacion].join(' ')).includes(term))
-      .sort((a,b)=>Number(normalize(b.nombre).startsWith(term))-Number(normalize(a.nombre).startsWith(term))||a.nombre.localeCompare(b.nombre,'es'));
-  },[products,category,query]);
+  const filtered=useMemo(()=>{const result=rankProducts(products,query,{category});if(sort==='price-asc')result.sort((a,b)=>a.precio-b.precio);if(sort==='price-desc')result.sort((a,b)=>b.precio-a.precio);if(sort==='name')result.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));return result;},[products,category,query,sort]);
+  const searchSuggestions=useMemo(()=>suggestProducts(products,query,{category}),[products,category,query]);
   const categories=['Todos',...new Set(products.map(p=>p.categoria))];
   function updateQuery(value){
     if(value){
@@ -71,13 +76,13 @@ export default function Store({initialCatalog=null,initialQuery='',whatsappUrl='
   function change(product,delta){const error=changeCart(product,delta);setToast(error||(delta>0?'Producto agregado a tu pedido':''));}
   return <>
     <a className="skip-link" href="#catalogo">Ir al catálogo</a>
-    <SiteHeader current="catalog" headerRef={header} query={query} onQueryChange={updateQuery} searchSuggestions={searchSuggestions} formatSearchPrice={money}/>
+    <SiteHeader current="catalog" headerRef={header} query={query} onQueryChange={updateQuery} searchSuggestions={searchSuggestions} searchEmpty={status==='ready'&&Boolean(query.trim())&&!filtered.length} formatSearchPrice={money}/>
     <main className="shell">
       <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><div className="hero-photos" aria-hidden="true">{['023','002','037'].map((id,i)=><Image key={id} className={`hero-photo photo-${['one','two','three'][i]}`} src={`/images/product-${id}.webp`} width={240} height={250} alt="" sizes="(max-width: 760px) 180px, 240px" loading={i===0?'eager':'lazy'} fetchPriority={i===0?'high':'auto'}/>)}<span className="hero-stamp">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span></div></section>
       <section className="catalog-section" id="catalogo" aria-labelledby="catalog-title"><div className="catalog-top"><div><p className="eyebrow muted">ENCONTRÁ TUS FAVORITOS</p><h2 id="catalog-title">Nuestro catálogo<span>.</span></h2></div></div>
         <div className="catalog-layout"><aside className="categories"><h3>Categorías</h3><nav aria-label="Categorías de productos">{categories.map(name=><Button unstyled key={name} className="category-button" aria-pressed={name===category} onClick={()=>{setCategory(name);setLimit(24);}}><span>{name}</span><span className="category-count">{name==='Todos'?products.length:products.filter(p=>p.categoria===name).length}</span></Button>)}</nav><div className="side-note"><span className="tiny-rule"/><strong>De tu carrito<br/>a WhatsApp.</strong><p>Consultá disponibilidad y coordiná el pago y la entrega al enviar tu pedido.</p></div></aside>
         <div className="results" ref={results} style={searchLayout}><div className="results-toolbar"><p role="status" aria-live="polite">{status==='loading'?'Cargando productos…':status==='error'?'Catálogo no disponible':`${filtered.length} ${filtered.length===1?'producto':'productos'}${category==='Todos'?'':' · '+category}`}</p><label className="sort-label" htmlFor="sort">Ordenar <NativeSelect.Root className="chakra-sort" width={{base:'176px',sm:'188px'}}><NativeSelect.Field id="sort" value={sort} onChange={e=>{setSort(e.target.value);setLimit(24);}} bg="var(--surface)" color="var(--ink)" borderColor="var(--line)" paddingInlineStart="14px" paddingInlineEnd="44px" minHeight="44px"><option value="catalog">Según catálogo</option><option value="price-asc">Menor precio</option><option value="price-desc">Mayor precio</option><option value="name">Nombre: A a Z</option></NativeSelect.Field><NativeSelect.Indicator insetInlineEnd="14px" color="var(--ink)"/></NativeSelect.Root></label></div>
-          {status==='error'?<div className="status-panel"><h3>No pudimos cargar el catálogo</h3><p>Intentá nuevamente en unos minutos.</p><Button unstyled onClick={loadCatalog}>Reintentar</Button></div>:status==='ready'&&!filtered.length?<div className="status-panel"><h3>No encontramos esos productos</h3><p>Probá con otra palabra o explorá todas las categorías.</p><Button unstyled onClick={()=>{updateQuery('');setCategory('Todos');}}>Ver todo el catálogo</Button></div>:<div className="product-grid" aria-busy={status==='loading'}>{filtered.slice(0,limit).map(product=><ProductCard key={product.id} product={product} quantity={cart[product.id]||0} money={money} change={change} href={CARDS_LINK_TO_PAGE?productPath(product):null} onDetail={setDetail}/>)}</div>}
+          {status==='error'?<div className="status-panel"><h3>No pudimos cargar el catálogo</h3><p>Intentá nuevamente en unos minutos.</p><Button unstyled onClick={loadCatalog}>Reintentar</Button></div>:status==='ready'&&!filtered.length?<div className="status-panel"><h3>{query.trim()?`No encontramos «${query.trim()}»`:'No encontramos esos productos'}</h3><p>Probá con otra palabra o explorá todas las categorías.</p><Button unstyled onClick={()=>{updateQuery('');setCategory('Todos');}}>Ver todo el catálogo</Button></div>:<div className="product-grid" aria-busy={status==='loading'}>{filtered.slice(0,limit).map(product=><ProductCard key={product.id} product={product} quantity={cart[product.id]||0} money={money} change={change} href={CARDS_LINK_TO_PAGE?productPath(product):null} onDetail={setDetail}/>)}</div>}
           {filtered.length>limit&&<Button unstyled className="load-more" onClick={()=>setLimit(n=>n+24)}>Ver más productos ({Math.min(limit,filtered.length)} de {filtered.length})</Button>}
         </div></div>
       </section>

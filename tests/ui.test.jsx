@@ -29,6 +29,7 @@ const EnviosPage=(await import('../components/envios-page.jsx')).default;
 const {enviosPageData}=await import('../lib/envios.js');
 const {useCart}=await import('../components/use-cart.js');
 const {makeOrder}=await import('../lib/checkout.js');
+const SiteHeader=(await import('../components/site-header.jsx')).default;
 const WelcomePopup=(await import('../components/welcome-popup.jsx')).default;
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
@@ -70,6 +71,88 @@ test('Búsqueda: categoría muestra todos los productos con foto y precio',async
  const options=within(screen.getByRole('listbox',{name:'Sugerencias de productos'})).getAllByRole('option');assert.equal(options.length,8);assert.equal(options[0].querySelector('img').getAttribute('src').includes('product-001.webp'),true);
  assert.match(options[0].querySelector('.search-suggestion-price').textContent,/100,00/);cleanup();
 });
+const {AppRouterContext}=await import('next/dist/shared/lib/app-router-context.shared-runtime.js');
+// Router de prueba: registra a dónde navega el buscador del header.
+function withRouter(ui){const pushes=[];const router={push:href=>pushes.push(href),replace(){},prefetch(){},back(){},forward(){},refresh(){}};return {pushes,ui:<AppRouterContext.Provider value={router}>{ui}</AppRouterContext.Provider>};}
+test('Búsqueda fuera de la home: sugerencias, teclado, producto y Enter a /?q=',async()=>{
+ cleanup();localStorage.clear();const {pushes,ui}=withRouter(<Provider><EnviosPage catalog={catalog} page={enviosPageData()} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);render(ui);
+ const user=userEvent.setup({document:dom.window.document});const search=screen.getByRole('combobox',{name:'Buscar productos'});
+ assert.equal(search.getAttribute('aria-expanded'),'false');
+ await user.type(search,'frutos');
+ const listbox=screen.getByRole('listbox',{name:'Sugerencias de productos'});assert.equal(search.getAttribute('aria-expanded'),'true');
+ const options=within(listbox).getAllByRole('option');assert.equal(options.length,1);assert.match(options[0].textContent,/Almendras/);assert.match(options[0].textContent,/100,00/);
+ await user.keyboard('{ArrowDown}');assert.equal(search.getAttribute('aria-activedescendant'),options[0].id);
+ await user.keyboard('{Enter}');assert.deepEqual(pushes,['/productos/almendras-n001']);
+ await user.clear(search);await user.type(search,'frutos');await user.keyboard('{Escape}');assert.equal(search.value,'frutos');assert.equal(screen.queryByRole('listbox'),null);
+ await user.keyboard('{Enter}');assert.equal(pushes.at(-1),'/?q=frutos');cleanup();
+});
+test('Búsqueda fuera de la home: sin catálogo lo pide una vez y muestra el estado vacío',async()=>{
+ const user=setup();cleanup();catalogReads=0;
+ const {pushes,ui}=withRouter(<Provider><SiteHeader/></Provider>);render(ui);
+ const search=screen.getByRole('combobox',{name:'Buscar productos'});await user.type(search,'té');
+ await screen.findByRole('option',{name:/Té verde/});assert.equal(catalogReads<=1,true);
+ await user.clear(search);await user.type(search,'zzz');
+ const empty=await screen.findByText('No encontramos «zzz»');assert(empty);assert.equal(screen.queryByRole('listbox'),null);
+ const all=screen.getByRole('link',{name:'Ver todo el catálogo'});assert.equal(all.getAttribute('href'),'/');
+ await user.click(all);assert.equal(search.value,'');assert.equal(screen.queryByText('No encontramos «zzz»'),null);assert.equal(pushes.every(href=>href==='/'),true);cleanup();
+});
+test('Búsqueda en la home: ?q= llega al buscador y filtra; sin resultados muestra el término',async()=>{
+ cleanup();localStorage.clear();render(<Provider><Store initialCatalog={catalog} initialQuery="frutos"/></Provider>);
+ const user=userEvent.setup({document:dom.window.document});const search=screen.getByRole('combobox',{name:'Buscar productos'});
+ assert.equal(search.value,'frutos');assert.equal(document.querySelectorAll('.product-card').length,1);assert.equal(document.querySelector('.product-card').dataset.product,'N001');
+ await user.clear(search);await user.type(search,'zzz');
+ assert(screen.getByRole('heading',{name:'No encontramos «zzz»'}));assert(screen.getByText('No encontramos «zzz»',{selector:'.search-empty p'}));
+ await user.click(screen.getByRole('link',{name:'Ver todo el catálogo'}));assert.equal(search.value,'');assert.equal(document.querySelectorAll('.product-card').length,3);cleanup();
+});
+const rankingCatalog={products:[
+ {id:'N101',nombre:'Mix con frutos',categoria:'Mixes',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
+ {id:'N102',nombre:'Frutillas deshidratadas',categoria:'Frutas',precio:200,presentacion:'250 GR',imagen:'/images/product-002.webp',disponibilidad:'consultar'},
+ {id:'N103',nombre:'Pasas de uva',categoria:'Frutas secas',precio:150,presentacion:'500 GR',imagen:'/images/product-003.webp',disponibilidad:'consultar'}
+],settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}};
+test('Búsqueda: la primera sugerencia es la primera tarjeta de la grilla (home y fuera de la home)',async()=>{
+ cleanup();localStorage.clear();render(<Provider><Store initialCatalog={rankingCatalog}/></Provider>);
+ let user=userEvent.setup({document:dom.window.document});await user.type(screen.getByRole('combobox',{name:'Buscar productos'}),'fru');
+ const cards=[...document.querySelectorAll('.product-card')].map(card=>card.dataset.product);assert.deepEqual(cards,['N102','N101','N103']);
+ let options=within(screen.getByRole('listbox',{name:'Sugerencias de productos'})).getAllByRole('option');
+ assert.match(options[0].textContent,/Frutillas/);assert.deepEqual(options.map(o=>o.textContent.match(/Frutillas|Mix con frutos|Pasas de uva/)[0]),['Frutillas','Mix con frutos','Pasas de uva']);
+ cleanup();const {ui}=withRouter(<Provider><SiteHeader catalog={rankingCatalog}/></Provider>);render(ui);user=userEvent.setup({document:dom.window.document});
+ await user.type(screen.getByRole('combobox',{name:'Buscar productos'}),'fru');
+ options=within(screen.getByRole('listbox',{name:'Sugerencias de productos'})).getAllByRole('option');assert.match(options[0].textContent,/Frutillas/);cleanup();
+});
+const NotFoundPage=(await import('../components/not-found-page.jsx')).default;
+test('404: copy, salidas al catálogo y WhatsApp, destacados con la tarjeta del catálogo y buscador que funciona',async()=>{
+ cleanup();localStorage.clear();const {pushes,ui}=withRouter(<Provider><NotFoundPage catalog={catalog} featured={products} storeWhatsappUrl="https://wa.me/5491100000000"/></Provider>);render(ui);
+ assert(screen.getByRole('heading',{level:1,name:'No encontramos esta página'}));
+ assert(screen.getByText('Puede que el producto ya no esté o que el link tenga un error. Buscalo acá arriba o mirá el catálogo.'));
+ assert.equal(screen.getByRole('link',{name:'Ver el catálogo'}).getAttribute('href'),'/#catalogo');
+ assert.equal(screen.getByRole('link',{name:'Consultanos por WhatsApp'}).getAttribute('href'),'https://wa.me/5491100000000');
+ assert.equal(document.querySelectorAll('.not-found-featured .product-card').length,3);
+ assert(screen.getByRole('link',{name:'Catálogo'}));assert(document.querySelector('footer.footer'));
+ const user=userEvent.setup({document:dom.window.document});const search=screen.getByRole('combobox',{name:'Buscar productos'});
+ await user.type(search,'alm');await user.click(screen.getByRole('option',{name:/Almendras/}));assert.deepEqual(pushes,['/productos/almendras-n001']);
+ await user.click(screen.getByRole('button',{name:'Agregar Almendras'}));
+ await waitFor(()=>assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')||'{}').N001,1));cleanup();
+});
+test('404 sin WhatsApp configurado no inventa un número',()=>{
+ cleanup();const {ui}=withRouter(<Provider><NotFoundPage catalog={null} featured={[]} storeWhatsappUrl=""/></Provider>);render(ui);
+ assert.equal(screen.queryByRole('link',{name:'Consultanos por WhatsApp'}),null);assert.equal(document.querySelectorAll('.product-card').length,0);cleanup();
+});
+const {NextRequest}=await import('next/server');
+const {proxy}=await import('../proxy.js');
+test('Proxy: /productos/N001 no se pasa a minúscula (un solo 308 desde la página); otros slugs sí',()=>{
+  const bare=proxy(new NextRequest('https://www.vitalia.energy/productos/N001'));
+  assert.equal(bare.status,200);
+  const mixed=proxy(new NextRequest('https://www.vitalia.energy/productos/Granola-N037'));
+  assert.equal(mixed.status,308);assert.equal(new URL(mixed.headers.get('location')).pathname,'/productos/granola-n037');
+  const category=proxy(new NextRequest('https://www.vitalia.energy/categorias/Barritas'));
+  assert.equal(category.status,308);
+});
+const notFoundSource=(await import('node:fs')).readFileSync(new URL('../app/not-found.jsx',import.meta.url),'utf8');
+test('404: título propio, sin robots duplicado (Next agrega noindex) y /productos/<slug inválido> usa notFound()',async()=>{
+ assert.match(notFoundSource,/Página no encontrada · Vitalia/);assert.doesNotMatch(notFoundSource,/robots:/);
+ const pageSource=(await import('node:fs')).readFileSync(new URL('../app/productos/[slug]/page.jsx',import.meta.url),'utf8');
+ assert.match(pageSource,/dynamicParams=false/);assert.match(pageSource,/notFound\(\)/);
+});
 const catalog={products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}};
 function goCheckout(){cleanup();render(<Provider><Checkout initialCatalog={catalog}/></Provider>);}
 test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',async()=>{
@@ -81,7 +164,9 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Quitar una presentación de Almendras'}));
  assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,1);
- assert.equal(screen.getByRole('link',{name:'Catálogo',exact:true}).getAttribute('href'),'/');
+ // Checkout con header liviano: sin buscador ni secciones, vuelve al catálogo con el carrito intacto.
+ assert.equal(screen.getByRole('link',{name:/Seguir comprando/}).getAttribute('href'),'/');
+ assert.equal(screen.queryByRole('search'),null);assert.equal(screen.queryByRole('link',{name:'Catálogo',exact:true}),null);
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
  await screen.findByRole('link',{name:/^Mi pedido 1presentaciones1 presentación/});cleanup();
 });

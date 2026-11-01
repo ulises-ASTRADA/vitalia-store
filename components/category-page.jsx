@@ -26,7 +26,7 @@ export default function CategoryPage({catalog,category,categories,storeWhatsappU
   function changeItem(product,delta){const error=change(product,delta);setToast(error||(delta>0?'Producto agregado a tu pedido':''));}
   return <>
     <a className="skip-link" href="#contenido">Ir al contenido</a>
-    <SiteHeader current="catalog"/>
+    <SiteHeader current="catalog" catalog={catalog}/>
     <main className="shell category-page" id="contenido">
       <nav className="breadcrumb" aria-label="Ruta de navegación"><ol><li><Link href="/">Inicio</Link></li><li><span aria-current="page">{category.name}</span></li></ol></nav>
       <header className="category-head"><p className="eyebrow muted">CATEGORÍA</p><h1>{category.name}<span aria-hidden="true">.</span></h1>{category.intro&&<p className="category-intro">{category.intro}</p>}</header>

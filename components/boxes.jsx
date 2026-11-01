@@ -12,7 +12,7 @@ export default function Boxes({initialCatalog,storeWhatsappUrl}) {
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
   const money=value=>formatter.format(value);
   return <>
-    <SiteHeader current="boxes"/>
+    <SiteHeader current="boxes" catalog={initialCatalog}/>
     <main className="shell boxes-page"><h1 className="sr-only">Boxes Vitalia</h1><BoxBuilder products={products} money={money} ready={loaded} onAdd={addSelection}/></main>
     <SiteFooter whatsappUrl={storeWhatsappUrl}/>
     <FloatingCart count={count} total={total} money={money}/>
