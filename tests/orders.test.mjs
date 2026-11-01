@@ -55,7 +55,6 @@ test('appendOrder: envía datos completos (precios, fechas, costo envío) al web
   };
 
   process.env.ORDERS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/exec';
-  process.env.ORDERS_WEBHOOK_TOKEN = 'test-token';
 
   try {
     const orderId = await appendOrder({
@@ -85,7 +84,6 @@ test('appendOrder: envía datos completos (precios, fechas, costo envío) al web
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.ORDERS_WEBHOOK_URL;
-    delete process.env.ORDERS_WEBHOOK_TOKEN;
   }
 });
 
@@ -182,7 +180,6 @@ test('appendOrder (webhook): también neutraliza fórmulas en el payload', async
   let captured;
   globalThis.fetch = async (url, options) => { captured = JSON.parse(options.body); return Response.json({ status: 'ok' }); };
   process.env.ORDERS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/exec';
-  process.env.ORDERS_WEBHOOK_TOKEN = 'test-token';
   try {
     await appendOrder({ name: '=1+1', locality: '+SUM(A1)', province: 'Córdoba', notes: '@cmd', items: '1x Miel', total: 100 });
     assert.equal(captured.name, "'=1+1");
@@ -191,38 +188,20 @@ test('appendOrder (webhook): también neutraliza fórmulas en el payload', async
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.ORDERS_WEBHOOK_URL;
-    delete process.env.ORDERS_WEBHOOK_TOKEN;
   }
 });
 
-test('appendOrder (webhook): manda la clave, redondea montos y sanitiza fecha_entrega', async () => {
+test('appendOrder (webhook): no manda token en el cuerpo, redondea montos y sanitiza fecha_entrega', async () => {
   const originalFetch = globalThis.fetch;
   let captured;
   globalThis.fetch = async (url, options) => { captured = JSON.parse(options.body); return Response.json({ status: 'ok' }); };
   process.env.ORDERS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/exec';
-  process.env.ORDERS_WEBHOOK_TOKEN = 'test-token';
   try {
     await appendOrder({ name: 'Ana', locality: 'Mendiolaza', province: 'Córdoba', items: '1x Miel', total: 12345.678, deliveryDate: '=HOY()' });
-    assert.equal(captured.token, 'test-token');
+    assert.equal('token' in captured, false);
     assert.equal(captured.precio_pedido, 12345.68);
     assert.equal(captured.total, 15345.68);
     assert.equal(captured.fecha_entrega, "'=HOY()");
-  } finally {
-    globalThis.fetch = originalFetch;
-    delete process.env.ORDERS_WEBHOOK_URL;
-    delete process.env.ORDERS_WEBHOOK_TOKEN;
-  }
-});
-
-test('appendOrder (webhook): sin clave no llama al webhook', async () => {
-  const originalFetch = globalThis.fetch;
-  let called = false;
-  globalThis.fetch = async () => { called = true; return Response.json({ status: 'ok' }); };
-  process.env.ORDERS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/exec';
-  delete process.env.ORDERS_WEBHOOK_TOKEN;
-  try {
-    await assert.rejects(appendOrder({ name: 'Ana', items: '1x Miel', total: 100 }));
-    assert.equal(called, false);
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.ORDERS_WEBHOOK_URL;
@@ -233,12 +212,10 @@ test('appendOrder (webhook): un 200 con status error se trata como falla', async
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => Response.json({ status: 'error' });
   process.env.ORDERS_WEBHOOK_URL = 'https://script.google.com/macros/s/test/exec';
-  process.env.ORDERS_WEBHOOK_TOKEN = 'test-token';
   try {
     await assert.rejects(appendOrder({ name: 'Ana', items: '1x Miel', total: 100 }));
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.ORDERS_WEBHOOK_URL;
-    delete process.env.ORDERS_WEBHOOK_TOKEN;
   }
 });
