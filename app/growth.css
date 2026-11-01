@@ -7,7 +7,9 @@
 .annc b{color:var(--lime);font-weight:700}
 .annc .sep{color:#9fb28a;margin:0 6px}
 .annc-msg{margin:0}
-@media(max-width:700px){.annc-in{min-height:44px;padding:6px 16px}}
+@media(max-width:700px){.annc{font-size:.75rem}.annc-in{min-height:32px;padding:0 12px}.annc-msg{min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.annc .sep{margin:0 4px}.annc-long{display:none}}
+/* Bloque fijo (barra + header): anclas y foco no quedan tapados. --header-height lo mide site-header.jsx. */
+:where(main [id],main :focus,footer :focus){scroll-margin-top:calc(var(--header-height) + 12px)}
 /* ---- Popup (dialog nativo) ---- */
 dialog.vp{position:fixed;z-index:31;background:var(--surface,#fff);color:var(--ink);box-shadow:0 -10px 40px #14211733;margin:0;border:0;inset:auto;max-width:none}
 dialog.vp-sheet{left:0;right:0;bottom:0;width:100%;border-radius:20px 20px 0 0;padding:20px 20px calc(10px + env(safe-area-inset-bottom));max-height:52dvh;overflow:auto}

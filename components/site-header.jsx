@@ -99,8 +99,9 @@ export default function SiteHeader({current,headerRef,variant,catalog,query:home
     return()=>{observer.disconnect();document.removeEventListener('keydown',shortcut);};
   },[ref]);
   return <>
-    <AnnouncementBar/>
+    {/* Bloque fijo: barra de promos + fila del logo y el buscador. La fila de secciones queda afuera y se va con el scroll. */}
     <div className="sticky-header" ref={ref}>
+      {!checkout&&<AnnouncementBar/>}
       <header className={`header${checkout?' header-checkout':''}`}><Link className="brand" href="/" aria-label="Vitalia, inicio"><Image className="brand-logo" src="/images/logo-web.webp" width={156} height={100} sizes="(max-width: 540px) 88px, 112px" alt="Vitalia · Dietética" loading="eager" fetchPriority="high"/></Link>
         {checkout?<Link className="continue-link" href="/"><span aria-hidden="true">←</span> Seguir comprando</Link>:<form className="search" role="search" action="/" method="get" onSubmit={submit} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))close();}}><Icon name="search"/><label className="sr-only" htmlFor="search">Buscar productos</label><Input unstyled id="search" name="q" ref={search} type="search" role="combobox" aria-autocomplete="list" aria-controls="search-suggestions" aria-expanded={showSuggestions} aria-activedescendant={activeSuggestion>=0?`search-suggestion-${activeSuggestion}`:undefined} placeholder="¿Qué estás buscando?" autoComplete="off" value={query} onFocus={()=>{ensureCatalog();setSuggestionsOpen(Boolean(term));}} onKeyDown={handleSearchKeyDown} onChange={event=>{ensureCatalog();setQuery(event.target.value);setSuggestionsOpen(true);setActiveSuggestion(-1);}}/><kbd>/</kbd>
           {showSuggestions&&<ul className="search-suggestions" id="search-suggestions" role="listbox" aria-label="Sugerencias de productos">{searchSuggestions.map((suggestion,index)=><li key={suggestion.id} role="presentation"><button id={`search-suggestion-${index}`} role="option" aria-selected={index===activeSuggestion} tabIndex={-1} type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>chooseSuggestion(suggestion)}><Photo product={suggestion} context="cart" frame={false} className="search-suggestion-image" alt=""/><span className="search-suggestion-info"><strong>{suggestion.nombre}</strong><small>{suggestion.categoria} · {suggestion.presentacion}</small></span><span className="search-suggestion-price">{formatPrice?.(suggestion.precio)}</span></button></li>)}</ul>}
@@ -108,8 +109,8 @@ export default function SiteHeader({current,headerRef,variant,catalog,query:home
         </form>}
         <div className="header-actions"><Button unstyled className="plain help-button" onClick={()=>setHelp(true)}>Cómo comprar</Button><ThemeToggle id="theme-toggle"/></div>
       </header>
-      {!checkout&&<SectionNav current={current}/>}
     </div>
+    {!checkout&&<SectionNav current={current}/>}
     {help&&<Suspense fallback={null}><Modal open={help} onClose={()=>setHelp(false)} title="Tu pedido, paso a paso" help><p className="eyebrow muted">ASÍ DE SIMPLE</p><h2>Tu pedido, paso a paso.</h2><ol><li><strong>Elegí tus productos.</strong><p>Revisá la presentación de cada uno y sumalo al carrito. Una cantidad equivale a una presentación, no siempre a una unidad individual.</p></li><li><strong>Prepará el mensaje.</strong><p>Completá tu nombre, localidad y provincia. Podés agregar una consulta opcional.</p></li><li><strong>Seguimos por WhatsApp.</strong><p>Enviá el mensaje para confirmar disponibilidad, presentaciones, entrega y forma de pago. El sitio no cobra ni reserva stock.</p></li></ol></Modal></Suspense>}
   </>;
 }

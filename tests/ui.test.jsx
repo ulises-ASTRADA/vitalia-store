@@ -539,3 +539,28 @@ test('Hero: con "reducir movimiento" arranca en pausa mostrando la primera foto'
   assert(document.querySelector('.hero-carousel').classList.contains('is-reduced'));
  }finally{dom.window.matchMedia=previous;cleanup();}
 });
+test('Header fijo: barra de promos + logo y buscador en un solo bloque; secciones afuera; sin barra en el checkout',async()=>{
+ const check=()=>{
+  const block=document.querySelector('.sticky-header');assert(block);
+  const promos=screen.getByRole('region',{name:'Promociones'});
+  assert.equal(promos.parentElement,block);assert.equal(block.firstElementChild,promos);
+  assert.equal(promos.nextElementSibling,block.querySelector('header'));
+  assert(block.contains(screen.getByRole('combobox',{name:'Buscar productos'})));
+  const nav=screen.getByRole('navigation',{name:'Secciones de la tienda'});assert(!block.contains(nav));
+  // Mobile oculta ".annc-long" y queda "10% off desde $400.000"; en compu se lee la frase completa.
+  assert.equal(promos.querySelector('.annc-long').textContent,' en todo el carrito');
+  assert.match(promos.textContent.replace(/\s+/g,' '),/Envío gratis desde \$70\.000 ·, 10% off en todo el carrito desde \$400\.000/);
+ };
+ setup(catalog);await screen.findByText('3 productos');check();
+ cleanup();render(<Provider><ProductPage catalog={catalog} product={products[0]} page={{slug:'almendras-n001',pack:'1 KG',description:'',perKilo:null,whatsappUrl:'https://wa.me/5491100000000?text=x'}} related={[products[1]]} category={{href:'/categorias/frutos-secos-y-semillas',count:1}}/></Provider>);check();
+ goCheckout();await screen.findByRole('link',{name:/Seguir comprando/});
+ assert.equal(screen.queryByRole('region',{name:'Promociones'}),null);
+ assert(document.querySelector('.sticky-header header'));
+});
+test('Header fijo: CSS de la barra en una línea con puntos suspensivos y scroll-margin con el alto del bloque',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const css=await readFile(new URL('../app/growth.css',import.meta.url),'utf8');
+ const mobile=css.match(/@media\(max-width:700px\)\{\.annc\{[^\n]*/)[0];
+ for(const rule of ['min-height:32px','white-space:nowrap','text-overflow:ellipsis','overflow:hidden','.annc-long{display:none}'])assert(mobile.includes(rule),rule);
+ assert.match(css,/scroll-margin-top:calc\(var\(--header-height\) \+ 12px\)/);
+});
