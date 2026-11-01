@@ -31,6 +31,7 @@ const {useCart}=await import('../components/use-cart.js');
 const {makeOrder}=await import('../lib/checkout.js');
 const SiteHeader=(await import('../components/site-header.jsx')).default;
 const WelcomePopup=(await import('../components/welcome-popup.jsx')).default;
+const HeroCarousel=(await import('../components/hero-carousel.jsx')).default;
 const products=[
 {id:'N001',nombre:'Almendras',categoria:'Frutos secos y semillas',precio:100,presentacion:'1 KG',imagen:'/images/product-001.webp',disponibilidad:'consultar'},
 {id:'N002',nombre:'Chalita de harina de centeno y semilla de zapallo',categoria:'Galletitas y panificados',precio:200,presentacion:'1 KG',imagen:'/images/product-002.webp',disponibilidad:'consultar'},
@@ -500,5 +501,41 @@ test('Popup: "No, gracias" lo cierra y queda oculto 30 días; no aparece por exi
   cleanup();sessionStorage.clear();render(<Provider><WelcomePopup/></Provider>);
   document.dispatchEvent(new dom.window.MouseEvent('mouseout',{clientY:0,bubbles:true}));
   await new Promise(r=>setTimeout(r,20));assert.equal(screen.queryByRole('dialog'),null);
+ }finally{dom.window.matchMedia=previous;cleanup();}
+});
+const heroState=()=>{const root=document.querySelector('.hero-carousel');return {active:[...root.querySelectorAll('.hero-slide')].findIndex(s=>s.classList.contains('is-active'))+1,inert:[...root.querySelectorAll('.hero-slide')].map(s=>s.hasAttribute('inert')),live:root.querySelector('.hero-track').getAttribute('aria-live')};};
+test('Hero: carrusel con puntos, slides accesibles y autoplay que pasa solo y da la vuelta',async()=>{
+ cleanup();render(<HeroCarousel interval={40}/>);
+ const region=screen.getByRole('region',{name:'Productos destacados'});assert.equal(region.getAttribute('aria-roledescription'),'carrusel');
+ const slides=within(region).getAllByRole('group',{hidden:true});assert.equal(slides.length,3);
+ assert.equal(slides[0].getAttribute('aria-roledescription'),'slide');assert.match(slides[1].getAttribute('aria-label'),/^2 de 3: Granola de chocolate "Vitalia"$/);
+ const dots=[1,2,3].map(n=>screen.getByRole('button',{name:`Foto ${n} de 3`}));assert.equal(dots[0].getAttribute('aria-current'),'true');assert.equal(dots[1].getAttribute('aria-current'),null);
+ const first=region.querySelector('img');assert.equal(first.getAttribute('loading'),'eager');assert.equal(first.getAttribute('fetchpriority'),'high');assert.equal(first.getAttribute('alt'),'Mix tropical');
+ for(const img of [...region.querySelectorAll('img')].slice(1))assert.equal(img.getAttribute('loading'),'lazy');
+ assert.equal(slides[1].querySelector('a').getAttribute('href'),'/productos/granola-de-chocolate-vitalia-n038');
+ await waitFor(()=>assert.equal(heroState().active,2));
+ assert.deepEqual(heroState(),{active:2,inert:[true,false,true],live:'off'});assert(screen.getByRole('button',{name:'Pausar'}));
+ await waitFor(()=>assert.equal(heroState().active,1),{timeout:500});
+ cleanup();
+});
+test('Hero: tocar un punto o una flecha frena el autoplay hasta tocar Reanudar',async()=>{
+ cleanup();render(<HeroCarousel interval={40}/>);const user=userEvent.setup({document:dom.window.document});
+ await user.click(screen.getByRole('button',{name:'Foto 3 de 3'}));
+ assert.equal(heroState().active,3);assert.equal(heroState().live,'polite');assert(screen.getByRole('button',{name:'Reanudar'}));
+ await new Promise(r=>setTimeout(r,150));assert.equal(heroState().active,3);
+ await user.click(screen.getByRole('button',{name:'Foto siguiente'}));assert.equal(heroState().active,1);
+ await user.click(screen.getByRole('button',{name:'Foto anterior'}));assert.equal(heroState().active,3);
+ await new Promise(r=>setTimeout(r,150));assert.equal(heroState().active,3);
+ await user.click(screen.getByRole('button',{name:'Reanudar'}));assert(screen.getByRole('button',{name:'Pausar'}));
+ cleanup();
+});
+test('Hero: con "reducir movimiento" arranca en pausa mostrando la primera foto',async()=>{
+ const previous=dom.window.matchMedia;dom.window.matchMedia=query=>({matches:query.includes('reduce'),addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});
+ try{
+  cleanup();render(<HeroCarousel interval={30}/>);
+  await waitFor(()=>assert(screen.getByRole('button',{name:'Reanudar'})));
+  await new Promise(r=>setTimeout(r,120));
+  assert.deepEqual(heroState(),{active:1,inert:[false,true,true],live:'polite'});
+  assert(document.querySelector('.hero-carousel').classList.contains('is-reduced'));
  }finally{dom.window.matchMedia=previous;cleanup();}
 });

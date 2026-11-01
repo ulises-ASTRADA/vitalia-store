@@ -1,11 +1,10 @@
 'use client';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import NextImage from 'next/image';
-const Image = NextImage.default || NextImage;
 import { Button, NativeSelect } from '@chakra-ui/react';
 import SiteHeader from './site-header';
 import SiteFooter from './site-footer';
 import FloatingCart from './floating-cart';
+import HeroCarousel from './hero-carousel';
 import {useCart} from './use-cart';
 import {ProductCard,Photo,pack} from './product-card';
 import {productPath} from '../lib/product-links';
@@ -78,7 +77,7 @@ export default function Store({initialCatalog=null,initialQuery='',whatsappUrl='
     <a className="skip-link" href="#catalogo">Ir al catálogo</a>
     <SiteHeader current="catalog" headerRef={header} query={query} onQueryChange={updateQuery} searchSuggestions={searchSuggestions} searchEmpty={status==='ready'&&Boolean(query.trim())&&!filtered.length} formatSearchPrice={money}/>
     <main className="shell">
-      <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><div className="hero-photos" aria-hidden="true">{['023','002','037'].map((id,i)=><Image key={id} className={`hero-photo photo-${['one','two','three'][i]}`} src={`/images/product-${id}.webp`} width={240} height={250} alt="" sizes="(max-width: 760px) 180px, 240px" loading={i===0?'eager':'lazy'} fetchPriority={i===0?'high':'auto'}/>)}<span className="hero-stamp">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span></div></section>
+      <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><HeroCarousel/></section>
       <section className="catalog-section" id="catalogo" aria-labelledby="catalog-title"><div className="catalog-top"><div><p className="eyebrow muted">ENCONTRÁ TUS FAVORITOS</p><h2 id="catalog-title">Nuestro catálogo<span>.</span></h2></div></div>
         <div className="catalog-layout"><aside className="categories"><h3>Categorías</h3><nav aria-label="Categorías de productos">{categories.map(name=><Button unstyled key={name} className="category-button" aria-pressed={name===category} onClick={()=>{setCategory(name);setLimit(24);}}><span>{name}</span><span className="category-count">{name==='Todos'?products.length:products.filter(p=>p.categoria===name).length}</span></Button>)}</nav><div className="side-note"><span className="tiny-rule"/><strong>De tu carrito<br/>a WhatsApp.</strong><p>Consultá disponibilidad y coordiná el pago y la entrega al enviar tu pedido.</p></div></aside>
         <div className="results" ref={results} style={searchLayout}><div className="results-toolbar"><p role="status" aria-live="polite">{status==='loading'?'Cargando productos…':status==='error'?'Catálogo no disponible':`${filtered.length} ${filtered.length===1?'producto':'productos'}${category==='Todos'?'':' · '+category}`}</p><label className="sort-label" htmlFor="sort">Ordenar <NativeSelect.Root className="chakra-sort" width={{base:'176px',sm:'188px'}}><NativeSelect.Field id="sort" value={sort} onChange={e=>{setSort(e.target.value);setLimit(24);}} bg="var(--surface)" color="var(--ink)" borderColor="var(--line)" paddingInlineStart="14px" paddingInlineEnd="44px" minHeight="44px"><option value="catalog">Según catálogo</option><option value="price-asc">Menor precio</option><option value="price-desc">Mayor precio</option><option value="name">Nombre: A a Z</option></NativeSelect.Field><NativeSelect.Indicator insetInlineEnd="14px" color="var(--ink)"/></NativeSelect.Root></label></div>
