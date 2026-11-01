@@ -2,10 +2,12 @@
 import {useEffect,useRef,useState} from 'react';
 import NextImage from 'next/image';
 import NextLink from 'next/link';
-import {Button,IconButton} from '@chakra-ui/react';
+import {Button} from '@chakra-ui/react';
 const Image=NextImage.default||NextImage,Link=NextLink.default||NextLink;
 export const pack=product=>product.presentacion||'Presentación a confirmar';
 const FALLBACK='/images/logo-web.webp';
+// Tope por producto que ya aplica el carrito (use-cart.js y lib/checkout.js). No hay stock por producto en los datos.
+export const CARD_MAX_QUANTITY=99;
 
 // Foto con ratio reservado: skeleton mientras carga y logo con "Foto no disponible" si falla.
 export function Photo({product,className='',eager=false,context='card',frame=true,alt}) {
@@ -21,11 +23,31 @@ export function Photo({product,className='',eager=false,context='card',frame=tru
   return <div className={`media-frame${loading?' is-loading':''}${fallback?' is-fallback':''}`}>{img}{fallback&&<span className="no-photo" aria-hidden="true">Foto no disponible</span>}</div>;
 }
 
+// Contador de la tarjeta: con 0 es un botón "Agregar" a lo ancho; con 1 o más, [ − | n | + ].
+// El número es una región aria-live que sobrevive al cambio de estado (misma key), y el foco pasa
+// a "+" al agregar el primero y vuelve a "Agregar" al quitar el último.
+function CardQuantity({product,quantity,change,disabled}) {
+  const plus=useRef(null),add=useRef(null),pending=useRef(null);
+  useEffect(()=>{
+    if(pending.current==='plus'&&quantity>0)plus.current?.focus();
+    if(pending.current==='add'&&!quantity)add.current?.focus();
+    pending.current=null;
+  },[quantity]);
+  const name=product.nombre,full=quantity>=CARD_MAX_QUANTITY;
+  return <div className={`card-qty${quantity>0?' is-active':''}`} role="group" aria-label={`Cantidad de ${name}`}>
+    {quantity>0&&<Button unstyled key="minus" type="button" className="card-qty-minus" aria-label={`Quitar una presentación de ${name}`} onClick={()=>{if(quantity===1)pending.current='add';change(product,-1);}}><span aria-hidden="true">−</span></Button>}
+    <span key="count" className={quantity>0?'card-qty-count':'sr-only'} aria-live="polite" aria-atomic="true">{quantity>0?<><span className="sr-only">En tu pedido: </span>{quantity}</>:''}</span>
+    {quantity>0
+      ?<Button unstyled key="plus" ref={plus} type="button" className="card-qty-plus" aria-label={`Agregar una presentación de ${name}`} disabled={full} title={full?`Máximo de ${CARD_MAX_QUANTITY} presentaciones por producto`:undefined} onClick={()=>change(product,1)}><span aria-hidden="true">+</span></Button>
+      :<Button unstyled key="add" ref={add} type="button" className="card-qty-add" aria-label={`Agregar ${name}`} disabled={disabled} onClick={()=>{pending.current='plus';change(product,1);}}>Agregar</Button>}
+  </div>;
+}
+
 // Tarjeta del catálogo. Con href, la foto y el nombre llevan a /productos/[slug].
 // Sin href (productos sin página), abren el modal si hay onDetail, o quedan sin link.
 export function ProductCard({product,quantity,money,change,href,onDetail}) {
   const out=product.disponibilidad==='agotado',priced=product.precio>0;
-  const media=<><Photo product={product}/>{out&&<span className="out-badge">Agotado</span>}{quantity>0&&<span className="quantity-badge">{quantity}</span>}</>;
+  const media=<><Photo product={product}/>{out&&<span className="out-badge">Agotado</span>}</>;
   return <article className={`product-card${out?' is-out':''}`} data-product={product.id}>
     {href?<Link className="product-image-button" href={href} aria-label={`Ver ${product.nombre}`} tabIndex={-1}>{media}</Link>
       :onDetail?<Button unstyled className="product-image-button" onClick={()=>onDetail(product)} aria-label={`Ver ${product.nombre}`}>{media}</Button>
@@ -34,7 +56,7 @@ export function ProductCard({product,quantity,money,change,href,onDetail}) {
     {href?<Link className="product-name" href={href}>{product.nombre}</Link>
       :onDetail?<Button unstyled className="product-name" onClick={()=>onDetail(product)}>{product.nombre}</Button>
       :<p className="product-name">{product.nombre}</p>}
-    <p className={`product-pack${out?' is-out':''}`}>{out?'Agotado':pack(product)}</p>
-    <div className="price-row"><IconButton unstyled className="add-button subtract-button" aria-label={`Quitar una presentación de ${product.nombre}`} disabled={!quantity} onClick={()=>change(product,-1)}>−</IconButton>{priced?<span className="price">{money(product.precio)}</span>:<span className="price price-ask">Precio a consultar</span>}<IconButton unstyled className="add-button" aria-label={`Agregar ${product.nombre}`} disabled={out||!priced} onClick={()=>change(product,1)}>+</IconButton></div>
+    <p className={`product-pack${out?' is-out':''}`}>{out?'Agotado':pack(product)}{!out&&<><span className="product-pack-sep" aria-hidden="true"> · </span><span className="sr-only">, </span>{priced?<b className="price">{money(product.precio)}</b>:<span className="price price-ask">Precio a consultar</span>}</>}</p>
+    <CardQuantity product={product} quantity={quantity} change={change} disabled={out||!priced}/>
   </article>;
 }

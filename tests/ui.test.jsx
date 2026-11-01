@@ -159,7 +159,7 @@ function goCheckout(){cleanup();render(<Provider><Checkout initialCatalog={catal
 test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',async()=>{
  const user=setup();await screen.findByText('3 productos');
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
- await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
+ await user.click(screen.getByRole('button',{name:'Agregar una presentación de Almendras'}));
  assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');
  assert.equal(document.querySelector('dialog.cart-dialog'),null);
  goCheckout();await screen.findByText('Productos elegidos');
@@ -334,7 +334,7 @@ test('Carrito flotante: nombre accesible = texto visible, dentro de un landmark'
  assert(screen.getByRole('link',{name:/^Mi pedido 0presentacionesCarrito vacío/}));cleanup();
 });
 test('Carrito flotante mobile: burbuja, total, CTA y minimizar',async()=>{
- const user=setup(catalog);await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
+ const user=setup(catalog);await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));await user.click(screen.getByRole('button',{name:'Agregar una presentación de Almendras'}));
  const bubble=screen.getByRole('button',{name:'Abrir resumen del pedido, 2 presentaciones'});assert.equal(within(bubble).getByText('2').textContent,'2');
  await user.click(bubble);assert(screen.getByText('Total del pedido'));assert.match(document.querySelector('.mobile-cart-summary strong').textContent,/200,00/);
  assert.equal(screen.getByRole('link',{name:'Ir al carrito'}).getAttribute('href'),'/checkout');
@@ -563,4 +563,38 @@ test('Header fijo: CSS de la barra en una línea con puntos suspensivos y scroll
  const mobile=css.match(/@media\(max-width:700px\)\{\.annc\{[^\n]*/)[0];
  for(const rule of ['min-height:32px','white-space:nowrap','text-overflow:ellipsis','overflow:hidden','.annc-long{display:none}'])assert(mobile.includes(rule),rule);
  assert.match(css,/scroll-margin-top:calc\(var\(--header-height\) \+ 12px\)/);
+});
+
+test('Tarjeta: con 0 muestra Agregar, con cantidad muestra [− n +] sin badge y con aria',async()=>{
+ const user=setup(catalog);await screen.findByText('3 productos');
+ const card=()=>document.querySelector('article.product-card[data-product="N001"]');
+ // Estado 0: un solo botón "Agregar", sin −/+ ni badge sobre la foto.
+ const add=within(card()).getByRole('button',{name:'Agregar Almendras',exact:true});
+ assert.equal(add.textContent,'Agregar');assert.equal(add.closest('.card-qty').getAttribute('role'),'group');
+ assert.equal(within(card()).queryByRole('button',{name:'Quitar una presentación de Almendras'}),null);
+ assert.equal(card().querySelector('.quantity-badge'),null);
+ // Precio junto al peso, en negrita.
+ assert.match(card().querySelector('.product-pack').textContent,/·.*\$\s?100,00/);assert.equal(card().querySelector('.product-pack .price').tagName,'B');
+ const live=card().querySelector('.card-qty [aria-live="polite"]');assert(live);
+ // Agregar → contador con 1, foco en "+", el número vive en la misma región aria-live.
+ await user.click(add);
+ const plus=within(card()).getByRole('button',{name:'Agregar una presentación de Almendras'});
+ const minus=within(card()).getByRole('button',{name:'Quitar una presentación de Almendras'});
+ await waitFor(()=>assert.equal(document.activeElement,plus));
+ const count=card().querySelector('.card-qty-count');assert.equal(count,live);assert.equal(count.getAttribute('aria-live'),'polite');assert.match(count.textContent,/1$/);
+ assert.equal(within(card()).queryByRole('button',{name:'Agregar Almendras',exact:true}),null);
+ assert.equal(card().querySelector('.quantity-badge'),null);
+ await user.click(plus);await user.click(plus);assert.match(count.textContent,/3$/);assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,3);
+ await user.click(minus);await user.click(minus);assert.match(count.textContent,/1$/);
+ // En 1, − quita el producto y vuelve "Agregar" con el foco.
+ await user.click(within(card()).getByRole('button',{name:'Quitar una presentación de Almendras'}));
+ const back=within(card()).getByRole('button',{name:'Agregar Almendras',exact:true});await waitFor(()=>assert.equal(document.activeElement,back));
+ assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')||'{}').N001,undefined);cleanup();
+});
+test('Tarjeta: + se deshabilita en el tope de 99 del carrito',async()=>{
+ cleanup();localStorage.clear();localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:99}));
+ render(<Provider><Store initialCatalog={catalog}/></Provider>);
+ const plus=await screen.findByRole('button',{name:'Agregar una presentación de Almendras'});
+ await waitFor(()=>assert.equal(plus.disabled,true));
+ assert.equal(screen.getByRole('button',{name:'Quitar una presentación de Almendras'}).disabled,false);cleanup();
 });
