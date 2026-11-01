@@ -1,6 +1,7 @@
 /* Carrusel de fotos del hero. El texto de la izquierda queda fijo; solo rotan las fotos.
    Sin JS: las slides quedan en una fila con scroll-snap. Con JS (.is-enhanced): fundido de 300 ms. */
 /* Por defecto (SSR y con JS): slides apiladas con fundido; la slide 1 se pinta igual que la composición original. */
+.hero-frame{position:absolute;inset:0}
 .hero-track{position:absolute;inset:0;touch-action:pan-y}
 .hero-slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}
 .hero-slide.is-active{opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s}
@@ -22,6 +23,7 @@
 .hero-prev{left:12px}.hero-next{right:12px}
 .hero-carousel:hover .hero-arrow,.hero-carousel:focus-within .hero-arrow{opacity:1}
 .hero-carousel .hero-arrow:focus-visible,.hero-carousel .hero-toggle:focus-visible,.hero-dot:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.hero-dots{display:flex;align-items:center;gap:6px}
 .hero-controls{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:6px;padding:3px 4px 3px 8px;border-radius:999px;background:#1b2d20cc}
 .hero-dot{width:24px;height:24px;border:0;background:transparent;padding:0;display:grid;place-items:center;border-radius:50%}
 .hero-dot span{width:10px;height:10px;border-radius:50%;border:2px solid #eef1d2;background:transparent}
@@ -33,18 +35,32 @@
 @media (prefers-reduced-motion:reduce){.hero-arrow{transition:none}}
 /* Tablet: igual que el original (foto 1 oculta) */
 @media(max-width:850px){.hero-photo-link{width:70%;height:250px}.hero-photo-link.photo-one{display:none}.hero-photo-link.photo-two{left:0;top:45px}.hero-photo-link.photo-three{left:65%;top:95px}.hero-photo-link.photo-solo{left:4%;top:30px;width:72%;height:250px}}
-/* Mobile: una sola foto visible como en el original; flechas chicas sobre la foto y puntos abajo */
-@media(max-width:540px){
-  .hero-photo-link{width:148px;height:211px}
-  .hero-photo-link.photo-two{left:3%;top:29px;transform:rotate(10deg)}
-  .hero-photo-link.photo-three{display:none}
-  .hero-photo-link.photo-solo{left:3%;top:29px;transform:rotate(10deg);width:148px;height:211px}
+/* Mobile (<768px): texto arriba a todo el ancho; foto 4:3 abajo dentro de la misma tarjeta; controles en su propia fila. */
+@media(max-width:767px){
+  .hero{height:auto;flex-direction:column}
+  .hero-copy{width:100%;padding:24px 16px 16px}
+  .hero-copy>p:not(.eyebrow){max-width:none}
+  .hero-photos.hero-carousel{width:100%;background:transparent;padding:0 16px 16px}
+  .hero-frame{position:relative;inset:auto;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#334a31}
   .hero-carousel .hero-photo{border-width:4px}
-  .hero-arrow{width:44px;height:44px;background:transparent;box-shadow:none;top:auto;bottom:46px;margin-top:0}
-  .hero-arrow::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#f4f6e4;box-shadow:0 3px 10px #101b1940;z-index:-1}
-  .hero-arrow svg{width:18px;height:18px}
-  .hero-prev{left:0}.hero-next{right:0}
-  .hero-controls{bottom:6px;gap:0;padding:2px;background:#1b2d20e6}
-  .hero-toggle{width:28px;height:28px;margin-left:0}
+  /* Slide 1: las 3 fotos entran completas en el marco, en abanico, debajo del sello. */
+  .hero-photo-link{width:31%;height:62%;border-radius:5px}
+  .hero-photo-link.photo-one{display:block;left:4.5%;top:22%;transform:rotate(-6deg)}
+  .hero-photo-link.photo-two{left:34.5%;top:14%;transform:rotate(2deg)}
+  .hero-photo-link.photo-three{display:block;left:64.5%;top:30%;transform:rotate(7deg)}
+  /* Slides 2 y 3: una foto que llena el marco */
+  .hero-photo-link.photo-solo{inset:0;width:100%;height:100%;transform:none;border-radius:0}
+  .hero-carousel .photo-solo .hero-photo{border:0;border-radius:0;box-shadow:none;object-fit:cover}
+  .hero-carousel .hero-stamp{display:flex;top:8px;right:8px;width:64px;height:64px;font-size:.5rem;line-height:1.15;letter-spacing:0;box-shadow:0 3px 10px #101b1940}
+  .hero-carousel .hero-stamp b{font-size:.5rem}
+  .hero-arrow,.hero-carousel .hero-arrow{opacity:1;width:44px;height:44px;top:50%;bottom:auto;margin-top:-22px;background:rgba(0,0,0,.45);color:#fff;box-shadow:none}
+  .hero-arrow svg{width:20px;height:20px}
+  .hero-prev{left:8px}.hero-next{right:8px}
+  .hero-controls{position:static;transform:none;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:12px;padding:12px 0 0;background:transparent;border-radius:0}
+  .hero-dots{grid-column:2;justify-self:center;gap:12px}
+  .hero-toggle{grid-column:3;width:44px;height:44px;margin:0;background:#f4f6e4;color:var(--green)}
+  .hero-toggle svg{width:18px;height:18px}
 }
-@media(max-width:540px){.hero-photo-link,.hero-photo-link.photo-solo{height:230px}}
+/* Antes de hidratar los controles ocupan su lugar pero no se ven (sin CLS); sin JS no existen. */
+.hero-carousel:not(.is-enhanced) .hero-controls{visibility:hidden}
+@media (scripting:none){.hero-controls{display:none!important}}
