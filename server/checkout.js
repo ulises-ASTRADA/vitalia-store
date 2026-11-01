@@ -17,16 +17,29 @@ export async function POST(request) {
     if (!settings.checkoutEnabled) throw new StoreError('Los pedidos por WhatsApp todavía no están habilitados.',503,'CHECKOUT_DISABLED');
     const {products}=await getCachedCatalog();
     const result=makeOrder(body,products,settings);
-    const lineCount = Array.isArray(body?.items) ? body.items.length : 0;
-    const orderId = await appendOrder({
-      name: body?.name,
-      locality: body?.locality,
-      province: body?.province,
-      notes: body?.notes,
-      items: `${lineCount} items · total ${result.total}`,
-      total: result.total,
-      whatsappUrl: result.whatsappUrl
-    });
+    const lookup = new Map(products.map(p => [p.id, p]));
+    const formattedItems = Array.isArray(body?.items)
+      ? body.items.map(item => {
+          const product = lookup.get(item.id);
+          const pack = product?.presentacion ? ` (${product.presentacion})` : '';
+          return `${item.quantity}x ${product?.nombre || item.id}${pack}`;
+        }).join('; ')
+      : '';
+    let orderId = null;
+    try {
+      orderId = await appendOrder({
+        name: body?.name,
+        locality: body?.locality,
+        province: body?.province,
+        notes: body?.notes,
+        items: formattedItems,
+        total: result.total,
+        whatsappUrl: result.whatsappUrl,
+        status: 'Pendiente'
+      });
+    } catch(err) {
+      console.error('[vitalia] Error registrando pedido en Sheets:', err?.message || err);
+    }
     return Response.json({...result, orderId}, {headers:{'Cache-Control':'no-store'}});
   } catch(error) {
     console.error('[vitalia] checkout error', error?.message || error, error?.stack);
