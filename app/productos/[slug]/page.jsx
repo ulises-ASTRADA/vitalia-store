@@ -18,9 +18,12 @@ export async function generateStaticParams() {
   const {products}=await getCatalog({fresh:true});
   const {phone}=storeSettings();
   const {currency}=storeSettings();
-  return pageProducts(products).map(product=>{
+  // Además del slug canónico se genera /productos/<id> en minúscula (el proxy ya pasa N001 → n001),
+  // que redirige con 308 al canónico en vez de dar 404.
+  return pageProducts(products).flatMap(product=>{
     const page=assertNoPlaceholders(pageModel(products,product,{currency,phone}),`/productos (${product.id})`);
-    return {slug:page.page.slug};
+    const bare=String(product.id).toLowerCase();
+    return bare===page.page.slug?[{slug:bare}]:[{slug:page.page.slug},{slug:bare}];
   });
 }
 

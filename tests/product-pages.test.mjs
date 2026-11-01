@@ -21,6 +21,9 @@ test('Se resuelve por el código del final, aunque cambie el nombre',()=>{
   assert.equal(findBySlug(products,'otra-n1037').id,'N1037');
   assert.equal(findBySlug(products,'nada-n999'),null);
   assert.deepEqual(resolveProduct(products,'granola-vieja-n037').canonicalSlug,'granola-tradicional-n037');
+  // El ID solo, en mayúscula o minúscula, resuelve al producto y su slug canónico (la página redirige con 308).
+  for(const bare of ['n037','N037'])assert.equal(resolveProduct(products,bare).canonicalSlug,'granola-tradicional-n037',bare);
+  assert.equal(findBySlug(products,'n1037').id,'N1037');assert.equal(findBySlug(products,'n999'),null);
 });
 test('N296 y N297 (aceites de CBD) tienen página como cualquier producto, aunque el catálogo local no los tenga',()=>{
   assert.equal(productLinks.NO_PRODUCT_PAGE,undefined);
