@@ -90,9 +90,22 @@ test('Checkout: datos obligatorios, número de pedido del servidor y envío por 
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));assert.equal(orders.length,0);
- await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ const shipping=()=>document.querySelector('.sum-lines div:last-child dd').textContent.replace(/\s/g,' ');
+ assert.equal(shipping(),'Elegí tu localidad');assert.equal(screen.getByText(/\$\s100,00/,{selector:'.total-row strong'}).tagName,'STRONG');
+ await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ // Sin localidad no se envía.
+ await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));assert.equal(orders.length,0);
+ const zone=screen.getByLabelText('Localidad');assert.equal(zone.tagName,'SELECT');assert.equal(zone.required,true);
+ assert.deepEqual([...zone.querySelectorAll('optgroup')].map(g=>g.label),['Envío $3.000','Envío $5.000']);
+ assert.deepEqual([...zone.options].map(o=>o.textContent),['Elegí tu localidad','Villa Allende (incluye Golf, Lomas y Parque)','Mendiolaza (incluye El Talar)','Saldán','Villa Rivera Indarte','Río Ceballos','Unquillo','La Calera (incluye countries)','Argüello','Cerro de las Rosas','Otra localidad']);
+ await user.selectOptions(zone,'la-calera');assert.equal(shipping(),'$ 5.000,00');assert(screen.getByText(/\$\s5\.100,00/,{selector:'.total-row strong'}));
+ await user.selectOptions(zone,'otra');assert.equal(shipping(),'A coordinar por WhatsApp');assert(screen.getByText('Total (sin envío)'));
+ const other=screen.getByLabelText('¿En qué localidad?');assert.equal(other.required,true);assert.equal(other.maxLength,60);
+ await user.selectOptions(zone,'villa-allende');assert.equal(screen.queryByLabelText('¿En qué localidad?'),null);
+ assert.equal(shipping(),'$ 3.000,00');assert(screen.getByText(/\$\s3\.100,00/,{selector:'.total-row strong'}));
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
- await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
+ await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');assert.equal(orders[0].zone,'villa-allende');assert.equal(orders[0].shippingCost,undefined);
+ assert.match(document.querySelector('.wa-preview').textContent,/Envio: \$3\.000,00\s+Total: \$3\.100,00[\s\S]*Localidad: Villa Allende/);
  assert.equal(screen.queryByLabelText('Mensaje del pedido'),null);assert.equal(screen.queryByRole('button',{name:'Copiar mensaje'}),null);
  await user.type(screen.getByLabelText('Tu nombre'),' Pérez');assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
 });
@@ -139,7 +152,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Sumar una presentación de Chalita de harina de centeno y semilla de zapallo'}));
  assert(screen.getByText('$ 530,00',{selector:'.total-row strong'}));
- await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.type(screen.getByLabelText('Localidad'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.selectOptions(screen.getByLabelText('Localidad'),'otra');await user.type(screen.getByLabelText('¿En qué localidad?'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));
  assert.equal(orders[0].items.find(i=>i.id==='N002').offerSourceId,'N003');
  await user.click(screen.getByRole('button',{name:'Quitar Té verde',exact:true}));
@@ -155,14 +168,14 @@ test('Catálogo del servidor no se consulta otra vez al hidratar',async()=>{
 test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
- await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.selectOptions(screen.getByLabelText('Localidad'),'villa-allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  let freshReads=0;
  globalThis.fetch=async url=>{
   if(url==='/api/checkout')return Response.json({code:'CATALOG_CHANGED',error:'Cambió un precio. Revisá el total actualizado antes de continuar.'},{status:409});
   assert.equal(url,'/api/catalog?fresh=1');freshReads++;return Response.json({...catalog,products:products.map(p=>p.id==='N001'?{...p,precio:175}:p)});
  };
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));await screen.findByRole('alert');
- assert.equal(freshReads,1);assert(screen.getByText('$ 175,00',{selector:'.total-row strong'}));assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
+ assert.equal(freshReads,1);assert(screen.getByText('$ 3.175,00',{selector:'.total-row strong'}));assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
 });
 
 test('Asistente de boxes: ruta separada, preguntas y carrito compartido',async()=>{
@@ -262,7 +275,7 @@ test('/envios: chips, secciones, tabla, retiro sin dirección, FAQ y footer con 
  assert.equal(screen.getByRole('link',{name:'Pedir con envío a Mendiolaza'}).getAttribute('href'),'https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Mendiolaza.');
  assert(screen.getByRole('heading',{name:'¿Qué dietética llega a Mendiolaza y El Talar?'}));
  const rows=[...container.querySelectorAll('.ship-table tbody tr')].map(tr=>tr.textContent);
- assert.deepEqual(rows,['Villa Allende, Mendiolaza, El Talar, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
+ assert.deepEqual(rows,['Villa Allende (incluye Villa Allende Golf, Lomas y Villa Allende Parque), Mendiolaza (incluye El Talar), Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera (incluye countries y barrios cerrados), Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
  assert.equal(container.querySelector('.pickup-addr').textContent,'Retiro en Villa Allende, coordinamos la dirección por WhatsApp.');
  const triggers=container.querySelectorAll('.faq-trigger');assert.equal(triggers.length,13);assert.equal(triggers[8].textContent,'¿Hay pedido mínimo?');
  assert.equal(triggers[0].getAttribute('aria-expanded'),'true');assert.equal(triggers[1].getAttribute('aria-expanded'),'false');
@@ -291,10 +304,13 @@ async function bigCheckout(quantity){
  return userEvent.setup({document:dom.window.document});
 }
 test('Carrito ≥ $400.000: 10% automático con la etiqueta "desde", envío gratis y meta cumplida',async()=>{
- await bigCheckout(4);
+ const user=await bigCheckout(4);
  assert(screen.getByText('Descuento por compra desde $400.000 (10%)'));
  assert(screen.getByText('$ 360.000,00',{selector:'.total-row strong'}));
+ assert.equal(document.querySelector('.sum-lines div:last-child dd').textContent,'Elegí tu localidad');
+ await user.selectOptions(screen.getByLabelText('Localidad'),'unquillo');
  assert.equal(document.querySelector('.sum-lines div:last-child dd').textContent,'Gratis');
+ assert(screen.getByText('$ 360.000,00',{selector:'.total-row strong'}));
  assert.match(document.querySelector('.goal').className,/done/);
  cleanup();
 });
@@ -302,6 +318,38 @@ test('Carrito por debajo de $400.000: meta muestra lo que falta y no hay descuen
  await bigCheckout(3);
  assert.equal(screen.queryByText('Descuento por compra desde $400.000 (10%)'),null);
  assert.match(document.querySelector('.goal').textContent,/Te faltan \$\s100\.000,00 para el 10% off/);
+ cleanup();
+});
+test('Código: "Aplicar" deshabilitado vacío o con espacios, "Aplicando…" al validar y error solo con la respuesta del servidor',async()=>{
+ const user=await bigCheckout(4);
+ await user.click(screen.getByRole('button',{name:'¿Tenés un código de descuento?'}));
+ const input=screen.getByLabelText('Código de descuento'),apply=()=>screen.getByRole('button',{name:/^Aplica(r$|ndo)/});
+ assert.equal(input.getAttribute('placeholder'),'Ej.: BV-XXXX-XXXX');
+ // Vacío: deshabilitado y Enter no envía.
+ assert.equal(apply().disabled,true);assert.equal(apply().textContent,'Aplicar');
+ await user.click(input);await user.keyboard('{Enter}');assert.equal(codeChecks.length,0);
+ // Solo espacios: sigue deshabilitado, Enter no envía.
+ await user.type(input,'   ');assert.equal(apply().disabled,true);await user.keyboard('{Enter}');assert.equal(codeChecks.length,0);assert.equal(screen.queryByRole('alert'),null);
+ // Un carácter: habilitado.
+ await user.clear(input);await user.type(input,'x');assert.equal(apply().disabled,false);
+ // Validando: "Aplicando…" y deshabilitado (sin doble envío). El error aparece recién con la respuesta.
+ let release;const pending=new Promise(resolve=>{release=resolve;});const previousFetch=globalThis.fetch;let calls=0;
+ globalThis.fetch=async(url,options)=>{if(url==='/api/cart/code'){calls++;await pending;return Response.json({error:'Código inválido o vencido.',code:'INVALID_CODE'},{status:400});}return previousFetch(url,options);};
+ try{
+  await user.click(apply());
+  await waitFor(()=>assert.equal(apply().textContent,'Aplicando…'));assert.equal(apply().disabled,true);
+  await user.click(apply());await user.keyboard('{Enter}');assert.equal(calls,1);
+  assert.equal(screen.queryByRole('alert'),null);
+  release();
+  assert.equal((await screen.findByRole('alert')).textContent,'Código inválido o vencido.');
+ }finally{globalThis.fetch=previousFetch;}
+ assert.equal(apply().textContent,'Aplicar');assert.equal(input.getAttribute('aria-invalid'),'true');assert.match(input.className,/bad/);
+ // Tipear de nuevo saca el error.
+ await user.type(input,'y');assert.equal(screen.queryByRole('alert'),null);assert.equal(input.getAttribute('aria-invalid'),null);assert.doesNotMatch(input.className,/bad/);
+ // Borrar el campo: sin error, sin borde rojo y "Aplicar" gris otra vez.
+ await user.click(apply());assert.equal((await screen.findByRole('alert')).textContent,'Este código ya se usó.');
+ await user.clear(input);
+ assert.equal(screen.queryByRole('alert'),null);assert.equal(input.getAttribute('aria-invalid'),null);assert.doesNotMatch(input.className,/bad/);assert.equal(apply().disabled,true);
  cleanup();
 });
 test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y viaja al checkout',async()=>{
@@ -314,7 +362,7 @@ test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y vi
  await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
  assert.equal(codeChecks.at(-1).code,'BV-7K2Q-9MXD');
  assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));assert(screen.getByText('Ahorrás $ 80.000,00'));
- await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.type(screen.getByLabelText('Localidad'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.selectOptions(screen.getByLabelText('Localidad'),'otra');await user.type(screen.getByLabelText('¿En qué localidad?'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
  await screen.findByRole('heading',{name:'Pedido listo para enviar'});
  assert.equal(orders[0].code,'BV-7K2Q-9MXD');assert.equal(orders[0].total,undefined);

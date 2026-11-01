@@ -9,7 +9,7 @@ const products=[
   {id:'oil',nombre:'Aceite',categoria:'Aceites y conservas',precio:100,disponibilidad:'consultar'}
 ];
 const settings={name:'Vitalia',currency:'ARS',phone:'5493512136078',testCheckout:true};
-const order=()=>({name:'Prueba',locality:'Córdoba',province:'Córdoba',notes:'',items:[{id:'tea',quantity:1,expectedPrice:150},{id:'cookies',quantity:2,expectedPrice:200,offerSourceId:'tea'}]});
+const order=()=>({name:'Prueba',zone:'otra',locality:'Córdoba',province:'Córdoba',notes:'',items:[{id:'tea',quantity:1,expectedPrice:150},{id:'cookies',quantity:2,expectedPrice:200,offerSourceId:'tea'}]});
 
 test('Descuento real del 10% en una unidad: redondeo, total y mensaje de prueba',()=>{
   assert.equal(offerPrice(11.11),10);
