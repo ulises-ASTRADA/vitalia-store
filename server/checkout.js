@@ -13,7 +13,6 @@ export async function POST(request) {
     let body;
     try {body=JSON.parse(text);} catch {throw new StoreError('Pedido no válido.',400);}
     const settings=storeSettings();
-    console.log(`[vitalia] checkout phone=${(settings.phone||'').length>=3?settings.phone.slice(0,3)+'***':settings.phone}`);
     if (!settings.checkoutEnabled) throw new StoreError('Los pedidos por WhatsApp todavía no están habilitados.',503,'CHECKOUT_DISABLED');
     const {products}=await getCachedCatalog();
     const result=makeOrder(body,products,settings);
@@ -42,7 +41,7 @@ export async function POST(request) {
     }
     return Response.json({...result, orderId}, {headers:{'Cache-Control':'no-store'}});
   } catch(error) {
-    console.error('[vitalia] checkout error', error?.message || error, error?.stack);
+    console.error('[vitalia] checkout error', error instanceof StoreError ? error.message : `${error?.name || 'Error'}: ${String(error?.message || '').slice(0,120)}`);
     return Response.json({error:error instanceof StoreError?error.message:'No pudimos preparar el pedido. Intentá nuevamente.',code:error.code||'UNAVAILABLE'},{status:error.status||503,headers:{'Cache-Control':'no-store'}});
   }
 }
