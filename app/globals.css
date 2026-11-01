@@ -38,9 +38,27 @@ html{scroll-padding-top:0}
 .floating-cart-copy b{display:grid;place-items:center;background:var(--lime);color:var(--green);border-radius:50%;min-width:23px;height:23px;font-size:.75rem}
 .floating-cart-copy>span{color:#e0e6d9;font-size:.8125rem}
 .floating-cart-total{margin-left:auto;padding-left:10px;font-size:1rem;font-weight:700;white-space:nowrap}
+.mobile-floating-cart{display:none}
 .footer{margin-top:32px;padding-top:20px;padding-bottom:48px}
 .toast{bottom:122px}
-@media(max-width:540px){.floating-cart{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));min-width:0;width:calc(100% - 32px);padding:13px 16px;gap:11px}.floating-cart-total{font-size:.9375rem}.toast{bottom:112px}.footer{padding-bottom:100px}}
+@media(max-width:540px){
+  .floating-cart-desktop{display:none}
+  .mobile-floating-cart{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9;display:block}
+  .mobile-cart-bubble{position:relative;display:grid;place-items:center;width:60px;height:60px;padding:0;border:1px solid #405841;border-radius:50%;background:var(--green);color:white;box-shadow:0 8px 30px #14211730}
+  .mobile-cart-bubble:hover{background:#354f32}
+  .mobile-cart-bubble svg{width:28px;height:28px}
+  .mobile-cart-badge{position:absolute;top:-5px;right:-4px;display:grid;place-items:center;min-width:25px;height:25px;padding:0 6px;border:2px solid var(--surface);border-radius:999px;background:var(--lime);color:var(--green);font-size:.75rem;font-weight:700;line-height:1}
+  .mobile-cart-panel{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:11px;width:min(360px,calc(100vw - 32px));padding:12px;border:1px solid #405841;border-radius:16px;background:var(--green);color:white;box-shadow:0 8px 30px #14211730}
+  .mobile-cart-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#ffffff14}
+  .mobile-cart-icon svg{width:23px;height:23px}
+  .mobile-cart-summary{display:flex;min-width:0;flex-direction:column;gap:3px}
+  .mobile-cart-summary>span{font-size:.7rem;color:#e0e6d9;white-space:nowrap}
+  .mobile-cart-summary strong{font-size:.9375rem;white-space:nowrap}
+  .mobile-cart-cta{display:flex;align-items:center;justify-content:center;min-height:42px;padding:0 13px;border-radius:9px;background:var(--lime);color:var(--green);font-size:.8125rem;font-weight:700;white-space:nowrap}
+  .mobile-cart-minimize{display:grid;place-items:center;width:36px;height:36px;padding:0;border:1px solid #ffffff40;border-radius:50%;background:transparent;color:white;font-size:1.4rem;line-height:1}
+  .mobile-cart-minimize:hover{background:#ffffff14}
+  .toast{bottom:92px}.footer{padding-bottom:100px}
+}
 
 /* Restar y sumar presentaciones desde cada tarjeta. */
 .price-row{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:5px}
