@@ -7,6 +7,8 @@ import {growthStore} from './growth-store.js';
 import {randomInt} from 'node:crypto';
 import {appendOrder} from '../lib/orders.js';
 
+const safeLogMessage = (message) => String(message || '').replace(/([?&]key=)[^&\s'"]+/gi, '$1***').replace(/https?:\/\/\S+/gi, '[url]').slice(0, 120);
+
 // Si la base no responde y el pedido no usa código, igual sale un número de referencia generado en el servidor.
 const fallbackRef=()=>`V-X${Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[randomInt(32)]).join('')}`;
 
@@ -21,7 +23,6 @@ export async function handleCheckout(request,{store=growthStore(),loadCatalog=ge
     let body;
     try {body=JSON.parse(text);} catch {throw new StoreError('Pedido no válido.',400);}
     const settings=storeSettings();
-    console.log(`[vitalia] checkout phone=${(settings.phone||'').length>=3?settings.phone.slice(0,3)+'***':settings.phone}`);
     if (!settings.checkoutEnabled) throw new StoreError('Los pedidos por WhatsApp todavía no están habilitados.',503,'CHECKOUT_DISABLED');
     let code=null;
     if (body?.code!==undefined&&body.code!==null&&body.code!=='') {
@@ -61,11 +62,11 @@ export async function handleCheckout(request,{store=growthStore(),loadCatalog=ge
       orderId=await recordOrder({name:body.name,locality:body.locality,province:body.province,notes:body.notes,items:formattedItems,
         total:order.total,whatsappUrl:order.whatsappUrl,status:'Pendiente',...(order.freeShipping?{shippingCost:0}:{})});
     } catch(err) {
-      console.error('[vitalia] Error registrando pedido en Sheets:', err?.message || err);
+      console.error('[vitalia] Error registrando pedido en Sheets:', `${err?.name || 'Error'}: ${safeLogMessage(err?.message)}`);
     }
     return Response.json({...order,orderId,...(codeToken?{codeToken}:{})},{headers:{'Cache-Control':'no-store'}});
   } catch(error) {
-    console.error('[vitalia] checkout error', error?.message || error, error?.stack);
+    console.error('[vitalia] checkout error', error instanceof StoreError ? error.message : `${error?.name || 'Error'}: ${safeLogMessage(error?.message)}`);
     return Response.json({error:error instanceof StoreError?error.message:'No pudimos preparar el pedido. Intentá nuevamente.',code:error.code||'UNAVAILABLE'},{status:error.status||503,headers:{'Cache-Control':'no-store'}});
   }
 }
