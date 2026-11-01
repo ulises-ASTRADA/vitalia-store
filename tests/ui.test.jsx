@@ -185,8 +185,10 @@ test('Checkout: datos obligatorios, número de pedido del servidor y envío por 
  assert.deepEqual([...zone.options].map(o=>o.textContent),['Elegí tu localidad','Villa Allende (incluye Golf, Lomas y Parque)','Mendiolaza (incluye El Talar)','Saldán','Villa Rivera Indarte','Río Ceballos','Unquillo','La Calera (incluye countries)','Argüello','Cerro de las Rosas','Otra localidad']);
  await user.selectOptions(zone,'la-calera');assert.equal(shipping(),'$ 5.000,00');assert(screen.getByText(/\$\s5\.100,00/,{selector:'.total-row strong'}));
  await user.selectOptions(zone,'otra');assert.equal(shipping(),'A coordinar por WhatsApp');assert(screen.getByText('Total (sin envío)'));
+ // Fuera de zona no se promete envío gratis: sin barra, con aviso.
+ assert.equal(document.querySelector('.goal-bar'),null);assert.match(document.querySelector('.goal').textContent,/El envío gratis aplica en nuestras zonas de entrega\./);assert.doesNotMatch(document.querySelector('.goal').textContent,/Te faltan/);
  const other=screen.getByLabelText('¿En qué localidad?');assert.equal(other.required,true);assert.equal(other.maxLength,60);
- await user.selectOptions(zone,'villa-allende');assert.equal(screen.queryByLabelText('¿En qué localidad?'),null);
+ await user.selectOptions(zone,'villa-allende');assert.equal(screen.queryByLabelText('¿En qué localidad?'),null);assert.match(document.querySelector('.goal').textContent,/Te faltan .* para el envío gratis/);
  assert.equal(shipping(),'$ 3.000,00');assert(screen.getByText(/\$\s3\.100,00/,{selector:'.total-row strong'}));
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
  await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');assert.equal(orders[0].zone,'villa-allende');assert.equal(orders[0].shippingCost,undefined);
