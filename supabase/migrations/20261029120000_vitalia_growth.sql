@@ -107,6 +107,9 @@ grant usage, select on sequence public.vitalia_subscribers_id_seq, public.vitali
 
 -- Sin políticas para anon/authenticated a propósito. La service role ignora RLS (bypassrls).
 
+-- Pedido de Sentinel (2026-11-01): la función rls_auto_enable() es SECURITY DEFINER; que no la puedan ejecutar anon ni authenticated.
+revoke execute on function public.rls_auto_enable() from anon, authenticated, public;
+
 commit;
 
 -- Verificación sugerida después de aplicar (debe devolver 0 filas):
