@@ -48,6 +48,14 @@ export default function Store({initialCatalog=null,initialQuery='',whatsappUrl='
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
   const money=value=>formatter.format(value);
   const filtered=useMemo(()=>{const result=products.filter(p=>(category==='Todos'||p.categoria===category)&&(!query||normalize([p.nombre,p.descripcion,p.categoria,p.id,p.presentacion].join(' ')).includes(normalize(query))));if(sort==='price-asc')result.sort((a,b)=>a.precio-b.precio);if(sort==='price-desc')result.sort((a,b)=>b.precio-a.precio);if(sort==='name')result.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));return result;},[products,category,query,sort]);
+  const searchSuggestions=useMemo(()=>{
+    const term=normalize(query.trim());
+    if(!term)return [];
+    return products
+      .filter(product=>(category==='Todos'||product.categoria===category)&&normalize(product.nombre)!==term&&normalize([product.nombre,product.categoria,product.presentacion].join(' ')).includes(term))
+      .sort((a,b)=>Number(normalize(b.nombre).startsWith(term))-Number(normalize(a.nombre).startsWith(term))||a.nombre.localeCompare(b.nombre,'es'))
+      .slice(0,6);
+  },[products,category,query]);
   const categories=['Todos',...new Set(products.map(p=>p.categoria))];
   function updateQuery(value){
     if(value){
@@ -64,7 +72,7 @@ export default function Store({initialCatalog=null,initialQuery='',whatsappUrl='
   function change(product,delta){const error=changeCart(product,delta);setToast(error||(delta>0?'Producto agregado a tu pedido':''));}
   return <>
     <a className="skip-link" href="#catalogo">Ir al catálogo</a>
-    <SiteHeader current="catalog" headerRef={header} query={query} onQueryChange={updateQuery}/>
+    <SiteHeader current="catalog" headerRef={header} query={query} onQueryChange={updateQuery} searchSuggestions={searchSuggestions}/>
     <main className="shell">
       <section className="hero" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">EL ALMACÉN, A TU MANERA</p><h1 id="hero-title">Un buen pedido.<br/>Muchas cosas ricas.</h1><p>Elegí tus productos. Nosotros seguimos<br className="desktop-break"/> la conversación por WhatsApp.</p><a className="hero-link" href="#catalogo">Explorar el catálogo</a></div><div className="hero-photos" aria-hidden="true">{['023','002','037'].map((id,i)=><Image key={id} className={`hero-photo photo-${['one','two','three'][i]}`} src={`/images/product-${id}.webp`} width={240} height={250} alt="" sizes="(max-width: 760px) 180px, 240px" loading={i===0?'eager':'lazy'} fetchPriority={i===0?'high':'auto'}/>)}<span className="hero-stamp">PARA<br/>COMPARTIR<br/><b>Y DISFRUTAR</b></span></div></section>
       <section className="catalog-section" id="catalogo" aria-labelledby="catalog-title"><div className="catalog-top"><div><p className="eyebrow muted">ENCONTRÁ TUS FAVORITOS</p><h2 id="catalog-title">Nuestro catálogo<span>.</span></h2></div></div>
