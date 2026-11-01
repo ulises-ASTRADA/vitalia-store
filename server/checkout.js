@@ -37,7 +37,7 @@ export async function POST(request) {
         status: 'Pendiente'
       });
     } catch(err) {
-      console.error('[vitalia] Error registrando pedido en Sheets:', err?.message || err);
+      console.error('[vitalia] Error registrando pedido en Sheets:', `${err?.name || 'Error'}: ${String(err?.message || '').slice(0,120)}`);
     }
     return Response.json({...result, orderId}, {headers:{'Cache-Control':'no-store'}});
   } catch(error) {
