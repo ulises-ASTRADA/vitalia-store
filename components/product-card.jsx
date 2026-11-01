@@ -8,7 +8,7 @@ export const pack=product=>product.presentacion||'Presentación a confirmar';
 const FALLBACK='/images/logo-web.webp';
 
 // Foto con ratio reservado: skeleton mientras carga y logo con "Foto no disponible" si falla.
-export function Photo({product,className='',eager=false,context='card',frame=true}) {
+export function Photo({product,className='',eager=false,context='card',frame=true,alt}) {
   const [broken,setBroken]=useState(false),[loading,setLoading]=useState(false);
   const image=useRef(null);
   const src=broken?FALLBACK:product.imagen||FALLBACK;
@@ -16,7 +16,7 @@ export function Photo({product,className='',eager=false,context='card',frame=tru
   useEffect(()=>{const img=image.current;if(img&&!img.complete)setLoading(true);else if(img&&img.naturalWidth===0&&!broken)setBroken(true);},[src,broken]);
   const sizes=context==='detail'?'(max-width: 760px) calc(100vw - 88px), 400px':context==='page'?'(max-width: 540px) calc(100vw - 32px), (max-width: 850px) 45vw, 540px':context==='cart'?'64px':'(max-width: 540px) calc((100vw - 48px)/2), (max-width: 1050px) 30vw, 260px';
   const big=context==='detail'||context==='page';
-  const img=<Image ref={image} src={src} alt={product.nombre} width={big?800:360} height={big?780:350} sizes={sizes} unoptimized={!src.startsWith('/images/')} loading={eager?'eager':'lazy'} fetchPriority={eager&&context==='page'?'high':undefined} className={className} onLoad={()=>setLoading(false)} onError={()=>{setLoading(false);setBroken(true);}}/>;
+  const img=<Image ref={image} src={src} alt={alt??product.nombre} width={big?800:360} height={big?780:350} sizes={sizes} unoptimized={!src.startsWith('/images/')} loading={eager?'eager':'lazy'} fetchPriority={eager&&context==='page'?'high':undefined} className={className} onLoad={()=>setLoading(false)} onError={()=>{setLoading(false);setBroken(true);}}/>;
   if(!frame)return img;
   return <div className={`media-frame${loading?' is-loading':''}${fallback?' is-fallback':''}`}>{img}{fallback&&<span className="no-photo" aria-hidden="true">Foto no disponible</span>}</div>;
 }

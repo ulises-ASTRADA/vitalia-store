@@ -54,6 +54,13 @@ test('Búsqueda: autocompleta productos con teclado y clic',async()=>{
  await user.clear(search);await user.type(search,'alm');await user.click(screen.getByRole('option',{name:/Almendras/}));
  assert.equal(search.value,'Almendras');assert.equal(document.querySelector('.product-card').dataset.product,'N001');cleanup();
 });
+test('Búsqueda: categoría muestra todos los productos con foto y precio',async()=>{
+ const categoryProducts=Array.from({length:8},(_,index)=>({...products[0],id:`F00${index}`,nombre:`Fruto seco ${index}`,precio:100+index}));
+ cleanup();localStorage.clear();render(<Provider><Store initialCatalog={{...catalog,products:categoryProducts}}/></Provider>);const user=userEvent.setup({document:dom.window.document});
+ await user.type(screen.getByRole('combobox',{name:'Buscar productos'}),'frutos secos');
+ const options=within(screen.getByRole('listbox',{name:'Sugerencias de productos'})).getAllByRole('option');assert.equal(options.length,8);assert.equal(options[0].querySelector('img').getAttribute('src').includes('product-001.webp'),true);
+ assert.match(options[0].querySelector('.search-suggestion-price').textContent,/100,00/);cleanup();
+});
 const catalog={products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}};
 function goCheckout(){cleanup();render(<Provider><Checkout initialCatalog={catalog}/></Provider>);}
 test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',async()=>{
