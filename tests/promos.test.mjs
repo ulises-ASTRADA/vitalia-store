@@ -4,7 +4,7 @@ import {BULK_DISCOUNT_FROM,BULK_DISCOUNT_LABEL,FREE_SHIPPING_FROM,computeTotals,
 import {makeOrder} from '../lib/checkout.js';
 
 const settings={name:'Vitalia',currency:'ARS',phone:'5491100000000',testCheckout:false};
-const order=(precio,quantity=1)=>{const products=[{id:'A',nombre:'Granola',precio,presentacion:'1 KG',disponibilidad:'disponible'}];return [{items:[{id:'A',quantity,expectedPrice:precio}],name:'Prueba',locality:'Córdoba',province:'Córdoba',notes:''},products];};
+const order=(precio,quantity=1)=>{const products=[{id:'A',nombre:'Granola',precio,presentacion:'1 KG',disponibilidad:'disponible'}];return [{items:[{id:'A',quantity,expectedPrice:precio}],name:'Prueba',zone:'villa-allende',locality:'Córdoba',province:'Córdoba',notes:''},products];};
 
 test('Umbrales salen de una sola config: $70.000 y $400.000',()=>{
   assert.equal(FREE_SHIPPING_FROM,70000);assert.equal(BULK_DISCOUNT_FROM,400000);

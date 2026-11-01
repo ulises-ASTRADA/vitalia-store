@@ -24,7 +24,7 @@ const mailbox=()=>{const sent=[];const send=async mail=>{sent.push(mail);return 
 const signup=(email,extra={})=>({name:'Prueba',email,consent:true,website:'',...extra});
 const products=[{id:'A',nombre:'Granola',precio:100000,presentacion:'1 KG',disponibilidad:'disponible'}];
 const loadCatalog=async()=>({products});
-const checkoutBody=extra=>({items:[{id:'A',quantity:4,expectedPrice:100000}],name:'Prueba',locality:'Córdoba',province:'Córdoba',notes:'',...extra});
+const checkoutBody=extra=>({items:[{id:'A',quantity:4,expectedPrice:100000}],name:'Prueba',zone:'villa-allende',locality:'',province:'Córdoba',notes:'',...extra});
 const checkoutEnv={VERCEL:'1',VERCEL_ENV:'preview',ALLOW_TEST_CHECKOUT:'true',WHATSAPP_NUMBER:'5491100000000'};
 
 test('Claves dummy o vacías nunca activan Supabase; en Vercel sin claves falla cerrado',()=>{
@@ -133,7 +133,7 @@ test('Carrito abandonado: solo con token de suscripto y se borra con la baja',wi
 test('Fila del pedido: fecha, si usó código y descuentos, sin datos personales ni el código',withEnv(checkoutEnv,async()=>{
   const store=freshStore(),{sent,send}=mailbox();
   await welcomePOST(post('/api/welcome',signup('pedido@mail.com')),{store,send});
-  const response=await handleCheckout(post('/api/checkout',checkoutBody({code:sent[0].code,name:'Juana Pérez',locality:'Saldán'})),{store,loadCatalog});
+  const response=await handleCheckout(post('/api/checkout',checkoutBody({code:sent[0].code,name:'Juana Pérez',zone:'saldan'})),{store,loadCatalog});
   assert.equal(response.status,200);
   const row=store._db.orders[0];
   assert.equal(row.usedCode,true);assert.ok(Number.isFinite(row.createdAt));assert.ok(row.bulkCents>0&&row.codeCents>0);

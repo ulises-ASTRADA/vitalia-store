@@ -59,8 +59,10 @@ export async function handleCheckout(request,{store=growthStore(),loadCatalog=ge
     }).join('; ');
     let orderId=null;
     try {
-      orderId=await recordOrder({name:body.name,locality:body.locality,province:body.province,notes:body.notes,items:formattedItems,
-        total:order.total,whatsappUrl:order.whatsappUrl,status:'Pendiente',...(order.freeShipping?{shippingCost:0}:{})});
+      // locality y shippingCost salen de makeOrder (recalculados en el servidor), no del body.
+      // total = productos con descuentos; appendOrder suma el envío en la columna total.
+      orderId=await recordOrder({name:body.name,locality:order.locality,province:body.province,notes:body.notes,items:formattedItems,
+        total:order.productsTotal,whatsappUrl:order.whatsappUrl,status:'Pendiente',shippingCost:order.shippingCost});
     } catch(err) {
       console.error('[vitalia] Error registrando pedido en Sheets:', `${err?.name || 'Error'}: ${safeLogMessage(err?.message)}`);
     }
