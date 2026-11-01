@@ -64,7 +64,7 @@ function supabaseStore(env=process.env) {
   async function rest(path,{method='GET',body,prefer}={}) {
     let response;
     try{
-      response=await fetch(`${base}/${path}`,{method,cache:'no-store',signal:AbortSignal.timeout(8000),headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',...(prefer?{Prefer:prefer}:{})},body:body===undefined?undefined:JSON.stringify(body)});
+      response=await fetch(`${base}/${path}`,{method,cache:'no-store',signal:AbortSignal.timeout(8000),headers:{apikey:key,...(key.startsWith('eyJ')?{Authorization:`Bearer ${key}`}:{}),'Content-Type':'application/json',...(prefer?{Prefer:prefer}:{})},body:body===undefined?undefined:JSON.stringify(body)});
     }catch{throw new GrowthUnavailable('supabase unreachable');}
     if(response.status===409)return {conflict:true};
     if(!response.ok){console.error('supabase request failed',method,path.split('?')[0],response.status);throw new GrowthUnavailable('supabase error');}
