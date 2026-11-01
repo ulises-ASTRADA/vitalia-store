@@ -40,9 +40,19 @@ function setup(initialCatalog=null){
 }
 test('React/Chakra: búsqueda, orden y categorías',async()=>{
  const user=setup();await screen.findByText('3 productos');
- const search=screen.getByRole('searchbox');await user.type(search,'te verde');assert.equal(document.querySelectorAll('.product-card').length,1);assert(screen.getByText('Té verde'));
+ const search=screen.getByRole('combobox',{name:'Buscar productos'});await user.type(search,'te verde');assert.equal(document.querySelectorAll('.product-card').length,1);assert(screen.getByText('Té verde'));
  await user.clear(search);await user.selectOptions(screen.getByLabelText('Ordenar'),'price-desc');assert.equal(document.querySelector('.product-card').dataset.product,'N002');
  await user.click(screen.getByRole('button',{name:/^Frutos secos/}));assert.equal(document.querySelectorAll('.product-card').length,1);assert.equal(document.querySelector('.product-card').dataset.product,'N001');cleanup();
+});
+test('Búsqueda: autocompleta productos con teclado y clic',async()=>{
+ const user=setup(catalog);const search=screen.getByRole('combobox',{name:'Buscar productos'});
+ await user.type(search,'te');
+ const listbox=screen.getByRole('listbox',{name:'Sugerencias de productos'}),option=within(listbox).getByRole('option',{name:/Té verde/});
+ assert.equal(search.getAttribute('aria-expanded'),'true');assert.equal(option.getAttribute('aria-selected'),'false');
+ await user.keyboard('{ArrowDown}');assert.equal(option.getAttribute('aria-selected'),'true');assert.equal(search.getAttribute('aria-activedescendant'),option.id);
+ await user.keyboard('{Enter}');assert.equal(search.value,'Té verde');assert.equal(screen.queryByRole('listbox'),null);assert.equal(document.querySelectorAll('.product-card').length,1);
+ await user.clear(search);await user.type(search,'alm');await user.click(screen.getByRole('option',{name:/Almendras/}));
+ assert.equal(search.value,'Almendras');assert.equal(document.querySelector('.product-card').dataset.product,'N001');cleanup();
 });
 const catalog={products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}};
 function goCheckout(){cleanup();render(<Provider><Checkout initialCatalog={catalog}/></Provider>);}
@@ -57,7 +67,7 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,1);
  assert.equal(screen.getByRole('link',{name:'Catálogo',exact:true}).getAttribute('href'),'/');
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
- await screen.findByRole('link',{name:/^Mi pedido 1 productos/});cleanup();
+ await screen.findByRole('link',{name:/^Mi pedido 1presentaciones1 presentación/});cleanup();
 });
 test('Checkout: datos obligatorios y redirección directa sin vista previa',async()=>{
  const user=setup();await screen.findByText('3 productos');
@@ -123,7 +133,7 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
 });
 test('Catálogo del servidor no se consulta otra vez al hidratar',async()=>{
  const user=setup(catalog);assert(screen.getByText('3 productos'));assert.equal(catalogReads,0);
- await user.type(screen.getByRole('searchbox'),'te verde');await user.click(screen.getByRole('button',{name:'Agregar Té verde',exact:true}));
+ await user.type(screen.getByRole('combobox',{name:'Buscar productos'}),'te verde');await user.click(screen.getByRole('button',{name:'Agregar Té verde',exact:true}));
  assert.equal(catalogReads,0);assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');cleanup();
 });
 test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async()=>{
@@ -203,8 +213,8 @@ test('Carrito flotante: nombre accesible = texto visible, dentro de un landmark'
  const link=container.querySelector('#floating-cart');assert.equal(link.getAttribute('aria-label'),null);
  assert.equal(link.closest('aside').getAttribute('aria-label'),'Tu pedido');
  assert(screen.getByRole('complementary',{name:'Tu pedido'}));
- assert.match(link.textContent,/^Mi pedido 0 productos Carrito vacío \$/);
- assert(screen.getByRole('link',{name:/^Mi pedido 0 productos Carrito vacío/}));cleanup();
+ assert.match(link.textContent,/^Mi pedido 0presentacionesCarrito vacío\$/);
+ assert(screen.getByRole('link',{name:/^Mi pedido 0presentacionesCarrito vacío/}));cleanup();
 });
 test('Footer de producto y categoría igual al de la home: WhatsApp e Instagram',async()=>{
  cleanup();localStorage.clear();
