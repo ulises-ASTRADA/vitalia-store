@@ -10,16 +10,16 @@
 @media(max-width:700px){.annc-in{min-height:44px;padding:6px 16px}}
 /* ---- Popup (dialog nativo) ---- */
 dialog.vp{position:fixed;z-index:31;background:var(--surface,#fff);color:var(--ink);box-shadow:0 -10px 40px #14211733;margin:0;border:0;inset:auto;max-width:none}
-dialog.vp-sheet{left:0;right:0;bottom:0;width:100%;border-radius:20px 20px 0 0;padding:14px 20px calc(10px + env(safe-area-inset-bottom));max-height:52dvh;overflow:auto}
+dialog.vp-sheet{left:0;right:0;bottom:0;width:100%;border-radius:20px 20px 0 0;padding:20px 20px calc(10px + env(safe-area-inset-bottom));max-height:52dvh;overflow:auto}
 dialog.vp-sheet[open]{animation:vp-up .2s ease-out}
 @keyframes vp-up{from{transform:translateY(100%)}to{transform:none}}
 @media(prefers-reduced-motion:reduce){dialog.vp-sheet[open]{animation:none}}
-.vp-grab{width:40px;height:4px;border-radius:2px;background:#cfd4c7;margin:0 auto 10px}
 dialog.vp-modal{left:50%;top:50%;transform:translate(-50%,-50%);width:440px;max-width:calc(100% - 32px);max-height:calc(100dvh - 32px);overflow:auto;border-radius:16px;padding:32px 32px 20px;box-shadow:0 20px 80px #0000004d}
-.vp-close{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;background:#f2f3ef;border:0;display:grid;place-items:center;color:var(--ink)}
-.vp-close svg{width:20px;height:20px;stroke-width:2}
-.vp-close:hover{background:#e6e9df}
-.vp-modal .vp-close{top:14px;right:14px}
+.vp-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;background:transparent;border:0;padding:0;display:grid;place-items:center;color:var(--ink)}
+.vp-close svg{width:20px;height:20px;stroke:currentColor;stroke-width:2}
+.vp-close:hover{background:rgba(0,0,0,.06)}
+[data-theme="dark"] .vp-close:hover{background:rgba(255,255,255,.08)}
+.vp-close:focus-visible{outline:3px solid #82952b;outline-offset:2px}
 .vp-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:1.4px;color:var(--muted);margin:0 0 6px;text-transform:uppercase}
 .vp h2{font-size:1.375rem;line-height:1.2;letter-spacing:-.4px;margin:0 52px 6px 0;font-weight:700}
 .vp h2[tabindex="-1"]:focus{outline:none}
@@ -35,7 +35,9 @@ dialog.vp-modal{left:50%;top:50%;transform:translate(-50%,-50%);width:440px;max-
 .vp-check input{appearance:none;width:22px;height:22px;flex-shrink:0;margin:0;border:2px solid var(--field-line);border-radius:5px;background:#fff;display:grid;place-items:center}
 .vp-check input:checked{background:var(--green);border-color:var(--green)}
 .vp-check input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
-.vp .primary{min-height:48px;font-size:1rem}
+.vp .primary{min-height:48px;font-size:1rem;background:#82952b;color:#142117;font-weight:700;border:0}
+.vp .primary:hover{background:#8fa333}
+.vp .primary:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .vp-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:2px}
 .vp-note{font-size:.8125rem;color:var(--muted);margin:0}
 .vp-skip{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:.875rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;background:none;border:0;color:var(--ink)}

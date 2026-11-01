@@ -339,9 +339,9 @@ test('Popup: exit intent en compu, consentimiento obligatorio, código nunca en 
   assert.equal(dialog.getAttribute('aria-modal'),'true');
   assert.equal(screen.getByLabelText(/Acepto recibir novedades/).checked,false);
   await user.type(screen.getByLabelText('Nombre'),'Prueba');await user.type(screen.getByLabelText('Email'),'prueba@mail.com');
-  await user.click(screen.getByRole('button',{name:'Quiero mi 10%'}));
+  await user.click(screen.getByRole('button',{name:'¡Quiero mi 10% OFF!'}));
   assert.equal(signups.length,0);assert(screen.getByText('Para mandarte el código necesitamos que aceptes recibir mails.'));
-  await user.click(screen.getByLabelText(/Acepto recibir novedades/));await user.click(screen.getByRole('button',{name:'Quiero mi 10%'}));
+  await user.click(screen.getByLabelText(/Acepto recibir novedades/));await user.click(screen.getByRole('button',{name:'¡Quiero mi 10% OFF!'}));
   await screen.findByRole('heading',{name:'¡Listo, Prueba!'});
   assert.deepEqual(signups[0],{name:'Prueba',email:'prueba@mail.com',consent:true,website:''});
   assert.doesNotMatch(document.body.textContent,/BV-/);

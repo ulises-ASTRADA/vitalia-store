@@ -87,7 +87,6 @@ export default function WelcomePopup() {
   const kind=desktop?'vp-modal':'vp-sheet';
   return <dialog ref={dialog} aria-modal="true" className={`vp ${kind}${done?' vp-success':''}`} aria-labelledby="vp-title" aria-describedby={done?undefined:'vp-sub'}
     onCancel={event=>{event.preventDefault();close();}} onClick={event=>{if(event.target===dialog.current)close();}}>
-    {!desktop&&<div className="vp-grab" aria-hidden="true"></div>}
     <button className="vp-close" type="button" aria-label="Cerrar" onClick={close}><Icon name="x"/></button>
     {done?<>
       <div className="vp-ok-icon" aria-hidden="true"><Icon name="check"/></div>
@@ -105,8 +104,8 @@ export default function WelcomePopup() {
         <div className={`vp-field${errors.email?' has-error':''}`}><label htmlFor="vp-email">Email</label><input id="vp-email" type="email" name="email" autoComplete="email" inputMode="email" maxLength={254} placeholder="tu@mail.com" required value={form.email} onChange={set('email')} aria-invalid={errors.email?'true':undefined} aria-describedby={errors.email?'vp-email-err':undefined}/>{errors.email&&<p className="vp-err" id="vp-email-err"><Icon name="alert"/>{errors.email}</p>}</div>
         <div className="vp-hp" aria-hidden="true"><label htmlFor="vp-website">Sitio web</label><input id="vp-website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')}/></div>
         <div className="vp-check-wrap"><label className={`vp-check${errors.consent?' has-error':''}`}><input id="vp-consent" type="checkbox" name="consent" required checked={form.consent} onChange={set('consent')} aria-invalid={errors.consent?'true':undefined} aria-describedby={errors.consent?'vp-consent-err':undefined}/><span>Acepto recibir novedades y promos de Vitalia por mail. Me puedo dar de baja cuando quiera.</span></label>{errors.consent&&<p className="vp-err" id="vp-consent-err"><Icon name="alert"/>{errors.consent}</p>}</div>
-        <button className="primary" type="submit" disabled={busy} aria-busy={busy||undefined}>{busy?'Enviando…':'Quiero mi 10%'}</button>
-        <div className="vp-foot"><p className="vp-note">Se suma a las otras promos.</p><button className="vp-skip" type="button" onClick={close}>No, gracias</button></div>
+        <button className="primary" type="submit" disabled={busy} aria-busy={busy||undefined}>{busy?'Enviando…':'¡Quiero mi 10% OFF!'}</button>
+        <div className="vp-foot"><p className="vp-note">Acumulable con otros descuentos</p><button className="vp-skip" type="button" onClick={close}>No, gracias</button></div>
       </form>
     </>}
   </dialog>;

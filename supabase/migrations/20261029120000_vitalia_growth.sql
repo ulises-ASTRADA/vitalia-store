@@ -1,5 +1,5 @@
 -- Vitalia growth pack: suscriptores del popup, códigos de bienvenida, pedidos y carritos abandonados.
--- NO APLICAR sin la revisión de seguridad. El proyecto de Supabase es compartido: todo va con prefijo vitalia_.
+-- NO APLICAR sin la revisión de seguridad. Va en el proyecto de Supabase dedicado de Vitalia; las tablas mantienen el prefijo vitalia_.
 -- Acceso: solo la service role desde el servidor (Next.js). RLS activado y sin políticas = anon/authenticated
 -- no ven nada; además se revocan los permisos de tabla y secuencia para esos roles.
 
