@@ -18,7 +18,7 @@ export default function EnviosPage({catalog,page,storeWhatsappUrl}) {
   const toggle=i=>setOpen(previous=>{const next=new Set(previous);if(next.has(i))next.delete(i);else next.add(i);return next;});
   return <>
     <a className="skip-link" href="#contenido">Ir al contenido</a>
-    <SiteHeader current="envios"/>
+    <SiteHeader current="envios" catalog={catalog}/>
     <main className="shell" id="contenido"><div className="ship-page">
       <nav className="breadcrumb" aria-label="Ruta de navegación"><ol><li><Link href="/">Inicio</Link></li><li><span aria-current="page">Envíos</span></li></ol></nav>
       <h1>{page.title}</h1>

@@ -35,7 +35,7 @@ export default function ProductPage({catalog,product,page,related,category,store
   const consult=page.whatsappUrl;
   return <>
     <a className="skip-link" href="#contenido">Ir al contenido</a>
-    <SiteHeader current="catalog"/>
+    <SiteHeader current="catalog" catalog={catalog}/>
     <main className="shell product-page" id="contenido">
       <nav className="breadcrumb" aria-label="Ruta de navegación"><ol><li><Link href="/">Inicio</Link></li><li><Link href={category.href}>{product.categoria}</Link></li><li><span aria-current="page">{product.nombre}</span></li></ol></nav>
       <article className="pdp" data-product={product.id}>

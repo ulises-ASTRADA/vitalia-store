@@ -88,7 +88,7 @@ export default function Checkout({initialCatalog}){
     }catch(problem){setError(problem.message||'No pudimos preparar el pedido.');}finally{setBusy(false);}
   }
   return <>
-    <SiteHeader/>
+    <SiteHeader variant="checkout"/>
     <main className="checkout-shell"><h1>Tu pedido</h1>
       {!loaded?<p role="status">Cargando tu pedido…</p>:!items.length?<section className="checkout-empty"><h2>Tu pedido empieza con algo rico.</h2><p>Explorá el catálogo y agregá los productos que te gusten.</p><Link href="/" className="secondary">Explorar productos</Link></section>:
       <form className="checkout-form" onSubmit={checkout}><div className="checkout-layout"><div className="checkout-main">

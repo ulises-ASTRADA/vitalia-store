@@ -1,10 +1,14 @@
 import {randomBytes} from 'node:crypto';
 import {NextResponse} from 'next/server';
 
+export const BARE_PRODUCT_ID=/^\/productos\/[A-Za-z]+\d+$/;
+
 export function proxy(request) {
   // /categorias/Barritas → 308 a /categorias/barritas (los slugs son siempre en minúscula).
   const {pathname}=request.nextUrl;
-  if(/^\/(categorias|productos)\//.test(pathname)&&pathname!==pathname.toLowerCase()){
+  // Excepción: /productos/N001 (el código solo) no pasa por acá; la página redirige directo al slug
+  // canónico en un único 308 (antes eran dos: N001 → n001 → slug).
+  if(/^\/(categorias|productos)\//.test(pathname)&&pathname!==pathname.toLowerCase()&&!BARE_PRODUCT_ID.test(pathname)){
     const url=request.nextUrl.clone();url.pathname=pathname.toLowerCase();
     return NextResponse.redirect(url,308);
   }
