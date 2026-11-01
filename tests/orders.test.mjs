@@ -1,10 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appendOrder, generateOrderId } from '../lib/orders.js';
+import { appendOrder, generateOrderId, estimateShippingCost } from '../lib/orders.js';
 
-test('generateOrderId: genera prefijo ORD- y caracteres en mayúscula', () => {
-  const id = generateOrderId();
-  assert.match(id, /^ORD-[A-Z0-9]+-[A-Z0-9]+$/);
+test('generateOrderId: genera prefijo VIT- con fecha y caracteres únicos', () => {
+  const id1 = generateOrderId();
+  const id2 = generateOrderId();
+  assert.match(id1, /^VIT-\d{8}-[A-Z0-9]+$/);
+  assert.notEqual(id1, id2);
+});
+
+test('estimateShippingCost: calcula costos por zona y envío gratis > $70.000', () => {
+  assert.equal(estimateShippingCost('Villa Allende', 15000), 3000);
+  assert.equal(estimateShippingCost('Mendiolaza', 20000), 3000);
+  assert.equal(estimateShippingCost('El Talar (Mendiolaza)', 20000), 3000);
+  assert.equal(estimateShippingCost('Río Ceballos', 25000), 5000);
+  assert.equal(estimateShippingCost('Unquillo', 10000), 5000);
+  assert.equal(estimateShippingCost('La Calera', 5000), 5000);
+  assert.equal(estimateShippingCost('Villa Allende', 75000), 0);
+  assert.equal(estimateShippingCost('Buenos Aires', 10000), null);
 });
 
 test('appendOrder: sin webhook ni service account devuelve orderId sin fallar', async () => {
@@ -23,14 +36,14 @@ test('appendOrder: sin webhook ni service account devuelve orderId sin fallar', 
       total: 10000,
       whatsappUrl: 'https://wa.me/549111'
     });
-    assert.match(orderId, /^ORD-/);
+    assert.match(orderId, /^VIT-/);
   } finally {
     if (prevWebhook !== undefined) process.env.ORDERS_WEBHOOK_URL = prevWebhook;
     if (prevSheet !== undefined) process.env.GOOGLE_ORDERS_SHEET_ID = prevSheet;
   }
 });
 
-test('appendOrder: envía datos correctamente al webhook cuando ORDERS_WEBHOOK_URL está configurado', async () => {
+test('appendOrder: envía datos completos (precios, fechas, costo envío) al webhook', async () => {
   let capturedUrl = null;
   let capturedBody = null;
   const originalFetch = globalThis.fetch;
@@ -61,10 +74,13 @@ test('appendOrder: envía datos correctamente al webhook cuando ORDERS_WEBHOOK_U
     assert.equal(capturedBody.province, 'Córdoba');
     assert.equal(capturedBody.notes, 'Timbre 2B');
     assert.equal(capturedBody.items, '1x Mix Frutos Secos (500 G); 2x Miel (500 G)');
-    assert.equal(capturedBody.total, 8500);
+    assert.equal(capturedBody.precio_pedido, 8500);
+    assert.equal(capturedBody.costo_envio, 3000); // 3000 por Mendiolaza
+    assert.equal(capturedBody.total, 11500); // 8500 + 3000
     assert.equal(capturedBody.status, 'Pendiente');
+    assert.equal(capturedBody.fecha_entrega, 'A coordinar');
     assert.equal(capturedBody.orderId, orderId);
-    assert.ok(capturedBody.fecha);
+    assert.ok(capturedBody.fecha_pedido);
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.ORDERS_WEBHOOK_URL;
