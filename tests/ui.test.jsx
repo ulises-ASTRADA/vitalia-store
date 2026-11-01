@@ -94,7 +94,7 @@ test('Checkout: datos obligatorios, número de pedido del servidor y envío por 
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
  await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
  assert.equal(screen.queryByLabelText('Mensaje del pedido'),null);assert.equal(screen.queryByRole('button',{name:'Copiar mensaje'}),null);
- await user.type(screen.getByLabelText('Tu nombre'),' Astrada');assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
+ await user.type(screen.getByLabelText('Tu nombre'),' Pérez');assert.equal(screen.queryByRole('link',{name:'Abrir WhatsApp'}),null);cleanup();
 });
 test('React/Chakra: tema persistente y detalle de producto',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Activar modo oscuro'}));await waitFor(()=>assert.equal(document.documentElement.dataset.theme,'dark'));assert.equal(localStorage.getItem('vitalia-theme'),'dark');
