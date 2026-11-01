@@ -3,6 +3,8 @@ import {getCachedCatalog} from '../lib/render-catalog.js';
 import {allowedOrigin,limitRequest} from '../lib/request-security.js';
 import {makeOrder} from '../lib/checkout.js';
 import {appendOrder} from '../lib/orders.js';
+
+const safeLogMessage = (message) => String(message || '').replace(/([?&]key=)[^&\s'"]+/gi, '$1***').replace(/https?:\/\/\S+/gi, '[url]').slice(0, 120);
 export async function POST(request) {
   try {
     if (!allowedOrigin(request)) throw new StoreError('Solicitud no permitida.',403);
@@ -37,11 +39,11 @@ export async function POST(request) {
         status: 'Pendiente'
       });
     } catch(err) {
-      console.error('[vitalia] Error registrando pedido en Sheets:', `${err?.name || 'Error'}: ${String(err?.message || '').slice(0,120)}`);
+      console.error('[vitalia] Error registrando pedido en Sheets:', `${err?.name || 'Error'}: ${safeLogMessage(err?.message)}`);
     }
     return Response.json({...result, orderId}, {headers:{'Cache-Control':'no-store'}});
   } catch(error) {
-    console.error('[vitalia] checkout error', error instanceof StoreError ? error.message : `${error?.name || 'Error'}: ${String(error?.message || '').slice(0,120)}`);
+    console.error('[vitalia] checkout error', error instanceof StoreError ? error.message : `${error?.name || 'Error'}: ${safeLogMessage(error?.message)}`);
     return Response.json({error:error instanceof StoreError?error.message:'No pudimos preparar el pedido. Intentá nuevamente.',code:error.code||'UNAVAILABLE'},{status:error.status||503,headers:{'Cache-Control':'no-store'}});
   }
 }
