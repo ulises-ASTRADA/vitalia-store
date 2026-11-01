@@ -1,6 +1,6 @@
 // Endpoints del growth pack: alta del popup, validación del código, carrito abandonado y baja.
 import {allowedOrigin,clientIp,limitKey,tooMany} from '../lib/request-security.js';
-import {CONSENT_TEXT,cleanName,isToken,normalizeCode,normalizeEmail,sha256} from '../lib/welcome-code.js';
+import {CONSENT_TEXT,cleanName,isToken,newToken,normalizeCode,normalizeEmail,sha256} from '../lib/welcome-code.js';
 import {growthStore,GrowthUnavailable} from './growth-store.js';
 import {sendWelcomeEmail} from './mailer.js';
 
@@ -29,7 +29,9 @@ export async function welcomePOST(request,{store=growthStore(),send=sendWelcomeE
   if(limitKey(`welcome:email:${sha256(email)}`,3,60*60000,now))return tooMany();
   try{
     const result=await store.signup({name,email,consentText:CONSENT_TEXT,now});
-    if(result.status==='exists')return json({error:'Este mail ya recibió el código de bienvenida.',detail:'Si no lo encontrás, buscalo en spam o promociones.',code:'ALREADY_SUBSCRIBED'},409);
+    // Mail ya suscripto: misma respuesta que un alta nueva (con un token al azar que no sirve para nada),
+    // así el formulario no revela qué mails están en la lista. No se reenvía el código.
+    if(result.status==='exists')return json({ok:true,cartToken:newToken()});
     const sent=await send({to:email,name,code:result.code,unsubToken:result.unsubToken});
     if(!sent){await store.removeSubscriber(result.id).catch(()=>{});return generic();}
     // El código nunca vuelve al navegador: solo el token opaco para guardar el carrito.
@@ -70,8 +72,9 @@ export async function cartSavePOST(request,{store=growthStore(),now=Date.now()}=
   const items=cleanCartItems(body?.items);
   if(!isToken(body?.cartToken)||!items)return json({error:'Carrito no válido.'},400);
   try{
-    const saved=await store.saveCart(body.cartToken,items,now);
-    return saved?json({ok:true}):json({error:'Sin suscripción activa.',code:'NOT_SUBSCRIBED'},404);
+    // Token desconocido o dado de baja: no se guarda nada, pero se responde igual que un guardado.
+    await store.saveCart(body.cartToken,items,now);
+    return json({ok:true});
   }catch{return json({error:'No disponible.'},503);}
 }
 

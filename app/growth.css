@@ -10,7 +10,7 @@
 @media(max-width:700px){.annc-in{min-height:44px;padding:6px 16px}}
 /* ---- Popup (dialog nativo) ---- */
 dialog.vp{position:fixed;z-index:31;background:var(--surface,#fff);color:var(--ink);box-shadow:0 -10px 40px #14211733;margin:0;border:0;inset:auto;max-width:none}
-.vp-sheet{left:0;right:0;bottom:0;width:100%;border-radius:20px 20px 0 0;padding:14px 20px calc(10px + env(safe-area-inset-bottom));max-height:52dvh;overflow:auto}
+dialog.vp-sheet{left:0;right:0;bottom:0;width:100%;border-radius:20px 20px 0 0;padding:14px 20px calc(10px + env(safe-area-inset-bottom));max-height:52dvh;overflow:auto}
 dialog.vp-sheet[open]{animation:vp-up .2s ease-out}
 @keyframes vp-up{from{transform:translateY(100%)}to{transform:none}}
 @media(prefers-reduced-motion:reduce){dialog.vp-sheet[open]{animation:none}}

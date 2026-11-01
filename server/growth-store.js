@@ -40,9 +40,10 @@ function memoryStore() {
       row.redeemedAt=now;row.reservationHash=reservationHash;return 'ok';
     },
     async releaseCode(code,reservationHash){const row=db.codes.find(c=>c.codeHash===sha256(code)&&c.reservationHash===reservationHash);if(row){row.redeemedAt=null;row.reservationHash=null;}},
-    async createOrder(order){db.orders.push({...order,id:++db.seq});return `V-${String(db.seq).padStart(4,'0')}`;},
+    async createOrder(order){db.orders.push({id:++db.seq,createdAt:Date.now(),grossCents:order.grossCents,suggestionCents:order.suggestionCents,bulkCents:order.bulkCents,codeCents:order.codeCents,totalCents:order.totalCents,freeShipping:order.freeShipping,usedCode:Boolean(order.code),items:order.items});return `V-${String(db.seq).padStart(4,'0')}`;},
     async saveCart(cartToken,items,now=Date.now()) {
       const s=db.subscribers.find(x=>x.cartTokenHash===sha256(cartToken)&&!x.unsubscribedAt);
+      for(const [id,cart] of db.carts)if(cart.updatedAt<now-90*DAY)db.carts.delete(id); // igual que vitalia_purge_abandoned_carts()
       if(!s)return false;
       if(items.length)db.carts.set(s.id,{items,updatedAt:now,convertedAt:null});else db.carts.delete(s.id);
       return true;
@@ -97,7 +98,7 @@ function supabaseStore(env=process.env) {
     },
     async releaseCode(code,reservationHash){await rest(`vitalia_welcome_codes?code_hash=eq.${sha256(code)}&reservation_hash=eq.${reservationHash}`,{method:'PATCH',prefer:'return=minimal',body:{redeemed_at:null,reservation_hash:null}});},
     async createOrder(order) {
-      const {rows}=await rest('vitalia_orders?select=ref',{method:'POST',prefer:'return=representation',body:{subtotal_cents:order.grossCents,suggestion_cents:order.suggestionCents,bulk_cents:order.bulkCents,code_cents:order.codeCents,total_cents:order.totalCents,free_shipping:order.freeShipping,code_hash:order.code?sha256(order.code):null,items:order.items}});
+      const {rows}=await rest('vitalia_orders?select=ref',{method:'POST',prefer:'return=representation',body:{subtotal_cents:order.grossCents,suggestion_cents:order.suggestionCents,bulk_cents:order.bulkCents,code_cents:order.codeCents,total_cents:order.totalCents,free_shipping:order.freeShipping,used_code:Boolean(order.code),items:order.items}});
       return rows[0].ref;
     },
     async saveCart(cartToken,items,now=Date.now()) {

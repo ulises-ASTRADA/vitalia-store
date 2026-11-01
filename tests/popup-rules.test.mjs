@@ -40,3 +40,13 @@ test('Una vez por sesión y nunca sobre otro diálogo',()=>{
   assert.equal(canShowPopup({...base,shownThisSession:true}),false);
   assert.equal(canShowPopup({...base,otherDialogOpen:true}),false);
 });
+test('CSS: en celular el popup queda anclado abajo (dialog.vp-sheet le gana a dialog.vp{inset:auto})',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  const css=await readFile(new URL('../app/growth.css',import.meta.url),'utf8');
+  assert.match(css,/dialog\.vp\{[^}]*inset:auto/);
+  const sheet=css.match(/(^|\n)dialog\.vp-sheet\{([^}]*)\}/);
+  assert.ok(sheet,'la regla del sheet tiene que ser dialog.vp-sheet (misma especificidad que dialog.vp, y va después)');
+  for(const decl of ['left:0','right:0','bottom:0','max-height:52dvh'])assert.ok(sheet[2].includes(decl),decl);
+  assert.ok(css.indexOf(sheet[0])>css.indexOf('dialog.vp{'),'va después de dialog.vp');
+  assert.doesNotMatch(css,/(^|\n)\.vp-sheet\{/);
+});

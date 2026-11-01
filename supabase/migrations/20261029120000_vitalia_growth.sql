@@ -31,6 +31,8 @@ create table if not exists public.vitalia_welcome_codes (
 );
 
 -- Pedidos preparados en el sitio (montos calculados en el servidor). El número de referencia sale del id.
+-- Sin datos personales: ni nombre, ni mail, ni dirección, ni el código (tampoco su hash, para no poder cruzarlo
+-- con el suscriptor). Solo fecha, montos, si se usó código y qué descuentos aplicaron.
 create table if not exists public.vitalia_orders (
   id bigint generated always as identity primary key,
   ref text generated always as ('V-' || lpad(id::text, 4, '0')) stored unique,
@@ -41,7 +43,12 @@ create table if not exists public.vitalia_orders (
   code_cents bigint not null default 0 check (code_cents >= 0),
   total_cents bigint not null check (total_cents >= 0),
   free_shipping boolean not null,
-  code_hash text check (code_hash is null or code_hash ~ '^[0-9a-f]{64}$'),
+  used_code boolean not null default false,
+  discounts_applied text[] generated always as (array_remove(array[
+    case when suggestion_cents > 0 then 'sugerencia_10' end,
+    case when bulk_cents > 0 then 'compra_400k_10' end,
+    case when code_cents > 0 then 'codigo_bienvenida_10' end
+  ], null)) stored,
   items jsonb not null check (jsonb_typeof(items) = 'array' and jsonb_array_length(items) between 1 and 50)
 );
 
@@ -52,6 +59,40 @@ create table if not exists public.vitalia_abandoned_carts (
   updated_at timestamptz not null default now(),
   converted_at timestamptz
 );
+
+-- Los carritos abandonados vencen a los 90 días (desde la última actualización).
+create index if not exists vitalia_abandoned_carts_updated_at_idx on public.vitalia_abandoned_carts (updated_at);
+
+create or replace function public.vitalia_purge_abandoned_carts()
+returns integer
+language sql
+security invoker
+set search_path = ''
+as $$
+  with gone as (
+    delete from public.vitalia_abandoned_carts
+     where updated_at < now() - interval '90 days'
+    returning 1
+  )
+  select count(*)::integer from gone;
+$$;
+
+-- La función está en public, así que PostgREST la expondría como RPC: solo la puede ejecutar la service role.
+revoke all on function public.vitalia_purge_abandoned_carts() from public, anon, authenticated;
+grant execute on function public.vitalia_purge_abandoned_carts() to service_role;
+
+-- Limpieza diaria (03:15 UTC = 00:15 en Córdoba) con pg_cron, solo si la extensión ya está activa.
+-- Si no lo está: activarla en Supabase (Database > Extensions > pg_cron) y correr este mismo cron.schedule,
+-- o llamar a la función desde un job del servidor.
+do $do$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.schedule('vitalia-purge-abandoned-carts', '15 3 * * *', 'select public.vitalia_purge_abandoned_carts()');
+  else
+    raise notice 'pg_cron no está activo: programar public.vitalia_purge_abandoned_carts() a mano';
+  end if;
+end
+$do$;
 
 alter table public.vitalia_subscribers enable row level security;
 alter table public.vitalia_welcome_codes enable row level security;

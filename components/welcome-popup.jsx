@@ -77,7 +77,6 @@ export default function WelcomePopup() {
         setDone({name:form.name.trim(),email:form.email.trim()});
         setTimeout(()=>title.current?.focus(),0);
       }else if(result.field){setErrors({[result.field]:result.error});}
-      else if(response.status===409)setAlert({title:'Este mail ya recibió el código de bienvenida.',text:'Si no lo encontrás, buscalo en spam o promociones.'});
       else if(response.status===429)setAlert({title:'Probá de nuevo en unos minutos.'});
       else setAlert({title:'No pudimos mandarte el código. Probá de nuevo en un rato.'});
     }catch{setAlert({title:'No pudimos mandarte el código. Probá de nuevo en un rato.'});}
@@ -93,7 +92,7 @@ export default function WelcomePopup() {
     {done?<>
       <div className="vp-ok-icon" aria-hidden="true"><Icon name="check"/></div>
       <h2 id="vp-title" tabIndex={-1} ref={title}>¡Listo, {done.name}!</h2>
-      <p className="vp-sub" role="status">Te mandamos tu código a <b>{done.email}</b>. Revisá también spam.</p>
+      <p className="vp-sub" role="status">Si es tu primera vez, te llega el código a <b>{done.email}</b> en unos minutos. Revisá también spam.</p>
       <button className="primary" type="button" onClick={close}>Seguir comprando</button>
       <p className="vp-fine">Es de un solo uso. Lo cargás en el carrito, en «¿Tenés un código de descuento?».</p>
     </>:<>

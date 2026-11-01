@@ -54,8 +54,14 @@ test('Alta: el código va solo por mail, nunca en la respuesta; sin consentimien
   assert.match(JSON.parse(text).cartToken,/^[0-9a-f]{64}$/);
   // Solo se guardan hashes: ni el código ni los tokens quedan en claro.
   assert.ok(!JSON.stringify([...store._db.codes,...store._db.subscribers]).includes(sent[0].code));
+  // Mail repetido: misma respuesta que un alta nueva (no revela si está suscripto) y no se reenvía el código.
   response=await welcomePOST(post('/api/welcome',signup('A@Mail.com')),{store,send});
-  assert.equal(response.status,409);assert.equal(sent.length,1);
+  const dup=await response.json();
+  assert.equal(response.status,200);assert.deepEqual(Object.keys(dup).sort(),Object.keys(JSON.parse(text)).sort());
+  assert.equal(dup.ok,true);assert.match(dup.cartToken,/^[0-9a-f]{64}$/);assert.equal(sent.length,1);assert.equal(store._db.subscribers.length,1);
+  // El token del mail repetido no guarda nada, pero responde igual que uno válido.
+  assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken:dup.cartToken,items:[{id:'A',quantity:1}]}),{store})).status,200);
+  assert.equal(store._db.carts.size,0);
   assert.equal((await welcomePOST(post('/api/welcome',signup('b@mail.com'),{origin:'https://evil.example'}),{store,send})).status,403);
 }));
 test('Honeypot: responde como si fuera real, pero no guarda ni manda nada',withEnv({VERCEL:'1'},async()=>{
@@ -114,11 +120,44 @@ test('El total del cliente no cuenta: el servidor recalcula y el número de pedi
 test('Carrito abandonado: solo con token de suscripto y se borra con la baja',withEnv({VERCEL:'1'},async()=>{
   const store=freshStore(),{sent,send}=mailbox();
   const {cartToken}=await (await welcomePOST(post('/api/welcome',signup('carrito@mail.com')),{store,send})).json();
-  assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken:'0'.repeat(64),items:[{id:'A',quantity:1}]}),{store})).status,404);
+  assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken:'0'.repeat(64),items:[{id:'A',quantity:1}]}),{store})).status,200);
+  assert.equal(store._db.carts.size,0);
   assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken,items:[{id:'A',quantity:2},{id:'<x>',quantity:1}]}),{store})).status,400);
   assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken,items:[{id:'A',quantity:2}]}),{store})).status,200);
   assert.deepEqual([...store._db.carts.values()][0].items,[{id:'A',quantity:2}]);
   const unsub=await unsubscribePOST(new Request(`${SITE}/api/welcome/unsubscribe?t=${sent[0].unsubToken}`,{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:'List-Unsubscribe=One-Click'}),{store});
   assert.equal(unsub.status,200);assert.equal(store._db.carts.size,0);
-  assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken,items:[{id:'A',quantity:1}]}),{store})).status,404);
+  assert.equal((await cartSavePOST(post('/api/cart/save',{cartToken,items:[{id:'A',quantity:1}]}),{store})).status,200);
+  assert.equal(store._db.carts.size,0,'después de la baja no se guarda nada');
 }));
+test('Fila del pedido: fecha, si usó código y descuentos, sin datos personales ni el código',withEnv(checkoutEnv,async()=>{
+  const store=freshStore(),{sent,send}=mailbox();
+  await welcomePOST(post('/api/welcome',signup('pedido@mail.com')),{store,send});
+  const response=await handleCheckout(post('/api/checkout',checkoutBody({code:sent[0].code,name:'Juana Pérez',locality:'Saldán'})),{store,loadCatalog});
+  assert.equal(response.status,200);
+  const row=store._db.orders[0];
+  assert.equal(row.usedCode,true);assert.ok(Number.isFinite(row.createdAt));assert.ok(row.bulkCents>0&&row.codeCents>0);
+  const raw=JSON.stringify(row);
+  for(const personal of ['Juana','Saldán','pedido@mail.com',sent[0].code])assert.ok(!raw.includes(personal),personal);
+  await handleCheckout(post('/api/checkout',checkoutBody()),{store,loadCatalog});
+  assert.equal(store._db.orders[1].usedCode,false);
+}));
+test('Carrito abandonado vence a los 90 días',withEnv({VERCEL:'1'},async()=>{
+  const store=freshStore(),{send}=mailbox(),DAY=86400000,t0=Date.UTC(2026,0,1);
+  const a=await (await welcomePOST(post('/api/welcome',signup('viejo@mail.com')),{store,send})).json();
+  const b=await (await welcomePOST(post('/api/welcome',signup('nuevo@mail.com')),{store,send})).json();
+  await cartSavePOST(post('/api/cart/save',{cartToken:a.cartToken,items:[{id:'A',quantity:1}]}),{store,now:t0});
+  await cartSavePOST(post('/api/cart/save',{cartToken:b.cartToken,items:[{id:'A',quantity:1}]}),{store,now:t0+91*DAY});
+  assert.equal(store._db.carts.size,1);
+}));
+test('Migración: pedidos sin hash del código, used_code y descuentos; limpieza de carritos a 90 días',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  const sql=await readFile(new URL('../supabase/migrations/20261029120000_vitalia_growth.sql',import.meta.url),'utf8');
+  const orders=sql.match(/create table if not exists public\.vitalia_orders \(([\s\S]*?)\n\);/)[1];
+  assert.match(orders,/created_at timestamptz not null default now\(\)/);
+  assert.match(orders,/used_code boolean not null/);assert.match(orders,/discounts_applied text\[\] generated always/);
+  assert.doesNotMatch(orders,/code_hash|email|name|locality/);
+  assert.match(sql,/delete from public\.vitalia_abandoned_carts\s+where updated_at < now\(\) - interval '90 days'/);
+  assert.match(sql,/revoke all on function public\.vitalia_purge_abandoned_carts\(\) from public, anon, authenticated/);
+  assert.match(sql,/extname = 'pg_cron'/);
+});
