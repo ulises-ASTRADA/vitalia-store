@@ -63,6 +63,7 @@ dialog.vp-modal{left:50%;top:50%;transform:translate(-50%,-50%);width:440px;max-
 .goal p{margin:0 0 8px}.goal b{font-weight:700}
 .goal-bar{height:6px;border-radius:3px;background:#d3d9c3;overflow:hidden}.goal-bar i{display:block;height:100%;background:var(--green);border-radius:3px}
 .goal.done{display:flex;gap:8px;align-items:center}.goal.done p{margin:0}.goal.done svg{width:18px;height:18px;stroke-width:2.4;color:var(--ok)}
+.goal.note p{margin:0}
 .code{margin:0 0 14px}
 .code-toggle{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0;background:none;border:0;font-size:.9375rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--ink)}
 .code-toggle svg{width:18px;height:18px}
