@@ -3,6 +3,7 @@ import EnviosPage from '../../components/envios-page';
 import {getInitialCatalog} from '../../lib/render-catalog';
 import {storeSettings} from '../../lib/catalog';
 import {serializeJsonLd,enviosJsonLd,whatsappUrl} from '../../lib/seo';
+import {shareMetadata} from '../../lib/og';
 import {ENVIOS_PATH,ENVIOS_META_TITLE,ENVIOS_DESCRIPTION,enviosPageData,assertNoMarkerInHtml} from '../../lib/envios';
 export const revalidate=60;
 export const runtime='nodejs';
@@ -11,8 +12,7 @@ export const metadata={
   title:{absolute:ENVIOS_META_TITLE},
   description:ENVIOS_DESCRIPTION,
   alternates:{canonical:ENVIOS_PATH},
-  openGraph:{type:'website',url:ENVIOS_PATH,siteName:'Vitalia',locale:'es_AR',title:ENVIOS_META_TITLE,description:ENVIOS_DESCRIPTION},
-  twitter:{card:'summary',title:ENVIOS_META_TITLE,description:ENVIOS_DESCRIPTION}
+  ...shareMetadata({path:ENVIOS_PATH,title:ENVIOS_META_TITLE,description:ENVIOS_DESCRIPTION})
 };
 
 // Todo lo que va al HTML (copy, metadatos y JSON-LD). Si trae "[A ", tira error.

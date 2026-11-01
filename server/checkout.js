@@ -5,12 +5,13 @@ import {makeOrder} from '../lib/checkout.js';
 import {isToken,newToken,normalizeCode,sha256} from '../lib/welcome-code.js';
 import {growthStore} from './growth-store.js';
 import {randomInt} from 'node:crypto';
+import {appendOrder} from '../lib/orders.js';
 
 // Si la base no responde y el pedido no usa código, igual sale un número de referencia generado en el servidor.
 const fallbackRef=()=>`V-X${Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[randomInt(32)]).join('')}`;
 
 export const POST=request=>handleCheckout(request);
-export async function handleCheckout(request,{store=growthStore(),loadCatalog=getCachedCatalog}={}) {
+export async function handleCheckout(request,{store=growthStore(),loadCatalog=getCachedCatalog,recordOrder=appendOrder}={}) {
   try {
     if (!allowedOrigin(request)) throw new StoreError('Solicitud no permitida.',403);
     const limited=limitRequest(request,'checkout',30);if(limited)return limited;
@@ -20,6 +21,7 @@ export async function handleCheckout(request,{store=growthStore(),loadCatalog=ge
     let body;
     try {body=JSON.parse(text);} catch {throw new StoreError('Pedido no válido.',400);}
     const settings=storeSettings();
+    console.log(`[vitalia] checkout phone=${(settings.phone||'').length>=3?settings.phone.slice(0,3)+'***':settings.phone}`);
     if (!settings.checkoutEnabled) throw new StoreError('Los pedidos por WhatsApp todavía no están habilitados.',503,'CHECKOUT_DISABLED');
     let code=null;
     if (body?.code!==undefined&&body.code!==null&&body.code!=='') {
@@ -46,8 +48,24 @@ export async function handleCheckout(request,{store=growthStore(),loadCatalog=ge
     }
     if (isToken(body.cartToken)) await store.markCartConverted(body.cartToken).catch(()=>{});
     const {totals,items,...order}=makeOrder(body,products,settings,{orderRef,code});
-    return Response.json({...order,...(codeToken?{codeToken}:{})},{headers:{'Cache-Control':'no-store'}});
+    // Fila en la planilla de pedidos (ID VIT). El link de WhatsApp de la fila lleva el número de pedido (#V-…).
+    // Si la planilla falla, el pedido sigue: el cliente igual lo manda por WhatsApp.
+    const lookup=new Map(products.map(p=>[p.id,p]));
+    const formattedItems=draft.items.map(({id,quantity})=>{
+      const product=lookup.get(id);
+      const pack=product?.presentacion?` (${product.presentacion})`:'';
+      return `${quantity}x ${product?.nombre||id}${pack}`;
+    }).join('; ');
+    let orderId=null;
+    try {
+      orderId=await recordOrder({name:body.name,locality:body.locality,province:body.province,notes:body.notes,items:formattedItems,
+        total:order.total,whatsappUrl:order.whatsappUrl,status:'Pendiente',...(order.freeShipping?{shippingCost:0}:{})});
+    } catch(err) {
+      console.error('[vitalia] Error registrando pedido en Sheets:', err?.message || err);
+    }
+    return Response.json({...order,orderId,...(codeToken?{codeToken}:{})},{headers:{'Cache-Control':'no-store'}});
   } catch(error) {
+    console.error('[vitalia] checkout error', error?.message || error, error?.stack);
     return Response.json({error:error instanceof StoreError?error.message:'No pudimos preparar el pedido. Intentá nuevamente.',code:error.code||'UNAVAILABLE'},{status:error.status||503,headers:{'Cache-Control':'no-store'}});
   }
 }

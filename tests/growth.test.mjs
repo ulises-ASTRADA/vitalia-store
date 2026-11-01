@@ -161,3 +161,14 @@ test('Migración: pedidos sin hash del código, used_code y descuentos; limpieza
   assert.match(sql,/revoke all on function public\.vitalia_purge_abandoned_carts\(\) from public, anon, authenticated/);
   assert.match(sql,/extname = 'pg_cron'/);
 });
+test('Checkout: la fila de la planilla lleva el total con descuentos y el link con el número de pedido; si falla, el pedido sigue',withEnv(checkoutEnv,async()=>{
+  const store=freshStore(),rows=[];
+  const recordOrder=async row=>{rows.push(row);return 'VIT-20260101-TEST';};
+  let response=await handleCheckout(post('/api/checkout',checkoutBody()),{store,loadCatalog,recordOrder});
+  const body=await response.json();
+  assert.equal(response.status,200);assert.equal(body.orderId,'VIT-20260101-TEST');
+  assert.equal(rows[0].total,body.total);assert.equal(rows[0].status,'Pendiente');
+  assert.ok(decodeURIComponent(rows[0].whatsappUrl).includes(`Pedido #${body.orderRef}`));
+  response=await handleCheckout(post('/api/checkout',checkoutBody()),{store,loadCatalog,recordOrder:async()=>{throw new Error('sheet caído');}});
+  assert.equal(response.status,200);assert.equal((await response.json()).orderId,null);
+}));

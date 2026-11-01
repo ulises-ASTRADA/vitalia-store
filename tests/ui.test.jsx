@@ -49,9 +49,26 @@ function setup(initialCatalog=null){
 }
 test('React/Chakra: búsqueda, orden y categorías',async()=>{
  const user=setup();await screen.findByText('3 productos');
- const search=screen.getByRole('searchbox');await user.type(search,'te verde');assert.equal(document.querySelectorAll('.product-card').length,1);assert(screen.getByText('Té verde'));
+ const search=screen.getByRole('combobox',{name:'Buscar productos'});await user.type(search,'te verde');assert.equal(document.querySelectorAll('.product-card').length,1);assert(screen.getByText('Té verde'));
  await user.clear(search);await user.selectOptions(screen.getByLabelText('Ordenar'),'price-desc');assert.equal(document.querySelector('.product-card').dataset.product,'N002');
  await user.click(screen.getByRole('button',{name:/^Frutos secos/}));assert.equal(document.querySelectorAll('.product-card').length,1);assert.equal(document.querySelector('.product-card').dataset.product,'N001');cleanup();
+});
+test('Búsqueda: autocompleta productos con teclado y clic',async()=>{
+ const user=setup(catalog);const search=screen.getByRole('combobox',{name:'Buscar productos'});
+ await user.type(search,'te');
+ const listbox=screen.getByRole('listbox',{name:'Sugerencias de productos'}),option=within(listbox).getByRole('option',{name:/Té verde/});
+ assert.equal(search.getAttribute('aria-expanded'),'true');assert.equal(option.getAttribute('aria-selected'),'false');
+ await user.keyboard('{ArrowDown}');assert.equal(option.getAttribute('aria-selected'),'true');assert.equal(search.getAttribute('aria-activedescendant'),option.id);
+ await user.keyboard('{Enter}');assert.equal(search.value,'Té verde');assert.equal(screen.queryByRole('listbox'),null);assert.equal(document.querySelectorAll('.product-card').length,1);
+ await user.clear(search);await user.type(search,'alm');await user.click(screen.getByRole('option',{name:/Almendras/}));
+ assert.equal(search.value,'Almendras');assert.equal(document.querySelector('.product-card').dataset.product,'N001');cleanup();
+});
+test('Búsqueda: categoría muestra todos los productos con foto y precio',async()=>{
+ const categoryProducts=Array.from({length:8},(_,index)=>({...products[0],id:`F00${index}`,nombre:`Fruto seco ${index}`,precio:100+index}));
+ cleanup();localStorage.clear();render(<Provider><Store initialCatalog={{...catalog,products:categoryProducts}}/></Provider>);const user=userEvent.setup({document:dom.window.document});
+ await user.type(screen.getByRole('combobox',{name:'Buscar productos'}),'frutos secos');
+ const options=within(screen.getByRole('listbox',{name:'Sugerencias de productos'})).getAllByRole('option');assert.equal(options.length,8);assert.equal(options[0].querySelector('img').getAttribute('src').includes('product-001.webp'),true);
+ assert.match(options[0].querySelector('.search-suggestion-price').textContent,/100,00/);cleanup();
 });
 const catalog={products,settings:{name:'Vitalia',currency:'ARS',checkoutEnabled:true,testCheckout:true}};
 function goCheckout(){cleanup();render(<Provider><Checkout initialCatalog={catalog}/></Provider>);}
@@ -66,14 +83,14 @@ test('Router: Mi pedido enlaza al checkout y cantidades persisten al volver',asy
  assert.equal(JSON.parse(localStorage.getItem('vitalia-cart-v1')).N001,1);
  assert.equal(screen.getByRole('link',{name:'Catálogo',exact:true}).getAttribute('href'),'/');
  cleanup();render(<Provider><Store initialCatalog={catalog}/></Provider>);
- await screen.findByRole('link',{name:/^Mi pedido 1 productos/});cleanup();
+ await screen.findByRole('link',{name:/^Mi pedido 1presentaciones1 presentación/});cleanup();
 });
 test('Checkout: datos obligatorios, número de pedido del servidor y envío por WhatsApp',async()=>{
  const user=setup();await screen.findByText('3 productos');
  await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));assert.equal(orders.length,0);
- await user.type(screen.getByLabelText('Tu nombre'),'Ulises');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
  await user.click(await screen.findByRole('link',{name:'Enviar por WhatsApp'}));await waitFor(()=>assert.equal(window.location.hash,'#whatsapp-prueba'));assert.equal(orders.length,1);assert.equal(orders[0].items[0].quantity,1);assert.equal(orders[0].province,'Córdoba');
  assert.equal(screen.queryByLabelText('Mensaje del pedido'),null);assert.equal(screen.queryByRole('button',{name:'Copiar mensaje'}),null);
@@ -132,13 +149,13 @@ test('Cross-sale aplica 10% al aceptar, persiste y recalcula al modificar el car
 });
 test('Catálogo del servidor no se consulta otra vez al hidratar',async()=>{
  const user=setup(catalog);assert(screen.getByText('3 productos'));assert.equal(catalogReads,0);
- await user.type(screen.getByRole('searchbox'),'te verde');await user.click(screen.getByRole('button',{name:'Agregar Té verde',exact:true}));
+ await user.type(screen.getByRole('combobox',{name:'Buscar productos'}),'te verde');await user.click(screen.getByRole('button',{name:'Agregar Té verde',exact:true}));
  assert.equal(catalogReads,0);assert.equal(screen.getByRole('link',{name:/^Mi pedido/}).getAttribute('href'),'/checkout');cleanup();
 });
 test('Checkout refresca precios tras conflicto y exige preparar de nuevo',async()=>{
  const user=setup();await screen.findByText('3 productos');await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
  goCheckout();await screen.findByText('Productos elegidos');
- await user.type(screen.getByLabelText('Tu nombre'),'Ulises');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ await user.type(screen.getByLabelText('Tu nombre'),'Ana');await user.type(screen.getByLabelText('Localidad'),'Villa Allende');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  let freshReads=0;
  globalThis.fetch=async url=>{
   if(url==='/api/checkout')return Response.json({code:'CATALOG_CHANGED',error:'Cambió un precio. Revisá el total actualizado antes de continuar.'},{status:409});
@@ -212,8 +229,15 @@ test('Carrito flotante: nombre accesible = texto visible, dentro de un landmark'
  const link=container.querySelector('#floating-cart');assert.equal(link.getAttribute('aria-label'),null);
  assert.equal(link.closest('aside').getAttribute('aria-label'),'Tu pedido');
  assert(screen.getByRole('complementary',{name:'Tu pedido'}));
- assert.match(link.textContent,/^Mi pedido 0 productos Carrito vacío \$/);
- assert(screen.getByRole('link',{name:/^Mi pedido 0 productos Carrito vacío/}));cleanup();
+ assert.match(link.textContent,/^Mi pedido 0presentacionesCarrito vacío\$/);
+ assert(screen.getByRole('link',{name:/^Mi pedido 0presentacionesCarrito vacío/}));cleanup();
+});
+test('Carrito flotante mobile: burbuja, total, CTA y minimizar',async()=>{
+ const user=setup(catalog);await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));await user.click(screen.getByRole('button',{name:'Agregar Almendras',exact:true}));
+ const bubble=screen.getByRole('button',{name:'Abrir resumen del pedido, 2 presentaciones'});assert.equal(within(bubble).getByText('2').textContent,'2');
+ await user.click(bubble);assert(screen.getByText('Total del pedido'));assert.match(document.querySelector('.mobile-cart-summary strong').textContent,/200,00/);
+ assert.equal(screen.getByRole('link',{name:'Ir al carrito'}).getAttribute('href'),'/checkout');
+ await user.click(screen.getByRole('button',{name:'Minimizar resumen del pedido'}));assert(screen.getByRole('button',{name:'Abrir resumen del pedido, 2 presentaciones'}));assert.equal(screen.queryByRole('link',{name:'Ir al carrito'}),null);cleanup();
 });
 test('Footer de producto y categoría igual al de la home: WhatsApp e Instagram',async()=>{
  cleanup();localStorage.clear();
@@ -238,7 +262,7 @@ test('/envios: chips, secciones, tabla, retiro sin dirección, FAQ y footer con 
  assert.equal(screen.getByRole('link',{name:'Pedir con envío a Mendiolaza'}).getAttribute('href'),'https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20un%20pedido%20con%20env%C3%ADo%20a%20Mendiolaza.');
  assert(screen.getByRole('heading',{name:'¿Qué dietética llega a Mendiolaza y El Talar?'}));
  const rows=[...container.querySelectorAll('.ship-table tbody tr')].map(tr=>tr.textContent);
- assert.deepEqual(rows,['Villa Allende, Mendiolaza, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
+ assert.deepEqual(rows,['Villa Allende, Mendiolaza, El Talar, Saldán y Villa Rivera Indarte$3.000','Río Ceballos, Unquillo, La Calera, Argüello y Cerro de las Rosas$5.000','Compras de más de $70.000, todas las zonasGratis']);
  assert.equal(container.querySelector('.pickup-addr').textContent,'Retiro en Villa Allende, coordinamos la dirección por WhatsApp.');
  const triggers=container.querySelectorAll('.faq-trigger');assert.equal(triggers.length,13);assert.equal(triggers[8].textContent,'¿Hay pedido mínimo?');
  assert.equal(triggers[0].getAttribute('aria-expanded'),'true');assert.equal(triggers[1].getAttribute('aria-expanded'),'false');

@@ -1,3 +1,4 @@
+import {shareMetadata} from '../../../lib/og';
 import {headers} from 'next/headers';
 import {notFound} from 'next/navigation';
 import CategoryPage from '../../../components/category-page';
@@ -36,7 +37,7 @@ export async function generateMetadata({params}) {
     title:{absolute:data.title},
     ...(data.metaDescription?{description:data.metaDescription}:{}),
     alternates:{canonical:categoryPath(data.name)},
-    openGraph:{type:'website',url:categoryPath(data.name),siteName:'Vitalia',locale:'es_AR',title:data.title,...(data.metaDescription?{description:data.metaDescription}:{}),images:[{url:'/images/logo.png',width:1536,height:1024,alt:'Vitalia Dietética'}]}
+    ...shareMetadata({path:categoryPath(data.name),title:data.title,description:data.metaDescription})
   };
 }
 

@@ -24,7 +24,7 @@ Regla `Vitalia API rate observation`: rutas exactas `/api/catalog` o `/api/check
 Publicar observación desde el proyecto, revisar tráfico legítimo y luego endurecer el límite en una etapa separada. La skill Vercel Firewall requiere que el usuario publique el borrador.
 
 ```sh
-npx vercel@63.1.2 --scope ulisesastrada1-9233s-projects firewall publish --project vitalia-store --yes
+npx vercel@63.1.2 firewall publish --project vitalia-store --yes
 ```
 
 ## Validación
