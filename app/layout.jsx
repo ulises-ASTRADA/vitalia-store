@@ -1,6 +1,7 @@
 import './globals.css';
 import './fase1.css';
 import './growth.css';
+import './hero-carousel.css';
 import Provider from '../components/provider';
 import WelcomePopup from '../components/welcome-popup';
 import {headers} from 'next/headers';

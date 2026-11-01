@@ -1,0 +1,50 @@
+/* Carrusel de fotos del hero. El texto de la izquierda queda fijo; solo rotan las fotos.
+   Sin JS: las slides quedan en una fila con scroll-snap. Con JS (.is-enhanced): fundido de 300 ms. */
+/* Por defecto (SSR y con JS): slides apiladas con fundido; la slide 1 se pinta igual que la composición original. */
+.hero-track{position:absolute;inset:0;touch-action:pan-y}
+.hero-slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}
+.hero-slide.is-active{opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s}
+.hero-photo-link{position:absolute;display:block;width:40%;height:250px;border-radius:5px}
+.hero-photo-link:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.hero-carousel .hero-photo{position:static;display:block;width:100%;height:100%;transform:none}
+.hero-photo-link.photo-solo{left:30%;top:24px;transform:rotate(4deg);width:42%;height:262px}
+.hero-carousel.is-reduced .hero-slide,.hero-carousel.is-reduced .hero-slide.is-active{transition:none}
+@media (prefers-reduced-motion:reduce){.hero-carousel .hero-slide,.hero-carousel .hero-slide.is-active{transition:none}.hero-track{scroll-behavior:auto}}
+/* Sin JS: las fotos quedan en una fila que se desliza (scroll-snap). */
+@media (scripting:none){
+  .hero-track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:auto}
+  .hero-track::-webkit-scrollbar{display:none}
+  .hero-slide{position:relative;inset:auto;flex:0 0 100%;height:100%;scroll-snap-align:start;opacity:1;visibility:visible;transition:none}
+}
+/* Controles */
+.hero-arrow,.hero-toggle{border:0;background:#f4f6e4;color:var(--green);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;padding:0;box-shadow:0 4px 14px #101b1940}
+.hero-arrow{position:absolute;top:50%;margin-top:-22px;z-index:4;opacity:0;transition:opacity .15s}
+.hero-prev{left:12px}.hero-next{right:12px}
+.hero-carousel:hover .hero-arrow,.hero-carousel:focus-within .hero-arrow{opacity:1}
+.hero-carousel .hero-arrow:focus-visible,.hero-carousel .hero-toggle:focus-visible,.hero-dot:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.hero-controls{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:6px;padding:3px 4px 3px 8px;border-radius:999px;background:#1b2d20cc}
+.hero-dot{width:24px;height:24px;border:0;background:transparent;padding:0;display:grid;place-items:center;border-radius:50%}
+.hero-dot span{width:10px;height:10px;border-radius:50%;border:2px solid #eef1d2;background:transparent}
+.hero-dot[aria-current="true"] span{background:var(--lime);border-color:var(--lime)}
+.hero-toggle{width:32px;height:32px;box-shadow:none;margin-left:2px}
+.hero-toggle svg{width:16px;height:16px}
+.hero-toggle svg path{fill:currentColor}
+@media (hover:none){.hero-arrow{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hero-arrow{transition:none}}
+/* Tablet: igual que el original (foto 1 oculta) */
+@media(max-width:850px){.hero-photo-link{width:70%;height:250px}.hero-photo-link.photo-one{display:none}.hero-photo-link.photo-two{left:0;top:45px}.hero-photo-link.photo-three{left:65%;top:95px}.hero-photo-link.photo-solo{left:4%;top:30px;width:72%;height:250px}}
+/* Mobile: una sola foto visible como en el original; flechas chicas sobre la foto y puntos abajo */
+@media(max-width:540px){
+  .hero-photo-link{width:148px;height:211px}
+  .hero-photo-link.photo-two{left:3%;top:29px;transform:rotate(10deg)}
+  .hero-photo-link.photo-three{display:none}
+  .hero-photo-link.photo-solo{left:3%;top:29px;transform:rotate(10deg);width:148px;height:211px}
+  .hero-carousel .hero-photo{border-width:4px}
+  .hero-arrow{width:44px;height:44px;background:transparent;box-shadow:none;top:auto;bottom:46px;margin-top:0}
+  .hero-arrow::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#f4f6e4;box-shadow:0 3px 10px #101b1940;z-index:-1}
+  .hero-arrow svg{width:18px;height:18px}
+  .hero-prev{left:0}.hero-next{right:0}
+  .hero-controls{bottom:6px;gap:0;padding:2px;background:#1b2d20e6}
+  .hero-toggle{width:28px;height:28px;margin-left:0}
+}
+@media(max-width:540px){.hero-photo-link,.hero-photo-link.photo-solo{height:230px}}
