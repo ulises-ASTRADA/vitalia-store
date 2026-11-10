@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import NextLink from 'next/link';
 import NextImage from 'next/image';
 import {Button,IconButton,Input,Textarea} from '@chakra-ui/react';
@@ -20,6 +20,17 @@ function CartPhoto({product}){
   return <Image src={src} alt={product.nombre} width={80} height={80} sizes="80px" loading="lazy" unoptimized={!src.startsWith('/images/')} onError={()=>setBroken(true)}/>;
 }
 const readStore=key=>{try{return localStorage.getItem(key);}catch{return null;}};
+const isCodeToken=value=>typeof value==='string'&&/^[0-9a-f]{64}$/.test(value);
+function newClientToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return [...bytes].map(byte=>byte.toString(16).padStart(2,'0')).join('');}
+function readHeld(){
+  try{
+    const saved=JSON.parse(readStore(CART_CODE_KEY)||'null');
+    const code=saved&&normalizeCode(saved.code);
+    if(!code)return null;
+    return {code,token:isCodeToken(saved.token)?saved.token:undefined};
+  }catch{return null;}
+}
+const transientCode=result=>result?.code==='UNAVAILABLE'||result?.code==='RATE_LIMITED';
 // Envío: "Elegí tu localidad" (sin elegir), "$3.000,00", "Gratis" o "A coordinar por WhatsApp".
 function SumLines({money,subtotal,suggestion,bulk,code,shipping}){
   return <dl className="sum-lines">
@@ -42,15 +53,38 @@ export default function Checkout({initialCatalog}){
   const {loaded,items,grossCents,suggestionCents,acceptOffer,change:changeCart,remove:removeCart}=useCart(products);
   const [customer,setCustomer]=useState({name:'',zone:'',locality:'',province:'',notes:''});
   const [error,setError]=useState(''),[busy,setBusy]=useState(false);
-  const [applied,setApplied]=useState(null),[codeOpen,setCodeOpen]=useState(false),[codeInput,setCodeInput]=useState(''),[codeError,setCodeError]=useState(''),[codeBusy,setCodeBusy]=useState(false);
+  const [applied,setApplied]=useState(null),[held,setHeld]=useState(null),[codeOpen,setCodeOpen]=useState(false),[codeInput,setCodeInput]=useState(''),[codeError,setCodeError]=useState(''),[codeBusy,setCodeBusy]=useState(false);
   const [ready,setReady]=useState(null);
-  const readyTitle=useRef(null),codeField=useRef(null),lastReservation=useRef(null);
-  useEffect(()=>{try{const saved=JSON.parse(readStore(CART_CODE_KEY)||'null');if(saved&&normalizeCode(saved.code))setApplied({code:normalizeCode(saved.code),token:typeof saved.token==='string'?saved.token:undefined});}catch{}},[]);
+  const readyTitle=useRef(null),codeField=useRef(null),lastReservation=useRef(null),appliedRef=useRef(null),heldRef=useRef(null),verifyingRef=useRef(false),checkoutFlight=useRef(false),codeGen=useRef(0);
+  function remember(next){heldRef.current=next;setHeld(next);try{if(next)localStorage.setItem(CART_CODE_KEY,JSON.stringify({code:next.code,...(next.token?{token:next.token}:{})}));else localStorage.removeItem(CART_CODE_KEY);}catch{}}
+  async function confirmHeld(entry){
+    if(!entry||verifyingRef.current)return;
+    const mine=++codeGen.current;
+    verifyingRef.current=true;setCodeBusy(true);setCodeError('');
+    try{
+      const response=await fetch('/api/cart/code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:entry.code,...(entry.token?{codeToken:entry.token}:{})})});
+      const result=await response.json().catch(()=>({}));
+      if(codeGen.current!==mine)return;
+      if(!response.ok){
+        const transient=transientCode(result)||response.status===503||response.status===429||response.status>=500;
+        if(!transient){appliedRef.current=null;setApplied(null);remember(null);setCodeInput('');setCodeOpen(true);setCodeError(result.orderRef?`${result.error} Pedido #${result.orderRef}.`:result.error||'Código inválido o vencido.');return;}
+        setCodeOpen(true);setCodeInput(entry.code);setCodeError(result.error||'No pudimos validar el código. Probá de nuevo en un rato.');return;
+      }
+      const next={code:result.code||entry.code,...(entry.token?{token:entry.token}:{})};
+      remember(next);appliedRef.current=next;setApplied(next);setCodeInput('');setCodeError('');
+    }catch{if(codeGen.current===mine){setCodeOpen(true);setCodeInput(entry.code);setCodeError('No pudimos validar el código. Probá de nuevo en un rato.');}}
+    finally{if(codeGen.current===mine){verifyingRef.current=false;setCodeBusy(false);}}
+  }
+  useLayoutEffect(()=>{
+    const entry=readHeld();if(!entry)return;
+    heldRef.current=entry;setHeld(entry);confirmHeld(entry);
+    return()=>{codeGen.current++;verifyingRef.current=false;};
+  },[]);
   useEffect(()=>{setReady(null);},[items]);
   useEffect(()=>{if(ready)readyTitle.current?.focus();},[ready]);
   useEffect(()=>{if(codeOpen&&!applied)codeField.current?.focus();},[codeOpen,applied]);
   const preview=useMemo(()=>computeTotals({grossCents,suggestionCents,hasCode:Boolean(applied),zone:customer.zone}),[grossCents,suggestionCents,applied,customer.zone]);
-  function saveCode(next){setApplied(next);try{if(next)localStorage.setItem(CART_CODE_KEY,JSON.stringify(next));else localStorage.removeItem(CART_CODE_KEY);}catch{}}
+  function saveCode(next){appliedRef.current=next;setApplied(next);remember(next);}
   async function applyCode(){
     if(codeBusy)return;
     // Vacío o solo espacios: no se envía (el botón está deshabilitado y Enter no hace nada).
@@ -58,13 +92,14 @@ export default function Checkout({initialCatalog}){
     const typed=codeInput.trim();
     if(!typed)return;
     const code=normalizeCode(typed)||typed;
-    setCodeBusy(true);setCodeError('');
+    verifyingRef.current=true;setCodeBusy(true);setCodeError('');
     try{
       const response=await fetch('/api/cart/code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,...(lastReservation.current?.code===code?{codeToken:lastReservation.current.token}:{})})});
       const result=await response.json().catch(()=>({}));
-      if(!response.ok){setCodeError(result.error||'Código inválido o vencido.');return;}
-      saveCode({code:result.code,...(lastReservation.current?.code===result.code?{token:lastReservation.current.token}:{})});setCodeInput('');setReady(null);
-    }catch{setCodeError('No pudimos validar el código. Probá de nuevo en un rato.');}finally{setCodeBusy(false);}
+      if(!response.ok){setCodeError(result.orderRef?`${result.error} Pedido #${result.orderRef}.`:result.error||'Código inválido o vencido.');return;}
+      const token=lastReservation.current?.code===result.code&&isCodeToken(lastReservation.current.token)?lastReservation.current.token:newClientToken();
+      saveCode({code:result.code,token});setCodeInput('');setReady(null);
+    }catch{setCodeError('No pudimos validar el código. Probá de nuevo en un rato.');}finally{verifyingRef.current=false;setCodeBusy(false);}
   }
   function removeCode(){if(applied?.token)lastReservation.current=applied;saveCode(null);setReady(null);setCodeOpen(true);}
   const formatter=useMemo(()=>new Intl.NumberFormat('es-AR',{style:'currency',currency:settings.currency,maximumFractionDigits:2}),[settings.currency]);
@@ -80,20 +115,23 @@ export default function Checkout({initialCatalog}){
     const data=await response.json();setProducts(data.products);setSettings(data.settings);
   }
   async function checkout(event){
-    event.preventDefault();if(busy||!loaded||!items.length||!settings.checkoutEnabled)return;
+    event.preventDefault();
+    // La verificación o un envío ya en curso bloquean el segundo submit aunque React todavía no haya pintado disabled.
+    if(checkoutFlight.current||busy||verifyingRef.current||codeBusy||!loaded||!items.length||!settings.checkoutEnabled)return;
     for(const field of event.currentTarget.querySelectorAll('[required]')){field.setCustomValidity(field.value.trim()?'':field.tagName==='SELECT'?'Elegí tu localidad.':'Completá este campo.');if(!field.reportValidity())return;}
-    setBusy(true);reset();
+    checkoutFlight.current=true;setBusy(true);reset();
     try{
       const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...customer,name:customer.name.trim(),zone:customer.zone,locality:customer.zone===OTHER_ZONE?customer.locality.trim():'',province:customer.province.trim(),...(applied?{code:applied.code,...(applied.token?{codeToken:applied.token}:{})}:{}),...(/^[0-9a-f]{64}$/.test(readStore(CART_TOKEN_KEY)||'')?{cartToken:readStore(CART_TOKEN_KEY)}:{}),items:items.map(({product,quantity,offerSourceId})=>({id:product.id,quantity,expectedPrice:product.precio,...(offerSourceId?{offerSourceId}:{})}))})});
       const result=await response.json();
       if(!response.ok){
         if(result.code==='CATALOG_CHANGED')await refreshCatalog();
-        if(result.code==='CODE_USED'||result.code==='INVALID_CODE'){saveCode(null);setCodeOpen(true);setCodeError(result.error);}
+        if(isCodeToken(result.codeToken)&&applied)saveCode({code:applied.code,token:result.codeToken});
+        if(result.code==='CODE_USED'||result.code==='INVALID_CODE'){saveCode(null);setCodeOpen(true);setCodeError(result.orderRef?`${result.error} Pedido #${result.orderRef}.`:result.error);}
         throw Error(result.error||'No pudimos preparar el pedido.');
       }
       if(applied&&result.codeToken)saveCode({code:applied.code,token:result.codeToken});
       setReady(result);
-    }catch(problem){setError(problem.message||'No pudimos preparar el pedido.');}finally{setBusy(false);}
+    }catch(problem){setError(problem.message||'No pudimos preparar el pedido.');}finally{checkoutFlight.current=false;setBusy(false);}
   }
   const field=(key,label,max,autocomplete,placeholder,inner=false)=>{const input=<><label htmlFor={`customer-${key}`}>{label}</label><Input unstyled id={`customer-${key}`} value={customer[key]} maxLength={max} autoComplete={autocomplete} placeholder={placeholder} required disabled={busy} aria-describedby={key==='locality'?'customer-locality-hint':undefined} onChange={event=>{event.target.setCustomValidity('');setCustomer(c=>({...c,[key]:event.target.value}));reset();}}/></>;return inner?input:<div key={key}>{input}</div>;};
   return <>
@@ -109,9 +147,9 @@ export default function Checkout({initialCatalog}){
       </div><aside className="checkout-sidebar" aria-labelledby="summary-title">{ready?<section className="checkout-card checkout-summary"><h2 id="summary-title" tabIndex={-1} ref={readyTitle}>Pedido listo para enviar</h2><div className="ref"><span>Número de pedido</span><b>#{ready.orderRef}</b></div><SumLines money={money} subtotal={ready.subtotal} suggestion={ready.suggestionSavings} bulk={ready.bulkDiscount} code={ready.codeDiscount} shipping={ready.shipping}/><div className="total-row"><span>{ready.shipping.kind==='other'?'Total (sin envío)':'Total'}</span><strong>{money(ready.total)}</strong></div>{ready.savings>0&&<p className="sum-save">Ahorrás {money(ready.savings)}</p>}
       <p className="cart-disclaimer">Montos verificados por Vitalia. Este es el mensaje que se abre en WhatsApp:</p><pre className="wa-preview">{ready.message}</pre><a className="primary whatsapp" href={ready.whatsappUrl} rel="noopener noreferrer">Enviar por WhatsApp</a>
       </section>:<section className="checkout-card checkout-summary"><h2 id="summary-title">Resumen del pedido</h2><Goal grossCents={grossCents} money={money} outOfZone={customer.zone===OTHER_ZONE}/>
-      <div className="code">{applied?<><span className="chip"><Icon name="tag"/>{applied.code}<button className="chip-x" type="button" disabled={busy} aria-label={`Quitar el código ${applied.code}`} onClick={removeCode}><span><Icon name="x"/></span></button></span><p className="code-ok" role="status">Código aplicado: 10% sobre el subtotal de productos.</p></>:!codeOpen?<button className="code-toggle" type="button" aria-expanded="false" aria-controls="code-panel" onClick={()=>setCodeOpen(true)}><Icon name="tag"/>¿Tenés un código de descuento?</button>:<div id="code-panel"><label htmlFor="code-in">Código de descuento</label><div className="code-row"><input id="code-in" ref={codeField} className={codeError?'bad':undefined} value={codeInput} maxLength={20} placeholder="Ej.: BV-XXXX-XXXX" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-invalid={codeError?'true':undefined} aria-describedby={codeError?'code-err':undefined} onChange={event=>{setCodeInput(event.target.value);setCodeError('');}} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();if(codeInput.trim())applyCode();}}}/><button type="button" disabled={codeBusy||!codeInput.trim()} aria-busy={codeBusy||undefined} onClick={applyCode}>{codeBusy?'Aplicando…':'Aplicar'}</button></div>{codeError&&<p className="vp-err" id="code-err" role="alert"><Icon name="alert"/>{codeError}</p>}</div>}</div>
+      <div className="code">{codeBusy&&<p className="code-ok" role="status" aria-label="Verificando tu descuento…">Verificando tu descuento…</p>}{codeBusy&&held&&!applied&&!codeOpen&&<p className="code-held">{held.code}</p>}{applied?<><span className="chip"><Icon name="tag"/>{applied.code}<button className="chip-x" type="button" disabled={busy} aria-label={`Quitar el código ${applied.code}`} onClick={removeCode}><span><Icon name="x"/></span></button></span><p className="code-ok" role="status">Código aplicado: 10% sobre el subtotal de productos.</p></>:codeBusy&&!codeOpen?null:!codeOpen?<button className="code-toggle" type="button" aria-expanded="false" aria-controls="code-panel" onClick={()=>setCodeOpen(true)}><Icon name="tag"/>¿Tenés un código de descuento?</button>:<div id="code-panel"><label htmlFor="code-in">Código de descuento</label><div className="code-row"><input id="code-in" ref={codeField} className={codeError?'bad':undefined} value={codeInput} maxLength={20} placeholder="Ej.: BV-XXXX-XXXX" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-invalid={codeError?'true':undefined} aria-describedby={codeError?'code-err':undefined} onChange={event=>{setCodeInput(event.target.value);setCodeError('');}} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();const retry=held&&!applied&&codeInput.trim()===held.code;if(retry)confirmHeld(heldRef.current);else if(codeInput.trim())applyCode();}}}/><button type="button" disabled={codeBusy||(!held||applied||codeInput.trim()!==held.code)&&!codeInput.trim()} aria-busy={codeBusy||undefined} onClick={()=>{const retry=held&&codeError&&!applied&&codeInput.trim()===held.code;if(retry)confirmHeld(heldRef.current);else applyCode();}}>{codeBusy?'Aplicando…':held&&codeError&&!applied&&codeInput.trim()===held.code?'Reintentar':'Aplicar'}</button></div>{codeError&&<p className="vp-err" id="code-err" role="alert"><Icon name="alert"/>{codeError}</p>}</div>}</div>
       <SumLines money={money} subtotal={preview.grossCents/100} suggestion={preview.suggestionCents/100} bulk={preview.bulkCents/100} code={preview.codeCents/100} shipping={{...preview.shipping,cost:preview.shippingCents/100}}/><div className="total-row" aria-live="polite"><span>{preview.shipping.kind==='other'?'Total (sin envío)':'Total'}</span><strong>{money(preview.payCents/100)}</strong></div>{preview.savingsCents>0&&<p className="sum-save">Ahorrás {money(preview.savingsCents/100)}</p>}<p className="cart-disclaimer">A confirmar: disponibilidad y forma de pago. El pedido se confirma al conversar por WhatsApp.</p>{error&&<p className="form-message" role="alert">{error}</p>}{!settings.checkoutEnabled&&<p className="form-message">Los pedidos por WhatsApp todavía no están habilitados.</p>}
-      <Button unstyled type="submit" className="primary whatsapp" disabled={busy||!settings.checkoutEnabled}>{busy?'Verificando tu pedido…':'Continuar por WhatsApp'}</Button>
+      <Button unstyled type="submit" className="primary whatsapp" disabled={busy||codeBusy||!settings.checkoutEnabled}>{busy?'Verificando tu pedido…':'Continuar por WhatsApp'}</Button>
       </section>}
       {recommendations.length>0&&<div className="checkout-card"><CartSuggestions recommendations={recommendations} money={money} busy={busy} onAdd={addSuggestion}/></div>}
       </aside></div></form>}

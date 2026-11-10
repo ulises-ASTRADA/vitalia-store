@@ -449,6 +449,8 @@ test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y vi
  await user.clear(input);await user.type(input,'bv 7k2q 9mxd');await user.click(screen.getByRole('button',{name:'Aplicar'}));
  await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
  assert.equal(codeChecks.at(-1).code,'BV-7K2Q-9MXD');
+ const held=JSON.parse(localStorage.getItem('vt_cart_code'));
+ assert.equal(held.code,'BV-7K2Q-9MXD');assert.match(held.token,/^[0-9a-f]{64}$/);
  assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));assert(screen.getByText('Ahorrás $ 80.000,00'));
  await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.selectOptions(screen.getByLabelText('Localidad'),'otra');await user.type(screen.getByLabelText('¿En qué localidad?'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
@@ -460,8 +462,140 @@ test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y vi
  // Cambiar el carrito vuelve al resumen editable.
  await user.click(screen.getByRole('button',{name:'Sumar una presentación de Almendras'}));
  assert(await screen.findByRole('button',{name:'Continuar por WhatsApp'}));
+ assert(screen.getByText('Código aplicado: 10% sobre el subtotal de productos.'));
+ assert(screen.getByText('$ 400.000,00',{selector:'.total-row strong'}));
  await user.click(screen.getByRole('button',{name:'Quitar el código BV-7K2Q-9MXD'}));
  assert(screen.getByText('$ 450.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Al reabrir el checkout el código guardado se revalida antes de mostrar el descuento',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){codeChecks.push(JSON.parse(options.body));return Response.json({error:'Este código ya se usó.',code:'CODE_USED'},{status:409});}
+  return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'bv-7k2q-9mxd',token:'c'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ const alert=await screen.findByRole('alert');
+ assert.equal(alert.textContent,'Este código ya se usó.');
+ assert.equal(codeChecks.at(-1).code,'BV-7K2Q-9MXD');
+ assert.equal(codeChecks.at(-1).codeToken,'c'.repeat(64));
+ assert.equal(localStorage.getItem('vt_cart_code'),null);
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ cleanup();
+});
+test('Al reabrir, un código vigente mantiene el 10% y se recalcula si cambia el carrito',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ const previous=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){codeChecks.push(JSON.parse(options.body));return Response.json({ok:true,code:'BV-7K2Q-9MXD',rate:10});}
+  return previous(url,options);
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'BV-7K2Q-9MXD',token:'d'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(codeChecks.at(-1).codeToken,'d'.repeat(64));
+ assert(await screen.findByText('$ 320.000,00',{selector:'.total-row strong'}));
+ const user=userEvent.setup({document:dom.window.document});
+ await user.click(screen.getByRole('button',{name:'Sumar una presentación de Almendras'}));
+ assert(screen.getByText('Código aplicado: 10% sobre el subtotal de productos.'));
+ assert(screen.getByText('$ 400.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Si la revalidación no llega, el código sigue visible y Reintentar usa el mismo token',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ let calls=0;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){
+   codeChecks.push(JSON.parse(options.body));calls++;
+   if(calls===1)return Response.json({error:'No pudimos validar el código. Probá de nuevo en un rato.',code:'UNAVAILABLE'},{status:503});
+   return Response.json({ok:true,code:'BV-7K2Q-9MXD',rate:10});
+  }
+  return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'BV-7K2Q-9MXD',token:'e'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ assert.equal((await screen.findByRole('alert')).textContent,'No pudimos validar el código. Probá de nuevo en un rato.');
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ assert.equal(screen.queryByText('Código de bienvenida (10%)'),null);
+ assert.equal(screen.getByLabelText('Código de descuento').value,'BV-7K2Q-9MXD');
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'e'.repeat(64));
+ const user=userEvent.setup({document:dom.window.document});
+ await user.click(screen.getByRole('button',{name:'Reintentar'}));
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(codeChecks.length,2);
+ assert.equal(codeChecks[0].codeToken,'e'.repeat(64));
+ assert.equal(codeChecks[1].codeToken,'e'.repeat(64));
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'e'.repeat(64));
+ assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Revalidar bloquea Continuar hasta tener respuesta y el total cambia junto con el 10%',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ let release;const pending=new Promise(resolve=>{release=resolve;});
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){codeChecks.push(JSON.parse(options.body));await pending;return Response.json({ok:true,code:'BV-7K2Q-9MXD',rate:10});}
+  if(url==='/api/checkout'){orders.push(JSON.parse(options.body));return Response.json({error:'no debería pedirse'},{status:500});}
+  return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'BV-7K2Q-9MXD',token:'f'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ await screen.findByRole('status',{name:'Verificando tu descuento…'});
+ await screen.findByText('Productos elegidos');
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ assert.equal(screen.queryByText('Código de bienvenida (10%)'),null);
+ assert(screen.getByText('$ 360.000,00',{selector:'.total-row strong'}));
+ const go=screen.getByRole('button',{name:'Continuar por WhatsApp'});
+ assert.equal(go.disabled,true);
+ document.querySelector('.checkout-form').dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
+ document.querySelector('.checkout-form').dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
+ assert.equal(orders.length,0);
+ assert.equal(codeChecks[0].codeToken,'f'.repeat(64));
+ release();
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(screen.queryByRole('status',{name:'Verificando tu descuento…'}),null);
+ assert(screen.getByText('Código de bienvenida (10%)'));
+ assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));
+ assert.equal(screen.getByRole('button',{name:'Continuar por WhatsApp'}).disabled,false);
+ assert.equal(orders.length,0);
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'f'.repeat(64));
+ cleanup();
+});
+// jsdom, sin base. El segundo requestSubmit ocurre antes de que React pinte disabled.
+test('Con el código aplicado, dos envíos sincrónicos hacen un solo checkout y un error deja reintentar',async()=>{
+ const user=await bigCheckout(1);
+ await user.click(screen.getByRole('button',{name:'¿Tenés un código de descuento?'}));
+ await user.type(screen.getByLabelText('Código de descuento'),'bv 7k2q 9mxd');
+ await user.click(screen.getByRole('button',{name:'Aplicar'}));
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ await user.type(screen.getByLabelText('Tu nombre'),'Prueba');
+ await user.selectOptions(screen.getByLabelText('Localidad'),'villa-allende');
+ await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ const previous=globalThis.fetch;
+ let release;let gate=new Promise(resolve=>{release=resolve;});
+ let checkouts=0;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/checkout'){checkouts++;orders.push(JSON.parse(options.body));await gate;return Response.json({error:'No pudimos preparar el pedido.',code:'UNAVAILABLE'},{status:503});}
+  return previous(url,options);
+ };
+ const form=document.querySelector('.checkout-form');
+ form.requestSubmit();form.requestSubmit();
+ assert.equal(checkouts,1);
+ release();
+ assert.equal((await screen.findByRole('alert')).textContent,'No pudimos preparar el pedido.');
+ checkouts=0;gate=new Promise(resolve=>{release=resolve;});
+ form.requestSubmit();
+ assert.equal(checkouts,1);
+ release();
+ await screen.findByRole('alert');
+ assert.equal(orders.length,2);
+ assert.equal(orders[0].code,'BV-7K2Q-9MXD');
+ assert.equal(orders[1].codeToken,orders[0].codeToken);
  cleanup();
 });
 test('Popup: exit intent en compu, consentimiento obligatorio, código nunca en pantalla, no vuelve a aparecer',async()=>{
