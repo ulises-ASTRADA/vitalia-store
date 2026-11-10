@@ -55,7 +55,7 @@ export default function Checkout({initialCatalog}){
   const [error,setError]=useState(''),[busy,setBusy]=useState(false);
   const [applied,setApplied]=useState(null),[held,setHeld]=useState(null),[codeOpen,setCodeOpen]=useState(false),[codeInput,setCodeInput]=useState(''),[codeError,setCodeError]=useState(''),[codeBusy,setCodeBusy]=useState(false);
   const [ready,setReady]=useState(null);
-  const readyTitle=useRef(null),codeField=useRef(null),lastReservation=useRef(null),appliedRef=useRef(null),heldRef=useRef(null),verifyingRef=useRef(false),codeGen=useRef(0);
+  const readyTitle=useRef(null),codeField=useRef(null),lastReservation=useRef(null),appliedRef=useRef(null),heldRef=useRef(null),verifyingRef=useRef(false),checkoutFlight=useRef(false),codeGen=useRef(0);
   function remember(next){heldRef.current=next;setHeld(next);try{if(next)localStorage.setItem(CART_CODE_KEY,JSON.stringify({code:next.code,...(next.token?{token:next.token}:{})}));else localStorage.removeItem(CART_CODE_KEY);}catch{}}
   async function confirmHeld(entry){
     if(!entry||verifyingRef.current)return;
@@ -116,10 +116,10 @@ export default function Checkout({initialCatalog}){
   }
   async function checkout(event){
     event.preventDefault();
-    // La verificación en curso bloquea el envío aunque el botón disabled todavía no se haya pintado.
-    if(busy||verifyingRef.current||codeBusy||!loaded||!items.length||!settings.checkoutEnabled)return;
+    // La verificación o un envío ya en curso bloquean el segundo submit aunque React todavía no haya pintado disabled.
+    if(checkoutFlight.current||busy||verifyingRef.current||codeBusy||!loaded||!items.length||!settings.checkoutEnabled)return;
     for(const field of event.currentTarget.querySelectorAll('[required]')){field.setCustomValidity(field.value.trim()?'':field.tagName==='SELECT'?'Elegí tu localidad.':'Completá este campo.');if(!field.reportValidity())return;}
-    setBusy(true);reset();
+    checkoutFlight.current=true;setBusy(true);reset();
     try{
       const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...customer,name:customer.name.trim(),zone:customer.zone,locality:customer.zone===OTHER_ZONE?customer.locality.trim():'',province:customer.province.trim(),...(applied?{code:applied.code,...(applied.token?{codeToken:applied.token}:{})}:{}),...(/^[0-9a-f]{64}$/.test(readStore(CART_TOKEN_KEY)||'')?{cartToken:readStore(CART_TOKEN_KEY)}:{}),items:items.map(({product,quantity,offerSourceId})=>({id:product.id,quantity,expectedPrice:product.precio,...(offerSourceId?{offerSourceId}:{})}))})});
       const result=await response.json();
@@ -131,7 +131,7 @@ export default function Checkout({initialCatalog}){
       }
       if(applied&&result.codeToken)saveCode({code:applied.code,token:result.codeToken});
       setReady(result);
-    }catch(problem){setError(problem.message||'No pudimos preparar el pedido.');}finally{setBusy(false);}
+    }catch(problem){setError(problem.message||'No pudimos preparar el pedido.');}finally{checkoutFlight.current=false;setBusy(false);}
   }
   const field=(key,label,max,autocomplete,placeholder,inner=false)=>{const input=<><label htmlFor={`customer-${key}`}>{label}</label><Input unstyled id={`customer-${key}`} value={customer[key]} maxLength={max} autoComplete={autocomplete} placeholder={placeholder} required disabled={busy} aria-describedby={key==='locality'?'customer-locality-hint':undefined} onChange={event=>{event.target.setCustomValidity('');setCustomer(c=>({...c,[key]:event.target.value}));reset();}}/></>;return inner?input:<div key={key}>{input}</div>;};
   return <>

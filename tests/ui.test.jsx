@@ -566,6 +566,38 @@ test('Revalidar bloquea Continuar hasta tener respuesta y el total cambia junto 
  assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'f'.repeat(64));
  cleanup();
 });
+// jsdom, sin base. El segundo requestSubmit ocurre antes de que React pinte disabled.
+test('Con el código aplicado, dos envíos sincrónicos hacen un solo checkout y un error deja reintentar',async()=>{
+ const user=await bigCheckout(1);
+ await user.click(screen.getByRole('button',{name:'¿Tenés un código de descuento?'}));
+ await user.type(screen.getByLabelText('Código de descuento'),'bv 7k2q 9mxd');
+ await user.click(screen.getByRole('button',{name:'Aplicar'}));
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ await user.type(screen.getByLabelText('Tu nombre'),'Prueba');
+ await user.selectOptions(screen.getByLabelText('Localidad'),'villa-allende');
+ await user.type(screen.getByLabelText('Provincia'),'Córdoba');
+ const previous=globalThis.fetch;
+ let release;let gate=new Promise(resolve=>{release=resolve;});
+ let checkouts=0;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/checkout'){checkouts++;orders.push(JSON.parse(options.body));await gate;return Response.json({error:'No pudimos preparar el pedido.',code:'UNAVAILABLE'},{status:503});}
+  return previous(url,options);
+ };
+ const form=document.querySelector('.checkout-form');
+ form.requestSubmit();form.requestSubmit();
+ assert.equal(checkouts,1);
+ release();
+ assert.equal((await screen.findByRole('alert')).textContent,'No pudimos preparar el pedido.');
+ checkouts=0;gate=new Promise(resolve=>{release=resolve;});
+ form.requestSubmit();
+ assert.equal(checkouts,1);
+ release();
+ await screen.findByRole('alert');
+ assert.equal(orders.length,2);
+ assert.equal(orders[0].code,'BV-7K2Q-9MXD');
+ assert.equal(orders[1].codeToken,orders[0].codeToken);
+ cleanup();
+});
 test('Popup: exit intent en compu, consentimiento obligatorio, código nunca en pantalla, no vuelve a aparecer',async()=>{
  setup();cleanup();
  const previous=dom.window.matchMedia;dom.window.matchMedia=()=>({matches:true,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});

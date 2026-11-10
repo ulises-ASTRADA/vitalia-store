@@ -1,3 +1,5 @@
+// Mock HTTP en este proceso. No abre Postgres ni PostgREST.
+// La base real, los roles y el HTTP de PostgREST están en tests/code-order-db.test.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
