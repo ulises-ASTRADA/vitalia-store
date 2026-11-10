@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appendOrder, generateOrderId, estimateShippingCost } from '../lib/orders.js';
+import { appendOrder, ensureOrderSheet, generateOrderId, estimateShippingCost, missingOrderRefs, sheetHasOrderRef } from '../lib/orders.js';
 
 test('generateOrderId: genera prefijo VIT- con fecha y caracteres únicos', () => {
   const id1 = generateOrderId();
@@ -205,6 +205,64 @@ test('appendOrder (webhook): no manda token en el cuerpo, redondea montos y sani
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.ORDERS_WEBHOOK_URL;
+  }
+});
+
+test('La referencia de la planilla no se confunde con otra y no duplica la fila', async () => {
+  const encoded = 'https://wa.me/5491100000000?text=' + encodeURIComponent('Pedido #V-0001\nTotal');
+  assert.deepEqual(missingOrderRefs(['V-0001', 'V-0002', 'V-0004'], [encoded, 'V-0002', 'Pedido #V-0003']), ['V-0004']);
+  assert.deepEqual(missingOrderRefs(['V-0001'], ['Pedido #V-00010']), ['V-0001']);
+  assert.deepEqual(missingOrderRefs(['V-00010'], ['Pedido #V-00010']), []);
+  const refs = new Set();
+  let writes = 0;
+  const hasRef = async ref => ({configured: true, present: refs.has(ref)});
+  const append = async () => { writes += 1; refs.add('V-0001'); return 'VIT'; };
+  await Promise.all([
+    ensureOrderSheet({ref: 'V-0001', firstWrite: false, hasRef, append}),
+    ensureOrderSheet({ref: 'V-0001', firstWrite: false, hasRef, append}),
+  ]);
+  assert.equal(writes, 1);
+  assert.equal(await ensureOrderSheet({ref: 'V-0001', firstWrite: false, hasRef, append}), null);
+  assert.equal(writes, 1);
+  let blind = 0;
+  const logs = [];
+  const original = console.error;
+  console.error = (...args) => logs.push(args.join(' '));
+  try {
+    assert.equal(await ensureOrderSheet({ref: 'V-0008', firstWrite: false, hasRef: async () => ({configured: false, present: false}), append: async () => { blind += 1; return 'VIT'; }}), null);
+    assert.equal(blind, 0);
+    assert.match(logs.join('\n'), /V-0008/);
+    assert.equal(await ensureOrderSheet({ref: 'V-0009', firstWrite: true, hasRef: async () => ({configured: false, present: false}), append: async () => { blind += 1; return 'VIT-NUEVO'; }}), 'VIT-NUEVO');
+    assert.equal(blind, 1);
+  } finally { console.error = original; }
+});
+
+test('Leer si el pedido ya está en la planilla no escribe', async () => {
+  const { generateKeyPairSync } = await import('node:crypto');
+  const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+  const keys = ['ORDERS_WEBHOOK_URL', 'GOOGLE_ORDERS_WEBHOOK_URL', 'GOOGLE_SERVICE_ACCOUNT_JSON', 'GOOGLE_SERVICE_ACCOUNT_EMAIL', 'GOOGLE_PRIVATE_KEY', 'GOOGLE_ORDERS_SHEET_ID'];
+  const prev = Object.fromEntries(keys.map(k => [k, process.env[k]]));
+  for (const k of keys) delete process.env[k];
+  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = 'dummy@test.invalid';
+  process.env.GOOGLE_PRIVATE_KEY = privateKey.export({ type: 'pkcs8', format: 'pem' });
+  process.env.GOOGLE_ORDERS_SHEET_ID = 'dummy-sheet';
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    const method = options.method || 'GET';
+    calls.push({ url: String(url), method });
+    if (String(url).startsWith('https://oauth2.googleapis.com/token')) return Response.json({ access_token: 'dummy-token', expires_in: 3600 });
+    if (String(url).includes('/values/')) return Response.json({ values: [['https://wa.me/549?text=' + encodeURIComponent('Pedido #V-0012')]] });
+    throw new Error(`unexpected ${method} ${url}`);
+  };
+  try {
+    assert.deepEqual(await sheetHasOrderRef('V-0012'), { configured: true, present: true });
+    assert.deepEqual(await sheetHasOrderRef('V-0099'), { configured: true, present: false });
+    assert.equal(calls.some(call => call.url.includes('/values/') && call.method === 'GET'), true);
+    assert.equal(calls.some(call => call.url.includes('sheets.googleapis.com') && call.method !== 'GET'), false);
+  } finally {
+    globalThis.fetch = originalFetch;
+    for (const k of keys) { if (prev[k] === undefined) delete process.env[k]; else process.env[k] = prev[k]; }
   }
 });
 

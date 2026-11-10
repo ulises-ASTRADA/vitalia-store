@@ -5,7 +5,7 @@ import {makeOrder} from '../lib/checkout.js';
 import {isToken,newToken,normalizeCode,sha256} from '../lib/welcome-code.js';
 import {growthStore} from './growth-store.js';
 import {randomInt} from 'node:crypto';
-import {appendOrder} from '../lib/orders.js';
+import {appendOrder, ensureOrderSheet, sheetHasOrderRef} from '../lib/orders.js';
 
 export function codedPayloadHash(draft, body) {
   const identity=value=>String(value??'').replace(/[\x00-\x1f\x7f]/g,' ').trim();
@@ -35,7 +35,7 @@ const safeLogMessage = (message) => String(message || '').replace(/([?&]key=)[^&
 const fallbackRef=()=>`V-X${Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[randomInt(32)]).join('')}`;
 
 export const POST=request=>handleCheckout(request);
-export async function handleCheckout(request,{store=growthStore(),loadCatalog=getCachedCatalog,recordOrder=appendOrder}={}) {
+export async function handleCheckout(request,{store=growthStore(),loadCatalog=getCachedCatalog,recordOrder=appendOrder,sheetHasRef=sheetHasOrderRef}={}) {
   try {
     if (!allowedOrigin(request)) throw new StoreError('Solicitud no permitida.',403);
     const limited=limitRequest(request,'checkout',30);if(limited)return limited;
@@ -91,12 +91,13 @@ export async function handleCheckout(request,{store=growthStore(),loadCatalog=ge
       return `${quantity}x ${product?.nombre||id}${pack}`;
     }).join('; ');
     let orderId=null;
+    const sheetRow={name:body.name,locality:order.locality,province:body.province,notes:body.notes,items:formattedItems,
+      total:order.productsTotal,whatsappUrl:order.whatsappUrl,status:'Pendiente',shippingCost:order.shippingCost,ref:orderRef};
     try {
       // locality y shippingCost salen de makeOrder (recalculados en el servidor), no del body.
       // total = productos con descuentos; appendOrder suma el envío en la columna total.
-      // Un reintento del mismo token no vuelve a escribir la fila: el pedido ya existe.
-      if(recordSheet)orderId=await recordOrder({name:body.name,locality:order.locality,province:body.province,notes:body.notes,items:formattedItems,
-        total:order.productsTotal,whatsappUrl:order.whatsappUrl,status:'Pendiente',shippingCost:order.shippingCost});
+      // El reintento del mismo token agrega la fila solo si esa referencia todavía no está en la planilla.
+      orderId=await ensureOrderSheet({ref:orderRef,firstWrite:recordSheet,hasRef:sheetHasRef,append:()=>recordOrder(sheetRow)});
     } catch(err) {
       console.error('[vitalia] Error registrando pedido en Sheets:', `${err?.name || 'Error'}: ${safeLogMessage(err?.message)}`);
     }

@@ -144,6 +144,13 @@ async function world(){
   return {fake,env,store:()=>growthStore(env)};
 }
 
+test('El servidor ya no reserva ni libera el código en una llamada aparte',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  for(const path of ['../server/growth-store.js','../server/checkout.js','../server/growth.js']){
+    const source=await readFile(new URL(path,import.meta.url),'utf8');
+    assert.doesNotMatch(source,/reserveCode|releaseCode|vitalia_release_unmatched_code/);
+  }
+});
 test('Validar un código vigente, vencido o usado no lo consume',withEnv({},async()=>{
   const {fake,env,store}=await world();
   try{
@@ -226,16 +233,24 @@ test('Respuesta perdida después de crear el pedido: el mismo token no abre otro
   const orderBody=checkoutBody({code:CODE,codeToken:token});
   try{
     await withEnv(env,async()=>{
-      const lostResponse=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
+      const refs=new Set(),sheets=[];
+      const sheetHasRef=async ref=>({configured:true,present:refs.has(ref)});
+      const recordOrder=async row=>{assert.equal(refs.has(row.ref),false);refs.add(row.ref);sheets.push(row.ref);return 'VIT';};
+      const lostResponse=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder,sheetHasRef});
       const lost=await lostResponse.json();
       assert.equal(lostResponse.status,503,JSON.stringify(lost));
       assert.equal(lost.codeToken,token);
       assert.equal(fake.db.orders.length,1);
+      assert.equal(sheets.length,0);
       assert.equal(fake.db.codes[0].reservation_hash,sha256(token));
-      const retry=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
+      const retry=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder,sheetHasRef});
       const done=await retry.json();
       assert.equal(retry.status,200,JSON.stringify(done));
       assert.equal(done.orderRef,fake.db.orders[0].ref);
+      assert.deepEqual(sheets,[done.orderRef]);
+      const third=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder,sheetHasRef});
+      assert.equal((await third.json()).orderRef,done.orderRef);
+      assert.deepEqual(sheets,[done.orderRef]);
       assert.equal(fake.db.orders.length,1);
       const other=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE})),{store:store(),loadCatalog});
       assert.equal(other.status,409);
@@ -256,11 +271,7 @@ test('Alta incierta: un 4xx o un 500 no libera una reserva ya tomada',withEnv({}
       assert.equal(fake.db.orders.length,0);
       assert.equal(fake.db.codes[0].reservation_hash,sha256('7'.repeat(64)));
       assert.equal(fake.db.writes.includes('release'),false);
-      fake.faults.prepare='ok';
-      fake.faults.release='reject';
-      await assert.rejects(()=>store().releaseCode(CODE,sha256('7'.repeat(64))));
       assert.equal(fake.db.codes[0].reservation_hash,sha256('7'.repeat(64)));
-      assert.equal(fake.db.writes.includes('release'),false);
     })();
   }finally{await fake.close();}
 }));
