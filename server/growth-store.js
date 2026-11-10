@@ -41,6 +41,21 @@ function memoryStore() {
     },
     async releaseCode(code,reservationHash){const row=db.codes.find(c=>c.codeHash===sha256(code)&&c.reservationHash===reservationHash);if(row&&!db.orders.some(order=>order.reservationHash===reservationHash)){row.redeemedAt=null;row.reservationHash=null;}},
     async orderRefForReservation(reservationHash){return db.orders.find(order=>order.reservationHash===reservationHash)?.ref||null;},
+    async prepareCodedOrder(order){
+      const row=db.codes.find(c=>c.codeHash===sha256(order.code));
+      const now=order.now??Date.now();
+      if(!row||row.expiresAt<=now)return {status:'invalid'};
+      if(row.redeemedAt&&row.reservationHash!==order.reservationHash)return {status:'used'};
+      const existing=db.orders.find(item=>item.reservationHash===order.reservationHash);
+      if(existing){
+        const same=existing.payloadHash===order.payloadHash&&JSON.stringify(existing.items)===JSON.stringify(order.items)&&existing.grossCents===order.totals.grossCents&&existing.totalCents===order.totals.totalCents&&existing.codeCents===order.totals.codeCents&&existing.freeShipping===order.totals.freeShipping;
+        return same?{status:'exists',ref:existing.ref}:{status:'mismatch',ref:existing.ref};
+      }
+      row.redeemedAt=now;row.reservationHash=order.reservationHash;
+      const ref=`V-${String(++db.seq).padStart(4,'0')}`;
+      db.orders.push({id:db.seq,ref,createdAt:now,grossCents:order.totals.grossCents,suggestionCents:order.totals.suggestionCents,bulkCents:order.totals.bulkCents,codeCents:order.totals.codeCents,totalCents:order.totals.totalCents,freeShipping:order.totals.freeShipping,usedCode:true,reservationHash:order.reservationHash,payloadHash:order.payloadHash,items:order.items});
+      return {status:'created',ref};
+    },
     async createOrder(order){
       if(order.reservationHash){const existing=db.orders.find(row=>row.reservationHash===order.reservationHash);if(existing)return {ref:existing.ref,created:false};}
       const ref=`V-${String(++db.seq).padStart(4,'0')}`;
@@ -109,14 +124,32 @@ function supabaseStore(env=process.env) {
       return status==='ok'?'unavailable':status;
     },
     async releaseCode(code,reservationHash){
-      try{if(await this.orderRefForReservation(reservationHash))return;}
-      catch(error){if(!(error?.status>=400&&error?.status<500))throw error;}
-      await rest(`vitalia_welcome_codes?code_hash=eq.${sha256(code)}&reservation_hash=eq.${reservationHash}`,{method:'PATCH',prefer:'return=minimal',body:{redeemed_at:null,reservation_hash:null}});
+      // Una sola función con FOR UPDATE. Si la llamada falla, no hay un PATCH de respaldo:
+      // un 4xx no demuestra que el pedido no exista.
+      await rest('rpc/vitalia_release_unmatched_code',{method:'POST',body:{p_code_hash:sha256(code),p_reservation_hash:reservationHash}});
     },
     async orderRefForReservation(reservationHash){
       if(!reservationHash)return null;
       const {rows}=await rest(`vitalia_orders?reservation_hash=eq.${reservationHash}&select=ref`);
       return rows[0]?.ref||null;
+    },
+    async prepareCodedOrder(order){
+      const result=await rest('rpc/vitalia_prepare_coded_order',{method:'POST',body:{
+        p_code_hash:sha256(order.code),
+        p_reservation_hash:order.reservationHash,
+        p_payload_hash:order.payloadHash,
+        p_subtotal_cents:order.totals.grossCents,
+        p_suggestion_cents:order.totals.suggestionCents,
+        p_bulk_cents:order.totals.bulkCents,
+        p_code_cents:order.totals.codeCents,
+        p_total_cents:order.totals.totalCents,
+        p_free_shipping:order.totals.freeShipping,
+        p_items:order.items,
+        p_at:new Date(order.now??Date.now()).toISOString(),
+      }});
+      const payload=Array.isArray(result.rows)?result.rows[0]:result.rows;
+      if(!payload?.status)throw new GrowthUnavailable('coded order missing status');
+      return {status:payload.status,ref:payload.ref};
     },
     async createOrder(order) {
       if(order.reservationHash){const existing=await this.orderRefForReservation(order.reservationHash);if(existing)return {ref:existing,created:false};}
@@ -153,7 +186,7 @@ function supabaseStore(env=process.env) {
 
 function unavailableStore() {
   const fail=async()=>{throw new GrowthUnavailable('growth store not configured');};
-  return {mode:'unavailable',signup:fail,removeSubscriber:fail,codeStatus:fail,reserveCode:fail,releaseCode:fail,orderRefForReservation:fail,createOrder:fail,saveCart:fail,markCartConverted:fail,unsubscribe:fail};
+  return {mode:'unavailable',signup:fail,removeSubscriber:fail,codeStatus:fail,reserveCode:fail,releaseCode:fail,orderRefForReservation:fail,prepareCodedOrder:fail,createOrder:fail,saveCart:fail,markCartConverted:fail,unsubscribe:fail};
 }
 
 export function growthStore(env=process.env) {

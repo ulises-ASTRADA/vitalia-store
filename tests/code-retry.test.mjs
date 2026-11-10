@@ -97,6 +97,35 @@ function startFakeSupabase(){
         send(200,[{ref}]);
         return;
       }
+      if(req.method==='POST'&&name==='rpc/vitalia_prepare_coded_order'){
+        const mode=take('prepare');
+        if(mode==='fail'||mode==='reject'){send(mode==='reject'?400:500,{code:mode==='reject'?'42703':'500',message:mode==='reject'?'column does not exist':'prepare failed'});return;}
+        const code=db.codes.find(row=>row.code_hash===body.p_code_hash);
+        if(!code||Date.parse(code.expires_at)<=Date.parse(body.p_at)){send(200,{status:'invalid'});return;}
+        if(code.redeemed_at&&code.reservation_hash!==body.p_reservation_hash){send(200,{status:'used'});return;}
+        const existing=db.orders.find(row=>row.reservation_hash===body.p_reservation_hash);
+        if(existing){
+          const same=existing.payload_hash===body.p_payload_hash&&JSON.stringify(existing.items)===JSON.stringify(body.p_items)&&existing.subtotal_cents===body.p_subtotal_cents&&existing.total_cents===body.p_total_cents&&existing.code_cents===body.p_code_cents&&existing.free_shipping===body.p_free_shipping;
+          send(200,same?{status:'exists',ref:existing.ref}:{status:'mismatch',ref:existing.ref});
+          return;
+        }
+        code.redeemed_at=body.p_at;code.reservation_hash=body.p_reservation_hash;
+        const ref=`V-${String(++db.seq).padStart(4,'0')}`;
+        db.orders.push({ref,reservation_hash:body.p_reservation_hash,payload_hash:body.p_payload_hash,items:body.p_items,subtotal_cents:body.p_subtotal_cents,suggestion_cents:body.p_suggestion_cents,bulk_cents:body.p_bulk_cents,code_cents:body.p_code_cents,total_cents:body.p_total_cents,free_shipping:body.p_free_shipping});
+        db.writes.push('prepare');
+        if(mode==='drop'){send(499);return;}
+        send(200,{status:'created',ref});
+        return;
+      }
+      if(req.method==='POST'&&name==='rpc/vitalia_release_unmatched_code'){
+        if(take('release')==='reject'){send(400,{code:'42703',message:'column does not exist'});return;}
+        const order=db.orders.find(row=>row.reservation_hash===body.p_reservation_hash);
+        const code=db.codes.find(row=>row.code_hash===body.p_code_hash&&row.reservation_hash===body.p_reservation_hash);
+        if(!code||order){send(200,{status:code?'kept':'missing'});return;}
+        code.redeemed_at=null;code.reservation_hash=null;db.writes.push('release');
+        send(200,{status:'released'});
+        return;
+      }
       send(404,{message:'not found'});
     });
   });
@@ -137,123 +166,99 @@ test('Validar un código vigente, vencido o usado no lo consume',withEnv({},asyn
   }finally{await fake.close();}
 }));
 
-test('Reserva escrita y respuesta vacía: no dice usado y deja un solo pedido',withEnv({},async()=>{
+test('Mismo token y mismo pedido: una referencia, el mismo mensaje y una sola fila de planilla',withEnv({},async()=>{
   const {fake,env,store}=await world();
-  fake.faults.reserve='empty-once';
   seed(fake.db);
+  const token='1'.repeat(64);
   const sheets=[];
+  const orderBody=checkoutBody({code:CODE,codeToken:token});
   try{
     await withEnv(env,async()=>{
-      const response=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:'1'.repeat(64)})),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push(1);return 'VIT';}});
-      const body=await response.json();
-      assert.equal(response.status,200,JSON.stringify(body));
+      const firstResponse=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push('sheet');return 'VIT';}});
+      const first=await firstResponse.json();
+      assert.equal(firstResponse.status,200,JSON.stringify(first));
+      const againResponse=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push('sheet');return 'VIT';}});
+      const again=await againResponse.json();
+      assert.equal(againResponse.status,200,JSON.stringify(again));
+      assert.equal(again.orderRef,first.orderRef);
+      assert.equal(again.message,first.message);
+      assert.equal(again.whatsappUrl,first.whatsappUrl);
       assert.equal(fake.db.orders.length,1);
-      assert.equal(fake.db.orders[0].reservation_hash,sha256('1'.repeat(64)));
-      assert.equal(fake.db.codes[0].reservation_hash,sha256('1'.repeat(64)));
       assert.equal(sheets.length,1);
-      const other=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE})),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push(1);return 'VIT';}});
-      assert.equal(other.status,409);
-      assert.equal(fake.db.orders.length,1);
+      assert.equal(fake.db.codes[0].reservation_hash,sha256(token));
     })();
   }finally{await fake.close();}
 }));
 
-test('Reserva escrita y respuesta perdida: el 503 devuelve el token y el reintento no duplica el pedido',withEnv({},async()=>{
+test('Mismo token y otro contenido: no reinterpreta la referencia ni escribe otra planilla',withEnv({},async()=>{
   const {fake,env,store}=await world();
-  fake.faults.reserve='drop-once';
-  seed(fake.db);
-  try{
-    await withEnv(env,async()=>{
-      const first=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
-      const lost=await first.json();
-      assert.equal(first.status,503,JSON.stringify(lost));
-      assert.equal(lost.code,'UNAVAILABLE');
-      assert.match(lost.codeToken,/^[0-9a-f]{64}$/);
-      assert.equal(fake.db.orders.length,0);
-      assert.equal(fake.db.codes[0].reservation_hash,sha256(lost.codeToken));
-      const retry=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:lost.codeToken})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
-      const done=await retry.json();
-      assert.equal(retry.status,200,JSON.stringify(done));
-      assert.equal(fake.db.orders.length,1);
-      assert.equal(done.orderRef,fake.db.orders[0].ref);
-      const stranger=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE})),{store:store(),loadCatalog});
-      assert.equal(stranger.status,409);
-      assert.equal(fake.db.orders.length,1);
-    })();
-  }finally{await fake.close();}
-}));
-
-test('Si crear el pedido y liberar la reserva fallan, el mismo token completa un solo pedido',withEnv({},async()=>{
-  const {fake,env,store}=await world();
-  fake.faults.order='fail-once';
-  fake.faults.release='fail-once';
   seed(fake.db);
   const token='2'.repeat(64);
-  try{
-    await withEnv(env,async()=>{
-      const first=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:token})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
-      const body=await first.json();
-      assert.equal(first.status,503,JSON.stringify(body));
-      assert.equal(body.codeToken,token);
-      assert.equal(fake.db.orders.length,0);
-      assert.equal(fake.db.codes[0].reservation_hash,sha256(token));
-      const retry=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:token,items:[{id:'A',quantity:4,expectedPrice:100000}]})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
-      const done=await retry.json();
-      assert.equal(retry.status,200,JSON.stringify(done));
-      assert.equal(fake.db.orders.length,1);
-      assert.equal(done.codeDiscount,40000);
-      assert.equal(done.subtotal,400000);
-      const other=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE})),{store:store(),loadCatalog});
-      assert.equal(other.status,409);
-      assert.equal((await other.json()).code,'CODE_USED');
-      assert.equal(fake.db.orders.length,1);
-    })();
-  }finally{await fake.close();}
-}));
-
-test('Pedido ya escrito y respuesta perdida: no se libera el código ni se crea otro pedido',withEnv({},async()=>{
-  const {fake,env,store}=await world();
-  fake.faults.order='drop-once';
-  seed(fake.db);
-  const token='3'.repeat(64);
   const sheets=[];
   try{
     await withEnv(env,async()=>{
-      const first=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:token})),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push('sheet');return 'VIT';}});
-      const lost=await first.json();
-      assert.equal(first.status,200,JSON.stringify(lost));
-      assert.equal(lost.orderRef,'V-0001');
-      assert.equal(fake.db.codes[0].reservation_hash,sha256(token));
-      assert.equal(sheets.length,0);
-      const retry=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:token,items:[{id:'A',quantity:4,expectedPrice:100000}]})),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push('sheet');return 'VIT';}});
-      const again=await retry.json();
-      assert.equal(retry.status,200,JSON.stringify(again));
-      assert.equal(again.orderRef,'V-0001');
+      const firstResponse=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:token,name:'Ana',zone:'villa-allende'})),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push('sheet');return 'VIT';}});
+      const first=await firstResponse.json();
+      assert.equal(firstResponse.status,200,JSON.stringify(first));
+      const changed=checkoutBody({code:CODE,codeToken:token,name:'Otra persona',zone:'unquillo',items:[{id:'A',quantity:4,expectedPrice:100000}],email:'otra@example.com'});
+      const retry=await handleCheckout(post('/api/checkout',changed),{store:store(),loadCatalog,recordOrder:async()=>{sheets.push('sheet');return 'VIT';}});
+      const body=await retry.json();
+      assert.equal(retry.status,409,JSON.stringify(body));
+      assert.equal(body.code,'ORDER_MISMATCH');
+      assert.equal(body.orderRef,first.orderRef);
+      assert.equal(body.whatsappUrl,undefined);
+      assert.equal(body.message,undefined);
       assert.equal(fake.db.orders.length,1);
-      assert.equal(sheets.length,0);
-      const status=await codePOST(post('/api/cart/code',{code:CODE,codeToken:token}),{store:store()});
-      const reported=await status.json();
-      assert.equal(status.status,409);
-      assert.equal(reported.orderRef,'V-0001');
-      assert.equal(fake.db.codes[0].redeemed_at!==null,true);
+      assert.equal(fake.db.orders[0].items[0].quantity,2);
+      assert.equal(sheets.length,1);
+      assert.equal(fake.db.codes[0].reservation_hash,sha256(token));
     })();
   }finally{await fake.close();}
 }));
 
-test('Si la base rechaza el pedido, la reserva no queda tomada',withEnv({},async()=>{
+test('Respuesta perdida después de crear el pedido: el mismo token no abre otro uso',withEnv({},async()=>{
   const {fake,env,store}=await world();
-  fake.faults.lookup='reject';
+  fake.faults.prepare='drop-once';
   seed(fake.db);
-  const token='7'.repeat(64);
+  const token='3'.repeat(64);
+  const orderBody=checkoutBody({code:CODE,codeToken:token});
   try{
     await withEnv(env,async()=>{
-      const response=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:token})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
+      const lostResponse=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
+      const lost=await lostResponse.json();
+      assert.equal(lostResponse.status,503,JSON.stringify(lost));
+      assert.equal(lost.codeToken,token);
+      assert.equal(fake.db.orders.length,1);
+      assert.equal(fake.db.codes[0].reservation_hash,sha256(token));
+      const retry=await handleCheckout(post('/api/checkout',orderBody),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
+      const done=await retry.json();
+      assert.equal(retry.status,200,JSON.stringify(done));
+      assert.equal(done.orderRef,fake.db.orders[0].ref);
+      assert.equal(fake.db.orders.length,1);
+      const other=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE})),{store:store(),loadCatalog});
+      assert.equal(other.status,409);
+      assert.equal(fake.db.orders.length,1);
+    })();
+  }finally{await fake.close();}
+}));
+
+test('Alta incierta: un 4xx o un 500 no libera una reserva ya tomada',withEnv({},async()=>{
+  const {fake,env,store}=await world();
+  seed(fake.db,{redeemedAt:new Date().toISOString(),reservationHash:sha256('7'.repeat(64))});
+  fake.faults.prepare='reject';
+  try{
+    await withEnv(env,async()=>{
+      const response=await handleCheckout(post('/api/checkout',checkoutBody({code:CODE,codeToken:'7'.repeat(64)})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'});
       const body=await response.json();
       assert.equal(response.status,503,JSON.stringify(body));
-      assert.equal(body.codeToken,token);
       assert.equal(fake.db.orders.length,0);
-      assert.equal(fake.db.codes[0].redeemed_at,null);
-      assert.equal(fake.db.codes[0].reservation_hash,null);
+      assert.equal(fake.db.codes[0].reservation_hash,sha256('7'.repeat(64)));
+      assert.equal(fake.db.writes.includes('release'),false);
+      fake.faults.prepare='ok';
+      fake.faults.release='reject';
+      await assert.rejects(()=>store().releaseCode(CODE,sha256('7'.repeat(64))));
+      assert.equal(fake.db.codes[0].reservation_hash,sha256('7'.repeat(64)));
+      assert.equal(fake.db.writes.includes('release'),false);
     })();
   }finally{await fake.close();}
 }));
@@ -271,7 +276,7 @@ test('Dos pedidos a la vez con el mismo código: uno solo, también si repiten t
       const parallel=await Promise.all([1,2].map(()=>handleCheckout(post('/api/checkout',checkoutBody({code:'BV-2345-6789',codeToken:shared})),{store:store(),loadCatalog,recordOrder:async()=>'VIT'})));
       const bodies=await Promise.all(parallel.map(response=>response.json()));
       const refs=bodies.filter((_,i)=>parallel[i].status===200).map(body=>body.orderRef);
-      assert.equal(new Set(refs).size,1,JSON.stringify(bodies));
+      assert.equal(new Set(refs).size,1,JSON.stringify(bodies.map(body=>body.orderRef||body.code)));
       assert.equal(fake.db.orders.filter(row=>row.reservation_hash===sha256(shared)).length,1);
       assert.equal(fake.db.codes.find(row=>row.code_hash===sha256('BV-2345-6789')).reservation_hash,sha256(shared));
     })();
