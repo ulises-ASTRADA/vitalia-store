@@ -39,8 +39,14 @@ function memoryStore() {
       if(row.redeemedAt&&row.reservationHash!==reservationHash)return 'used';
       row.redeemedAt=now;row.reservationHash=reservationHash;return 'ok';
     },
-    async releaseCode(code,reservationHash){const row=db.codes.find(c=>c.codeHash===sha256(code)&&c.reservationHash===reservationHash);if(row){row.redeemedAt=null;row.reservationHash=null;}},
-    async createOrder(order){db.orders.push({id:++db.seq,createdAt:Date.now(),grossCents:order.grossCents,suggestionCents:order.suggestionCents,bulkCents:order.bulkCents,codeCents:order.codeCents,totalCents:order.totalCents,freeShipping:order.freeShipping,usedCode:Boolean(order.code),items:order.items});return `V-${String(db.seq).padStart(4,'0')}`;},
+    async releaseCode(code,reservationHash){const row=db.codes.find(c=>c.codeHash===sha256(code)&&c.reservationHash===reservationHash);if(row&&!db.orders.some(order=>order.reservationHash===reservationHash)){row.redeemedAt=null;row.reservationHash=null;}},
+    async orderRefForReservation(reservationHash){return db.orders.find(order=>order.reservationHash===reservationHash)?.ref||null;},
+    async createOrder(order){
+      if(order.reservationHash){const existing=db.orders.find(row=>row.reservationHash===order.reservationHash);if(existing)return {ref:existing.ref,created:false};}
+      const ref=`V-${String(++db.seq).padStart(4,'0')}`;
+      db.orders.push({id:db.seq,ref,createdAt:Date.now(),grossCents:order.grossCents,suggestionCents:order.suggestionCents,bulkCents:order.bulkCents,codeCents:order.codeCents,totalCents:order.totalCents,freeShipping:order.freeShipping,usedCode:Boolean(order.code),reservationHash:order.reservationHash||null,items:order.items});
+      return {ref,created:true};
+    },
     async saveCart(cartToken,items,now=Date.now()) {
       const s=db.subscribers.find(x=>x.cartTokenHash===sha256(cartToken)&&!x.unsubscribedAt);
       for(const [id,cart] of db.carts)if(cart.updatedAt<now-90*DAY)db.carts.delete(id); // igual que vitalia_purge_abandoned_carts()
@@ -67,7 +73,7 @@ function supabaseStore(env=process.env) {
       response=await fetch(`${base}/${path}`,{method,cache:'no-store',signal:AbortSignal.timeout(8000),headers:{apikey:key,...(key.startsWith('eyJ')?{Authorization:`Bearer ${key}`}:{}),'Content-Type':'application/json',...(prefer?{Prefer:prefer}:{})},body:body===undefined?undefined:JSON.stringify(body)});
     }catch{throw new GrowthUnavailable('supabase unreachable');}
     if(response.status===409)return {conflict:true};
-    if(!response.ok){console.error('supabase request failed',method,path.split('?')[0],response.status);throw new GrowthUnavailable('supabase error');}
+    if(!response.ok){console.error('supabase request failed',method,path.split('?')[0],response.status);const error=new GrowthUnavailable('supabase error');error.status=response.status;throw error;}
     const text=await response.text();
     return {rows:text?JSON.parse(text):[]};
   }
@@ -91,15 +97,38 @@ function supabaseStore(env=process.env) {
     async reserveCode(code,reservationHash,now=Date.now()) {
       // PATCH condicional: Postgres serializa la fila, así que solo una reserva gana.
       const filter=`code_hash=eq.${sha256(code)}&expires_at=gt.${enc(new Date(now).toISOString())}&or=${enc(`(redeemed_at.is.null,reservation_hash.eq.${reservationHash})`)}`;
-      const {rows}=await rest(`vitalia_welcome_codes?${filter}&select=id`,{method:'PATCH',prefer:'return=representation',body:{redeemed_at:new Date(now).toISOString(),reservation_hash:reservationHash}});
-      if(rows.length===1)return 'ok';
-      const status=statusOf(await codeRow(code),reservationHash,now);
-      return status==='ok'?'used':status;
+      // select incluye las columnas del or: en PostgREST < 14.4, PATCH con or y select=id
+      // responde 400 (column does not exist) y no reserva. La validación por GET no usa or.
+      const {rows}=await rest(`vitalia_welcome_codes?${filter}&select=id,redeemed_at,reservation_hash`,{method:'PATCH',prefer:'return=representation',body:{redeemed_at:new Date(now).toISOString(),reservation_hash:reservationHash}});
+      if(rows?.length===1)return 'ok';
+      const row=await codeRow(code);
+      // La reserva quedó escrita aunque la respuesta del PATCH haya venido vacía.
+      if(row?.reservation_hash===reservationHash&&Date.parse(row.expires_at)>now)return 'ok';
+      const status=statusOf(row,reservationHash,now);
+      // El cupón sigue libre: la reserva no quedó tomada. No decir "usado".
+      return status==='ok'?'unavailable':status;
     },
-    async releaseCode(code,reservationHash){await rest(`vitalia_welcome_codes?code_hash=eq.${sha256(code)}&reservation_hash=eq.${reservationHash}`,{method:'PATCH',prefer:'return=minimal',body:{redeemed_at:null,reservation_hash:null}});},
+    async releaseCode(code,reservationHash){
+      try{if(await this.orderRefForReservation(reservationHash))return;}
+      catch(error){if(!(error?.status>=400&&error?.status<500))throw error;}
+      await rest(`vitalia_welcome_codes?code_hash=eq.${sha256(code)}&reservation_hash=eq.${reservationHash}`,{method:'PATCH',prefer:'return=minimal',body:{redeemed_at:null,reservation_hash:null}});
+    },
+    async orderRefForReservation(reservationHash){
+      if(!reservationHash)return null;
+      const {rows}=await rest(`vitalia_orders?reservation_hash=eq.${reservationHash}&select=ref`);
+      return rows[0]?.ref||null;
+    },
     async createOrder(order) {
-      const {rows}=await rest('vitalia_orders?select=ref',{method:'POST',prefer:'return=representation',body:{subtotal_cents:order.grossCents,suggestion_cents:order.suggestionCents,bulk_cents:order.bulkCents,code_cents:order.codeCents,total_cents:order.totalCents,free_shipping:order.freeShipping,used_code:Boolean(order.code),items:order.items}});
-      return rows[0].ref;
+      if(order.reservationHash){const existing=await this.orderRefForReservation(order.reservationHash);if(existing)return {ref:existing,created:false};}
+      const inserted=await rest('vitalia_orders?select=ref',{method:'POST',prefer:'return=representation',body:{subtotal_cents:order.grossCents,suggestion_cents:order.suggestionCents,bulk_cents:order.bulkCents,code_cents:order.codeCents,total_cents:order.totalCents,free_shipping:order.freeShipping,used_code:Boolean(order.code),items:order.items,...(order.reservationHash?{reservation_hash:order.reservationHash}:{})}});
+      if(inserted.conflict){
+        const existing=order.reservationHash&&await this.orderRefForReservation(order.reservationHash);
+        if(existing)return {ref:existing,created:false};
+        throw new GrowthUnavailable('order conflict');
+      }
+      const ref=inserted.rows?.[0]?.ref;
+      if(!ref)throw new GrowthUnavailable('order missing ref');
+      return {ref,created:true};
     },
     async saveCart(cartToken,items,now=Date.now()) {
       const {rows}=await rest(`vitalia_subscribers?cart_token_hash=eq.${sha256(cartToken)}&unsubscribed_at=is.null&select=id`);
@@ -124,7 +153,7 @@ function supabaseStore(env=process.env) {
 
 function unavailableStore() {
   const fail=async()=>{throw new GrowthUnavailable('growth store not configured');};
-  return {mode:'unavailable',signup:fail,removeSubscriber:fail,codeStatus:fail,reserveCode:fail,releaseCode:fail,createOrder:fail,saveCart:fail,markCartConverted:fail,unsubscribe:fail};
+  return {mode:'unavailable',signup:fail,removeSubscriber:fail,codeStatus:fail,reserveCode:fail,releaseCode:fail,orderRefForReservation:fail,createOrder:fail,saveCart:fail,markCartConverted:fail,unsubscribe:fail};
 }
 
 export function growthStore(env=process.env) {

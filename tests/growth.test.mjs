@@ -98,8 +98,12 @@ test('Código de un solo uso: el segundo pedido con el mismo código se rechaza'
   assert.equal(first.subtotal,400000);assert.equal(first.total,320000);assert.equal(first.freeShipping,true);
   assert.match(first.orderRef,/^V-\d{4}$/);assert.match(first.message,new RegExp(`Pedido #${first.orderRef}`));assert.match(first.message,new RegExp(code));
   assert.match(first.codeToken,/^[0-9a-f]{64}$/);
-  // El mismo carrito (mismo token) puede volver a preparar el pedido; otro no.
-  assert.equal((await handleCheckout(post('/api/checkout',checkoutBody({code,codeToken:first.codeToken})),{store,loadCatalog})).status,200);
+  // El mismo token recupera ese pedido: no abre otro uso del código. Otro token no.
+  const again=await handleCheckout(post('/api/checkout',checkoutBody({code,codeToken:first.codeToken})),{store,loadCatalog});
+  const againBody=await again.json();
+  assert.equal(again.status,200,JSON.stringify(againBody));
+  assert.equal(againBody.orderRef,first.orderRef);
+  assert.equal(store._db.orders.length,1);
   response=await handleCheckout(post('/api/checkout',checkoutBody({code})),{store,loadCatalog});
   assert.equal(response.status,409);assert.equal((await response.json()).code,'CODE_USED');
   response=await codePOST(post('/api/cart/code',{code}),{store});

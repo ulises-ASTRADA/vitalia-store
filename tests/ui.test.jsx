@@ -449,6 +449,8 @@ test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y vi
  await user.clear(input);await user.type(input,'bv 7k2q 9mxd');await user.click(screen.getByRole('button',{name:'Aplicar'}));
  await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
  assert.equal(codeChecks.at(-1).code,'BV-7K2Q-9MXD');
+ const held=JSON.parse(localStorage.getItem('vt_cart_code'));
+ assert.equal(held.code,'BV-7K2Q-9MXD');assert.match(held.token,/^[0-9a-f]{64}$/);
  assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));assert(screen.getByText('Ahorrás $ 80.000,00'));
  await user.type(screen.getByLabelText('Tu nombre'),'Prueba');await user.selectOptions(screen.getByLabelText('Localidad'),'otra');await user.type(screen.getByLabelText('¿En qué localidad?'),'Córdoba');await user.type(screen.getByLabelText('Provincia'),'Córdoba');
  await user.click(screen.getByRole('button',{name:'Continuar por WhatsApp'}));
@@ -460,8 +462,61 @@ test('Código: se valida en el servidor, suma 10% plano (20% con el umbral) y vi
  // Cambiar el carrito vuelve al resumen editable.
  await user.click(screen.getByRole('button',{name:'Sumar una presentación de Almendras'}));
  assert(await screen.findByRole('button',{name:'Continuar por WhatsApp'}));
+ assert(screen.getByText('Código aplicado: 10% sobre el subtotal de productos.'));
+ assert(screen.getByText('$ 400.000,00',{selector:'.total-row strong'}));
  await user.click(screen.getByRole('button',{name:'Quitar el código BV-7K2Q-9MXD'}));
  assert(screen.getByText('$ 450.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Al reabrir el checkout el código guardado se revalida antes de mostrar el descuento',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){codeChecks.push(JSON.parse(options.body));return Response.json({error:'Este código ya se usó.',code:'CODE_USED'},{status:409});}
+  return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'bv-7k2q-9mxd',token:'c'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ const alert=await screen.findByRole('alert');
+ assert.equal(alert.textContent,'Este código ya se usó.');
+ assert.equal(codeChecks.at(-1).code,'BV-7K2Q-9MXD');
+ assert.equal(codeChecks.at(-1).codeToken,'c'.repeat(64));
+ assert.equal(localStorage.getItem('vt_cart_code'),null);
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ cleanup();
+});
+test('Al reabrir, un código vigente mantiene el 10% y se recalcula si cambia el carrito',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ const previous=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){codeChecks.push(JSON.parse(options.body));return Response.json({ok:true,code:'BV-7K2Q-9MXD',rate:10});}
+  return previous(url,options);
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'BV-7K2Q-9MXD',token:'d'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(codeChecks.at(-1).codeToken,'d'.repeat(64));
+ assert(await screen.findByText('$ 320.000,00',{selector:'.total-row strong'}));
+ const user=userEvent.setup({document:dom.window.document});
+ await user.click(screen.getByRole('button',{name:'Sumar una presentación de Almendras'}));
+ assert(screen.getByText('Código aplicado: 10% sobre el subtotal de productos.'));
+ assert(screen.getByText('$ 400.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Si la revalidación no llega, no se muestra el descuento y el código guardado sigue',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code')return Response.json({error:'No pudimos validar el código. Probá de nuevo en un rato.',code:'UNAVAILABLE'},{status:503});
+  return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'BV-7K2Q-9MXD',token:'e'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ assert.equal((await screen.findByRole('alert')).textContent,'No pudimos validar el código. Probá de nuevo en un rato.');
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'e'.repeat(64));
  cleanup();
 });
 test('Popup: exit intent en compu, consentimiento obligatorio, código nunca en pantalla, no vuelve a aparecer',async()=>{

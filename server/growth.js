@@ -50,6 +50,10 @@ export async function codePOST(request,{store=growthStore(),now=Date.now()}={}) 
     const status=await store.codeStatus(code,reservation,now);
     if(status==='used')return json({error:'Este código ya se usó.',code:'CODE_USED'},409);
     if(status!=='ok')return json({error:'Código inválido o vencido.',code:'INVALID_CODE'},404);
+    if(reservation){
+      const orderRef=await store.orderRefForReservation(reservation);
+      if(orderRef)return json({error:'Este código ya se usó.',code:'CODE_USED',orderRef},409);
+    }
     return json({ok:true,code,rate:10});
   }catch{return json({error:'No pudimos validar el código. Probá de nuevo en un rato.',code:'UNAVAILABLE'},503);}
 }

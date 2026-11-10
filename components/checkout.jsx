@@ -20,6 +20,8 @@ function CartPhoto({product}){
   return <Image src={src} alt={product.nombre} width={80} height={80} sizes="80px" loading="lazy" unoptimized={!src.startsWith('/images/')} onError={()=>setBroken(true)}/>;
 }
 const readStore=key=>{try{return localStorage.getItem(key);}catch{return null;}};
+const isCodeToken=value=>typeof value==='string'&&/^[0-9a-f]{64}$/.test(value);
+function newClientToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return [...bytes].map(byte=>byte.toString(16).padStart(2,'0')).join('');}
 // Envío: "Elegí tu localidad" (sin elegir), "$3.000,00", "Gratis" o "A coordinar por WhatsApp".
 function SumLines({money,subtotal,suggestion,bulk,code,shipping}){
   return <dl className="sum-lines">
@@ -44,13 +46,32 @@ export default function Checkout({initialCatalog}){
   const [error,setError]=useState(''),[busy,setBusy]=useState(false);
   const [applied,setApplied]=useState(null),[codeOpen,setCodeOpen]=useState(false),[codeInput,setCodeInput]=useState(''),[codeError,setCodeError]=useState(''),[codeBusy,setCodeBusy]=useState(false);
   const [ready,setReady]=useState(null);
-  const readyTitle=useRef(null),codeField=useRef(null),lastReservation=useRef(null);
-  useEffect(()=>{try{const saved=JSON.parse(readStore(CART_CODE_KEY)||'null');if(saved&&normalizeCode(saved.code))setApplied({code:normalizeCode(saved.code),token:typeof saved.token==='string'?saved.token:undefined});}catch{}},[]);
+  const readyTitle=useRef(null),codeField=useRef(null),lastReservation=useRef(null),appliedRef=useRef(null);
+  useEffect(()=>{
+    let saved=null;try{saved=JSON.parse(readStore(CART_CODE_KEY)||'null');}catch{return;}
+    const code=saved&&normalizeCode(saved.code);if(!code)return;
+    const token=isCodeToken(saved.token)?saved.token:undefined;
+    let cancel=false;setCodeBusy(true);
+    (async()=>{
+      try{
+        const response=await fetch('/api/cart/code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,...(token?{codeToken:token}:{})})});
+        const result=await response.json().catch(()=>({}));
+        if(cancel||appliedRef.current)return;
+        if(!response.ok){
+          if(result.code==='UNAVAILABLE'||response.status===503||response.status===429){setCodeOpen(true);setCodeError(result.error||'No pudimos validar el código. Probá de nuevo en un rato.');return;}
+          saveCode(null);setCodeOpen(true);setCodeError(result.orderRef?`${result.error} Pedido #${result.orderRef}.`:result.error||'Código inválido o vencido.');return;
+        }
+        saveCode({code:result.code||code,token:token||newClientToken()});
+      }catch{if(!cancel&&!appliedRef.current){setCodeOpen(true);setCodeError('No pudimos validar el código. Probá de nuevo en un rato.');}}
+      finally{if(!cancel)setCodeBusy(false);}
+    })();
+    return()=>{cancel=true;};
+  },[]);
   useEffect(()=>{setReady(null);},[items]);
   useEffect(()=>{if(ready)readyTitle.current?.focus();},[ready]);
   useEffect(()=>{if(codeOpen&&!applied)codeField.current?.focus();},[codeOpen,applied]);
   const preview=useMemo(()=>computeTotals({grossCents,suggestionCents,hasCode:Boolean(applied),zone:customer.zone}),[grossCents,suggestionCents,applied,customer.zone]);
-  function saveCode(next){setApplied(next);try{if(next)localStorage.setItem(CART_CODE_KEY,JSON.stringify(next));else localStorage.removeItem(CART_CODE_KEY);}catch{}}
+  function saveCode(next){appliedRef.current=next;setApplied(next);try{if(next)localStorage.setItem(CART_CODE_KEY,JSON.stringify(next));else localStorage.removeItem(CART_CODE_KEY);}catch{}}
   async function applyCode(){
     if(codeBusy)return;
     // Vacío o solo espacios: no se envía (el botón está deshabilitado y Enter no hace nada).
@@ -62,8 +83,9 @@ export default function Checkout({initialCatalog}){
     try{
       const response=await fetch('/api/cart/code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,...(lastReservation.current?.code===code?{codeToken:lastReservation.current.token}:{})})});
       const result=await response.json().catch(()=>({}));
-      if(!response.ok){setCodeError(result.error||'Código inválido o vencido.');return;}
-      saveCode({code:result.code,...(lastReservation.current?.code===result.code?{token:lastReservation.current.token}:{})});setCodeInput('');setReady(null);
+      if(!response.ok){setCodeError(result.orderRef?`${result.error} Pedido #${result.orderRef}.`:result.error||'Código inválido o vencido.');return;}
+      const token=lastReservation.current?.code===result.code&&isCodeToken(lastReservation.current.token)?lastReservation.current.token:newClientToken();
+      saveCode({code:result.code,token});setCodeInput('');setReady(null);
     }catch{setCodeError('No pudimos validar el código. Probá de nuevo en un rato.');}finally{setCodeBusy(false);}
   }
   function removeCode(){if(applied?.token)lastReservation.current=applied;saveCode(null);setReady(null);setCodeOpen(true);}
@@ -88,7 +110,8 @@ export default function Checkout({initialCatalog}){
       const result=await response.json();
       if(!response.ok){
         if(result.code==='CATALOG_CHANGED')await refreshCatalog();
-        if(result.code==='CODE_USED'||result.code==='INVALID_CODE'){saveCode(null);setCodeOpen(true);setCodeError(result.error);}
+        if(isCodeToken(result.codeToken)&&applied)saveCode({code:applied.code,token:result.codeToken});
+        if(result.code==='CODE_USED'||result.code==='INVALID_CODE'){saveCode(null);setCodeOpen(true);setCodeError(result.orderRef?`${result.error} Pedido #${result.orderRef}.`:result.error);}
         throw Error(result.error||'No pudimos preparar el pedido.');
       }
       if(applied&&result.codeToken)saveCode({code:applied.code,token:result.codeToken});
