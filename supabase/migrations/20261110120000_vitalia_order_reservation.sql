@@ -1,10 +1,11 @@
 -- Un pedido preparado por código guarda solo el hash de la reserva (no el código ni el mail).
 -- Así un reintento del mismo intento reconoce el pedido ya creado y no abre otro uso.
 -- NO APLICAR en producción sin la revisión de Sentinel. Aplicar esta migración ANTES de publicar
--- la versión de la app que escribe reservation_hash: si la columna no existe, el checkout con código
--- falla cerrado (503) y no libera la reserva.
--- No libera reservas viejas. Los pedidos anteriores no tienen este hash, así que no se puede saber
--- si una reserva ya tomada tiene un pedido real. No reactivar códigos en bloque.
+-- la versión de la app que escribe reservation_hash.
+-- Si la columna no existe, el alta del pedido responde 4xx antes de insertar una fila: el checkout
+-- falla cerrado (503) y suelta la reserva de ese intento, porque no quedó un pedido. No suelta otras
+-- reservas ni un código que ya tenga pedido. Los pedidos anteriores no tienen este hash, así que no se
+-- puede saber si una reserva vieja tiene un pedido real. No reactivar códigos en bloque.
 -- Consulta de diagnóstico, solo lectura, para revisar a mano (no borra ni actualiza nada):
 -- select c.id, c.redeemed_at is not null as reservado, c.expires_at < now() as vencido
 --   from public.vitalia_welcome_codes c

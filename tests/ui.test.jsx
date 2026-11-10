@@ -505,10 +505,15 @@ test('Al reabrir, un código vigente mantiene el 10% y se recalcula si cambia el
  assert(screen.getByText('$ 400.000,00',{selector:'.total-row strong'}));
  cleanup();
 });
-test('Si la revalidación no llega, no se muestra el descuento y el código guardado sigue',async()=>{
+test('Si la revalidación no llega, el código sigue visible y Reintentar usa el mismo token',async()=>{
  setup();cleanup();serverProducts=bigCatalog.products;
+ let calls=0;
  globalThis.fetch=async(url,options)=>{
-  if(url==='/api/cart/code')return Response.json({error:'No pudimos validar el código. Probá de nuevo en un rato.',code:'UNAVAILABLE'},{status:503});
+  if(url==='/api/cart/code'){
+   codeChecks.push(JSON.parse(options.body));calls++;
+   if(calls===1)return Response.json({error:'No pudimos validar el código. Probá de nuevo en un rato.',code:'UNAVAILABLE'},{status:503});
+   return Response.json({ok:true,code:'BV-7K2Q-9MXD',rate:10});
+  }
   return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
  };
  localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
@@ -516,7 +521,49 @@ test('Si la revalidación no llega, no se muestra el descuento y el código guar
  render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
  assert.equal((await screen.findByRole('alert')).textContent,'No pudimos validar el código. Probá de nuevo en un rato.');
  assert.equal(screen.queryByText(/Código aplicado/),null);
+ assert.equal(screen.queryByText('Código de bienvenida (10%)'),null);
+ assert.equal(screen.getByLabelText('Código de descuento').value,'BV-7K2Q-9MXD');
  assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'e'.repeat(64));
+ const user=userEvent.setup({document:dom.window.document});
+ await user.click(screen.getByRole('button',{name:'Reintentar'}));
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(codeChecks.length,2);
+ assert.equal(codeChecks[0].codeToken,'e'.repeat(64));
+ assert.equal(codeChecks[1].codeToken,'e'.repeat(64));
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'e'.repeat(64));
+ assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));
+ cleanup();
+});
+test('Revalidar bloquea Continuar hasta tener respuesta y el total cambia junto con el 10%',async()=>{
+ setup();cleanup();serverProducts=bigCatalog.products;
+ let release;const pending=new Promise(resolve=>{release=resolve;});
+ globalThis.fetch=async(url,options)=>{
+  if(url==='/api/cart/code'){codeChecks.push(JSON.parse(options.body));await pending;return Response.json({ok:true,code:'BV-7K2Q-9MXD',rate:10});}
+  if(url==='/api/checkout'){orders.push(JSON.parse(options.body));return Response.json({error:'no debería pedirse'},{status:500});}
+  return Response.json({products:bigCatalog.products,settings:bigCatalog.settings});
+ };
+ localStorage.setItem('vitalia-cart-v1',JSON.stringify({N001:4}));
+ localStorage.setItem('vt_cart_code',JSON.stringify({code:'BV-7K2Q-9MXD',token:'f'.repeat(64)}));
+ render(<Provider><Checkout initialCatalog={bigCatalog}/></Provider>);
+ await screen.findByRole('status',{name:'Verificando tu descuento…'});
+ await screen.findByText('Productos elegidos');
+ assert.equal(screen.queryByText(/Código aplicado/),null);
+ assert.equal(screen.queryByText('Código de bienvenida (10%)'),null);
+ assert(screen.getByText('$ 360.000,00',{selector:'.total-row strong'}));
+ const go=screen.getByRole('button',{name:'Continuar por WhatsApp'});
+ assert.equal(go.disabled,true);
+ document.querySelector('.checkout-form').dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
+ document.querySelector('.checkout-form').dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
+ assert.equal(orders.length,0);
+ assert.equal(codeChecks[0].codeToken,'f'.repeat(64));
+ release();
+ await screen.findByText('Código aplicado: 10% sobre el subtotal de productos.');
+ assert.equal(screen.queryByRole('status',{name:'Verificando tu descuento…'}),null);
+ assert(screen.getByText('Código de bienvenida (10%)'));
+ assert(screen.getByText('$ 320.000,00',{selector:'.total-row strong'}));
+ assert.equal(screen.getByRole('button',{name:'Continuar por WhatsApp'}).disabled,false);
+ assert.equal(orders.length,0);
+ assert.equal(JSON.parse(localStorage.getItem('vt_cart_code')).token,'f'.repeat(64));
  cleanup();
 });
 test('Popup: exit intent en compu, consentimiento obligatorio, código nunca en pantalla, no vuelve a aparecer',async()=>{
