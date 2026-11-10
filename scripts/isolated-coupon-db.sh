@@ -19,7 +19,7 @@ bin="${POSTGREST_BIN:-/tmp/postgrest/postgrest}"
 if [[ ! -x "${bin}" ]]; then
   mkdir -p /tmp/postgrest
   archive="$(mktemp)"
-  curl -fsSL -o "${archive}" https://github.com/PostgREST/postgrest/releases/download/v12.2.12/postgrest-v12.2.12-linux-static-x64.tar.xz
+  curl -fsSL -o "${archive}" https://github.com/PostgREST/postgrest/releases/download/v12.2.12/postgrest-v12.2.12-linux-static-x86-64.tar.xz
   tar -C /tmp/postgrest -xJf "${archive}"
   rm -f "${archive}"
   bin=/tmp/postgrest/postgrest
@@ -27,3 +27,4 @@ fi
 "${bin}" --version
 export POSTGREST_BIN="${bin}"
 node --test tests/code-order-db.test.mjs
+node scripts/reconcile-order-sheet.mjs

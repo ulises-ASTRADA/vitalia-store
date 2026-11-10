@@ -114,7 +114,11 @@ function orderBody(code,token,extra={}){
   return {name:'Ana Prueba',zone:'villa-allende',locality:'',province:'Córdoba',notes:'sintetica',email:'ana@example.com',code,codeToken:token,items:[{id:'A1',quantity:2,expectedPrice:15000}],...extra};
 }
 async function checkout(store,body,sheets){
-  const response=await handleCheckout(new Request(`http://127.0.0.1:${proxyPort}/api/checkout`,{method:'POST',headers:{'content-type':'application/json',origin:`http://127.0.0.1:${proxyPort}`},body:JSON.stringify(body)}),{store,loadCatalog:async()=>({products}),recordOrder:async row=>{sheets.push(row);return 'PLANILLA-LOCAL';}});
+  const response=await handleCheckout(new Request(`http://127.0.0.1:${proxyPort}/api/checkout`,{method:'POST',headers:{'content-type':'application/json',origin:`http://127.0.0.1:${proxyPort}`},body:JSON.stringify(body)}),{
+    store,loadCatalog:async()=>({products}),
+    sheetHasRef:async ref=>({configured:true,present:sheets.some(row=>row.ref===ref)}),
+    recordOrder:async row=>{if(sheets.some(item=>item.ref===row.ref))throw new Error('fila duplicada');sheets.push(row);return 'PLANILLA-LOCAL';},
+  });
   return {status:response.status,body:await response.json()};
 }
 
@@ -416,14 +420,14 @@ test('PostgREST local: permisos, pedido real y esquema sin la migración',{skip:
   assert.equal(await runSql(`select (redeemed_at is not null)::text from public.vitalia_welcome_codes where code_hash='${sha256(lostCode)}'`),'true');
   const recovered=await checkout(store,orderBody(lostCode,lostToken),lostSheets);
   assert.equal(recovered.status,200);
-  // La base ya commiteó antes de perder la respuesta. El reintento reconoce el pedido y no escribe otra fila:
-  // no hay forma de saber si una planilla anterior llegó, así que no se rellena en este camino.
-  assert.equal(lostSheets.length,0);
+  // La base ya commiteó. El reintento ve que la referencia no está en la planilla y escribe una sola fila.
+  assert.equal(lostSheets.length,1);
+  assert.equal(lostSheets[0].ref,recovered.body.orderRef);
   const recoveredAgain=await checkout(store,orderBody(lostCode,lostToken),lostSheets);
   assert.equal(recoveredAgain.body.orderRef,recovered.body.orderRef);
   assert.equal(recoveredAgain.body.message,recovered.body.message);
   assert.match(recovered.body.message,/Ana Prueba/);
-  assert.equal(lostSheets.length,0);
+  assert.equal(lostSheets.length,1);
   assert.equal(await runSql(`select count(*)::text from public.vitalia_orders where reservation_hash='${sha256(lostToken)}'`),'1');
 
   const bareFree='BV-7K2Q-9MXH';
@@ -471,4 +475,17 @@ test('PostgREST local: permisos, pedido real y esquema sin la migración',{skip:
     await runSql(await readFile(new URL('../supabase/migrations/20261110120000_vitalia_order_reservation.sql',import.meta.url),'utf8')).catch(()=>{});
     await notifySchema();
   }
+});
+
+test('Migración pendiente: elimina vitalia_release_unmatched_code y deja prepare',{skip:ready?false:'sin Postgres local vitalia_code_test'},async()=>{
+  const before=await runSql('select count(*)::text from public.vitalia_orders');
+  await runSql(await readFile(new URL('../supabase/migrations/20261110223000_drop_vitalia_release_unmatched_code.sql',import.meta.url),'utf8'));
+  assert.equal(await runSql("select (to_regprocedure('public.vitalia_release_unmatched_code(text,text)') is null)::text"),'true');
+  assert.equal(await runSql('select count(*)::text from public.vitalia_orders'),before);
+  assert.equal(await runSql("select count(*)::text from pg_proc where proname='vitalia_prepare_coded_order'"),'1');
+  assert.match(await runSql("select prosecdef::text || '|' || coalesce(array_to_string(proconfig,','),'') from pg_proc where proname='vitalia_prepare_coded_order'"),/false\|search_path=""/);
+  if(!postgrest)return;
+  await notifySchema();
+  const gone=await fetch(`http://127.0.0.1:${postgrestPort}/rpc/vitalia_release_unmatched_code`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${jwt('service_role',jwtSecret)}`},body:JSON.stringify({p_code_hash:'c'.repeat(64),p_reservation_hash:'d'.repeat(64)})});
+  assert.equal(gone.status,404);
 });

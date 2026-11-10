@@ -32,14 +32,6 @@ function memoryStore() {
       if(row.redeemedAt&&row.reservationHash!==reservationHash)return 'used';
       return 'ok';
     },
-    async reserveCode(code,reservationHash,now=Date.now()) {
-      // Una sola operación síncrona: dos pedidos simultáneos no pueden reservar el mismo código.
-      const row=db.codes.find(c=>c.codeHash===sha256(code));
-      if(!row||row.expiresAt<=now)return 'invalid';
-      if(row.redeemedAt&&row.reservationHash!==reservationHash)return 'used';
-      row.redeemedAt=now;row.reservationHash=reservationHash;return 'ok';
-    },
-    async releaseCode(code,reservationHash){const row=db.codes.find(c=>c.codeHash===sha256(code)&&c.reservationHash===reservationHash);if(row&&!db.orders.some(order=>order.reservationHash===reservationHash)){row.redeemedAt=null;row.reservationHash=null;}},
     async orderRefForReservation(reservationHash){return db.orders.find(order=>order.reservationHash===reservationHash)?.ref||null;},
     async prepareCodedOrder(order){
       const row=db.codes.find(c=>c.codeHash===sha256(order.code));
@@ -92,7 +84,6 @@ function supabaseStore(env=process.env) {
     const text=await response.text();
     return {rows:text?JSON.parse(text):[]};
   }
-  const enc=encodeURIComponent;
   async function codeRow(code){const {rows}=await rest(`vitalia_welcome_codes?code_hash=eq.${sha256(code)}&select=expires_at,redeemed_at,reservation_hash`);return rows[0];}
   const statusOf=(row,reservationHash,now)=>!row||Date.parse(row.expires_at)<=now?'invalid':row.redeemed_at&&row.reservation_hash!==reservationHash?'used':'ok';
   return {
@@ -109,25 +100,6 @@ function supabaseStore(env=process.env) {
     },
     async removeSubscriber(id){await rest(`vitalia_subscribers?id=eq.${Number(id)}`,{method:'DELETE',prefer:'return=minimal'});},
     async codeStatus(code,reservationHash,now=Date.now()){return statusOf(await codeRow(code),reservationHash,now);},
-    async reserveCode(code,reservationHash,now=Date.now()) {
-      // PATCH condicional: Postgres serializa la fila, así que solo una reserva gana.
-      const filter=`code_hash=eq.${sha256(code)}&expires_at=gt.${enc(new Date(now).toISOString())}&or=${enc(`(redeemed_at.is.null,reservation_hash.eq.${reservationHash})`)}`;
-      // select incluye las columnas del or: en PostgREST < 14.4, PATCH con or y select=id
-      // responde 400 (column does not exist) y no reserva. La validación por GET no usa or.
-      const {rows}=await rest(`vitalia_welcome_codes?${filter}&select=id,redeemed_at,reservation_hash`,{method:'PATCH',prefer:'return=representation',body:{redeemed_at:new Date(now).toISOString(),reservation_hash:reservationHash}});
-      if(rows?.length===1)return 'ok';
-      const row=await codeRow(code);
-      // La reserva quedó escrita aunque la respuesta del PATCH haya venido vacía.
-      if(row?.reservation_hash===reservationHash&&Date.parse(row.expires_at)>now)return 'ok';
-      const status=statusOf(row,reservationHash,now);
-      // El cupón sigue libre: la reserva no quedó tomada. No decir "usado".
-      return status==='ok'?'unavailable':status;
-    },
-    async releaseCode(code,reservationHash){
-      // Una sola función con FOR UPDATE. Si la llamada falla, no hay un PATCH de respaldo:
-      // un 4xx no demuestra que el pedido no exista.
-      await rest('rpc/vitalia_release_unmatched_code',{method:'POST',body:{p_code_hash:sha256(code),p_reservation_hash:reservationHash}});
-    },
     async orderRefForReservation(reservationHash){
       if(!reservationHash)return null;
       const {rows}=await rest(`vitalia_orders?reservation_hash=eq.${reservationHash}&select=ref`);
@@ -186,7 +158,7 @@ function supabaseStore(env=process.env) {
 
 function unavailableStore() {
   const fail=async()=>{throw new GrowthUnavailable('growth store not configured');};
-  return {mode:'unavailable',signup:fail,removeSubscriber:fail,codeStatus:fail,reserveCode:fail,releaseCode:fail,orderRefForReservation:fail,prepareCodedOrder:fail,createOrder:fail,saveCart:fail,markCartConverted:fail,unsubscribe:fail};
+  return {mode:'unavailable',signup:fail,removeSubscriber:fail,codeStatus:fail,orderRefForReservation:fail,prepareCodedOrder:fail,createOrder:fail,saveCart:fail,markCartConverted:fail,unsubscribe:fail};
 }
 
 export function growthStore(env=process.env) {
